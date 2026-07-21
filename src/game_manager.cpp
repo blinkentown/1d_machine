@@ -2,12 +2,8 @@
 
 #include "config.h"
 #include "games/colour_shooter.h"
-#include "games/meteor_dodge.h"
-#include "games/memory_sequence.h"
 #include "games/pong_1d.h"
-#include "games/reaction_race.h"
 #include "games/snake_1d.h"
-#include "games/twang.h"
 #include "input_manager.h"
 #include "led_manager.h"
 #include "power_mode_manager.h"
@@ -35,12 +31,8 @@ enum class State : uint8_t {
 
 GameId selectedGame = GameId::ColourShooter;
 State state = State::Selecting;
-TwangGame twang;
 ColourShooterGame colourShooter;
-MeteorDodgeGame meteorDodge;
-MemorySequenceGame memorySequence;
 Pong1DGame pong;
-ReactionRaceGame reactionRace;
 Snake1DGame snake;
 PowerStressTest powerStressTest;
 uint32_t lastRenderAt = 0;
@@ -118,32 +110,25 @@ void changeSelection(int8_t direction) {
   printSelection();
 }
 
+bool selectedGameIsImplemented() {
+  return selectedGame == GameId::ColourShooter ||
+         selectedGame == GameId::Pong1D || selectedGame == GameId::Snake1D;
+}
+
 void startSelectedGame(uint32_t now) {
+  if (!selectedGameIsImplemented()) {
+    Serial.print(gameName(selectedGame));
+    Serial.println(F(" is not implemented yet"));
+    return;
+  }
+
   state = State::Running;
-  switch (selectedGame) {
-    case GameId::Twang:
-      twang.start(now);
-      break;
-    case GameId::ColourShooter:
-      colourShooter.start(now);
-      break;
-    case GameId::Pong1D:
-      pong.start(now);
-      break;
-    case GameId::ReactionRace:
-      reactionRace.start(now);
-      break;
-    case GameId::Snake1D:
-      snake.start(now);
-      break;
-    case GameId::MeteorDodge:
-      meteorDodge.start(now);
-      break;
-    case GameId::MemorySequence:
-      memorySequence.start(now);
-      break;
-    default:
-      break;
+  if (selectedGame == GameId::ColourShooter) {
+    colourShooter.start(now);
+  } else if (selectedGame == GameId::Pong1D) {
+    pong.start(now);
+  } else {
+    snake.start(now);
   }
 }
 
@@ -268,31 +253,12 @@ void render(uint32_t now) {
   } else if (state == State::PowerStress) {
     powerStressTest.render();
   } else {
-    switch (selectedGame) {
-      case GameId::Twang:
-        twang.render(now);
-        break;
-      case GameId::ColourShooter:
-        colourShooter.render(now);
-        break;
-      case GameId::Pong1D:
-        pong.render(now);
-        break;
-      case GameId::ReactionRace:
-        reactionRace.render(now);
-        break;
-      case GameId::Snake1D:
-        snake.render(now);
-        break;
-      case GameId::MeteorDodge:
-        meteorDodge.render(now);
-        break;
-      case GameId::MemorySequence:
-        memorySequence.render(now);
-        break;
-      default:
-        LedManager::clearStrip();
-        break;
+    if (selectedGame == GameId::ColourShooter) {
+      colourShooter.render(now);
+    } else if (selectedGame == GameId::Pong1D) {
+      pong.render(now);
+    } else {
+      snake.render(now);
     }
     LedManager::setModePixel(gameColor(selectedGame));
   }
@@ -375,30 +341,12 @@ void update(uint32_t now) {
       }
       returnToSelector();
     } else {
-      switch (selectedGame) {
-        case GameId::Twang:
-          twang.update(now);
-          break;
-        case GameId::ColourShooter:
-          colourShooter.update(now);
-          break;
-        case GameId::Pong1D:
-          pong.update(now);
-          break;
-        case GameId::ReactionRace:
-          reactionRace.update(now);
-          break;
-        case GameId::Snake1D:
-          snake.update(now);
-          break;
-        case GameId::MeteorDodge:
-          meteorDodge.update(now);
-          break;
-        case GameId::MemorySequence:
-          memorySequence.update(now);
-          break;
-        default:
-          break;
+      if (selectedGame == GameId::ColourShooter) {
+        colourShooter.update(now);
+      } else if (selectedGame == GameId::Pong1D) {
+        pong.update(now);
+      } else {
+        snake.update(now);
       }
     }
   }

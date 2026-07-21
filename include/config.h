@@ -83,62 +83,6 @@ static_assert((PONG_HIT_ZONE_LENGTH * GAME_PIXEL_WIDTH) %
                   0,
               "Pong hit zone must divide into equal quality bands");
 
-constexpr uint8_t TWANG_STARTING_LIVES = 3;
-constexpr uint8_t TWANG_START_CELL = 1;
-constexpr uint8_t TWANG_ATTACK_RANGE_CELLS = 3;
-constexpr uint8_t TWANG_DASH_CELLS = 2;
-constexpr uint16_t TWANG_DASH_COOLDOWN_MS = 600;
-constexpr uint16_t TWANG_EFFECT_MS = 300;
-constexpr uint16_t TWANG_LEVEL_CLEAR_MS = 900;
-constexpr uint32_t TWANG_PLAYER_COLOR = 0xFFFFFFUL;
-constexpr uint32_t TWANG_ATTACK_COLOR = 0x0080FFUL;
-constexpr uint32_t TWANG_ENEMY_COLOR = 0xFF0000UL;
-constexpr uint32_t TWANG_LAVA_COLOR = 0xFF4000UL;
-constexpr uint32_t TWANG_EXIT_COLOR = 0x00FF00UL;
-constexpr uint32_t TWANG_LIFE_COLOR = 0x004000UL;
-
-constexpr uint8_t REACTION_ROUNDS_TO_WIN = 3;
-constexpr uint16_t REACTION_WAIT_MIN_MS = 1500;
-constexpr uint16_t REACTION_WAIT_MAX_MS = 4000;
-constexpr uint16_t REACTION_ROUND_RESULT_MS = 1000;
-constexpr uint32_t REACTION_PLAYER_1_COLOR = 0xFF0000UL;
-constexpr uint32_t REACTION_PLAYER_2_COLOR = 0x0000FFUL;
-constexpr uint32_t REACTION_WAIT_COLOR = 0xFF8000UL;
-constexpr uint32_t REACTION_GO_COLOR = 0x00FF00UL;
-constexpr uint32_t REACTION_FALSE_START_COLOR = 0xFFFF00UL;
-
-constexpr uint8_t METEOR_STARTING_LIVES = 3;
-constexpr uint8_t METEOR_STARTING_SHIELDS = 3;
-constexpr uint8_t METEOR_DASH_CELLS = 3;
-constexpr uint8_t METEOR_BLAST_RADIUS_CELLS = 2;
-constexpr uint16_t METEOR_DASH_COOLDOWN_MS = 700;
-constexpr uint16_t METEOR_INITIAL_WARNING_MS = 1200;
-constexpr uint16_t METEOR_MINIMUM_WARNING_MS = 450;
-constexpr uint8_t METEOR_WARNING_SPEEDUP_MS = 35;
-constexpr uint8_t METEOR_MAX_SPEED_STEPS =
-    (METEOR_INITIAL_WARNING_MS - METEOR_MINIMUM_WARNING_MS) /
-    METEOR_WARNING_SPEEDUP_MS;
-constexpr uint16_t METEOR_IMPACT_MS = 360;
-constexpr uint32_t METEOR_PLAYER_COLOR = 0xFFFFFFUL;
-constexpr uint32_t METEOR_WARNING_COLOR = 0xFF8000UL;
-constexpr uint32_t METEOR_BLAST_COLOR = 0xFF0000UL;
-constexpr uint32_t METEOR_SHIELD_COLOR = 0x00FFFFUL;
-constexpr uint32_t METEOR_LIFE_COLOR = 0x004000UL;
-static_assert(METEOR_INITIAL_WARNING_MS -
-                      METEOR_MAX_SPEED_STEPS * METEOR_WARNING_SPEEDUP_MS >=
-                  METEOR_MINIMUM_WARNING_MS,
-              "Meteor warning speed must respect its minimum");
-
-constexpr uint8_t MEMORY_START_LENGTH = 1;
-constexpr uint8_t MEMORY_MAX_LENGTH = 32;
-constexpr uint16_t MEMORY_SHOW_ON_MS = 400;
-constexpr uint16_t MEMORY_SHOW_GAP_MS = 180;
-constexpr uint16_t MEMORY_INPUT_FEEDBACK_MS = 180;
-constexpr uint16_t MEMORY_INPUT_TIMEOUT_MS = 3500;
-constexpr uint16_t MEMORY_SUCCESS_MS = 700;
-constexpr uint32_t MEMORY_SUCCESS_COLOR = 0x00FF00UL;
-constexpr uint32_t MEMORY_ERROR_COLOR = 0xFF0000UL;
-
 constexpr uint8_t COLOUR_SHOOTER_STARTING_LIVES = 3;
 constexpr uint8_t COLOUR_SHOOTER_TARGET_COUNT = 8;
 constexpr uint8_t COLOUR_SHOOTER_MAX_SHOTS = 4;

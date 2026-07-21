@@ -43,19 +43,6 @@ void setStripPixel(uint16_t index, uint32_t color) {
   }
 }
 
-void setStripRange(uint16_t start, uint16_t count, uint32_t color) {
-  const uint16_t end =
-      start + count > Config::LED_COUNT ? Config::LED_COUNT : start + count;
-  for (uint16_t index = start; index < end; ++index) {
-    stripLeds[index] = CRGB(color);
-  }
-}
-
-void setGameCell(uint8_t cell, uint32_t color) {
-  setStripRange(static_cast<uint16_t>(cell) * Config::GAME_PIXEL_WIDTH,
-                Config::GAME_PIXEL_WIDTH, color);
-}
-
 void setModePixel(uint32_t color) { modePixel[0] = CRGB(color); }
 
 void show() { FastLED.show(); }
