@@ -24,6 +24,6 @@ constexpr uint32_t BUTTON_3_COLOR = 0x0000FFUL;
 constexpr uint32_t BUTTON_4_COLOR = 0xFFFFFFUL;
 constexpr uint32_t SETUP_BUTTON_COLOR = 0xFFFF00UL;
 constexpr uint32_t ENCODER_CLICK_COLOR = 0x8000FFUL;
-constexpr uint32_t IDLE_PIXEL_COLOR = 0x2040FFUL;
+constexpr uint32_t IDLE_PIXEL_COLOR = 0x000000UL;
 
 }  // namespace Config

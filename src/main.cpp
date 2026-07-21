@@ -158,11 +158,7 @@ void updateEncoder() {
 }
 
 bool selectedButtonColor(CRGB& color) {
-  if (encoderClick.isPressed()) {
-    color = CRGB(Config::ENCODER_CLICK_COLOR);
-  } else if (setupButton.isPressed()) {
-    color = CRGB(Config::SETUP_BUTTON_COLOR);
-  } else if (button4.isPressed()) {
+  if (button4.isPressed()) {
     color = CRGB(Config::BUTTON_4_COLOR);
   } else if (button3.isPressed()) {
     color = CRGB(Config::BUTTON_3_COLOR);
