@@ -53,9 +53,31 @@ For non-color games, the additional labels are red `P1-A/Left`, green
 ## Build and upload
 
 ```powershell
+# Build only
 platformio run -e sparkfun_promicro16
-platformio run -e sparkfun_promicro16 -t upload
+
+# Build and upload
+powershell -ExecutionPolicy Bypass -File .\tools\upload_promicro.ps1
 ```
+
+The Windows upload helper discovers ports from the Pro Micro USB VID/PID. It
+does not assume fixed application or bootloader COM numbers. It builds the
+firmware, identifies the connected application interface, and then waits for
+one quick `RST`-to-`GND` contact. After Windows exposes the bootloader on
+whichever COM port it assigns, the helper waits 350 ms for that interface to
+stabilize before starting AVR109 programming and verification.
+
+If more than one compatible Pro Micro is connected, the helper refuses to
+guess. Select the intended application interface explicitly:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\upload_promicro.ps1 `
+    -ApplicationPort COM7
+```
+
+The COM number above is only an example. Check the detected ports on every
+upload. Use exactly one reset contact after the watcher is armed; an additional
+reset can interrupt the bootloader while it is programming.
 
 The serial monitor runs at 115200 baud.
 
