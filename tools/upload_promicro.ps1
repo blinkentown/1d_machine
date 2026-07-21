@@ -58,7 +58,7 @@ if (-not (Test-Path -LiteralPath $firmware)) {
     throw "Firmware image not found: $firmware"
 }
 
-$initialPorts = Get-ProMicroPorts
+$initialPorts = @(Get-ProMicroPorts)
 if ($initialPorts.Count -eq 0) {
     throw "No SparkFun/Arduino ATmega32U4 serial interface was detected."
 }
@@ -96,7 +96,7 @@ $applicationDisappeared = $false
 $bootloader = $null
 
 while ((Get-Date) -lt $deadline -and -not $bootloader) {
-    $currentPorts = Get-ProMicroPorts
+    $currentPorts = @(Get-ProMicroPorts)
     $currentKeys = @($currentPorts | ForEach-Object { Get-PortKey $_ })
 
     if ($applicationKey -notin $currentKeys) {
@@ -129,7 +129,7 @@ if (-not $bootloader) {
 Write-Host "Bootloader interface: $($bootloader.DeviceID)"
 Start-Sleep -Milliseconds $PortStabilizationMs
 
-$stableBootloader = Get-ProMicroPorts |
+$stableBootloader = @(Get-ProMicroPorts) |
     Where-Object { $_.DeviceID -eq $bootloader.DeviceID } |
     Select-Object -First 1
 if (-not $stableBootloader) {
