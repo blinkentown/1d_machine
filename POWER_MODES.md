@@ -18,6 +18,15 @@ To enter PSU mode, hold both the Blue and Yellow game buttons while powering
 on. Keep both held for two seconds. Releasing either button early cancels the
 arming sequence and leaves the firmware in bench mode.
 
+The power mode can also be changed without restarting:
+
+1. Return to the game selector.
+2. Hold the Blue and Yellow game buttons together for two seconds.
+3. Green confirms PSU mode; blue confirms bench mode.
+
+The runtime chord is ignored during a game. Entering PSU mode does not bypass
+the power preflight.
+
 - FastLED limit: 3000 mA.
 - Global brightness: 85/255. FastLED scales dense frames to the configured
   current ceiling while allowing sparse game effects to use the extra
@@ -26,7 +35,7 @@ arming sequence and leaves the firmware in bench mode.
 - Verify the actual current during that stage; the FastLED limit is an
   estimate, not a current sensor.
 - The strip is cleared automatically after the measurement stage.
-- PSU mode remains latched until reset or power-off.
+- The selected mode remains active until changed or reset.
 - Every normal restart returns to bench mode.
 
 Build and upload the single firmware at the desk:
@@ -49,6 +58,9 @@ One safe arrangement for serial monitoring is:
 
 Alternatively, power the Pro Micro and strip from the regulated external 5 V
 supply with USB completely disconnected.
+
+Simultaneous external power and USB data requires proper isolation between the
+USB and PSU positive rails. Their grounds must remain common.
 
 Before a PSU test, verify polarity, common ground, fusing, and that the strip
 receives power injection at the planned points. The software limit and preview

@@ -39,7 +39,7 @@ void applyPsuMode() {
   LedManager::clearStrip();
   LedManager::setModePixel(Config::POWER_TEST_READY_COLOR);
   LedManager::show();
-  Serial.println(F("Power mode: PSU (latched until reset)"));
+  Serial.println(F("Power mode: PSU"));
 }
 
 }  // namespace
@@ -81,6 +81,15 @@ void update(uint32_t now) {
   if (static_cast<uint32_t>(now - armStartedAt) >=
       Config::PSU_MODE_BOOT_HOLD_MS) {
     startupState = StartupState::WaitingForRelease;
+    applyPsuMode();
+  }
+}
+
+void toggleMode() {
+  startupState = StartupState::Ready;
+  if (psuMode) {
+    applyBenchMode();
+  } else {
     applyPsuMode();
   }
 }

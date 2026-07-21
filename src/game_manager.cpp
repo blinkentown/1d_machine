@@ -5,6 +5,7 @@
 #include "games/pong_1d.h"
 #include "input_manager.h"
 #include "led_manager.h"
+#include "power_mode_manager.h"
 #include "power_test.h"
 
 namespace GameManager {
@@ -35,6 +36,11 @@ PowerTest powerTest;
 uint32_t lastRenderAt = 0;
 uint32_t modeButtonPressedAt = 0;
 bool modeButtonLongHandled = false;
+uint32_t powerChordStartedAt = 0;
+uint32_t powerNoticeStartedAt = 0;
+bool powerChordTracking = false;
+bool powerChordHandled = false;
+bool powerNoticeActive = false;
 
 const __FlashStringHelper* gameName(GameId game) {
   switch (game) {
@@ -127,10 +133,60 @@ void returnToSelector() {
   printSelection();
 }
 
+bool powerModeChordHeld() {
+  return InputManager::isHeld(InputManager::Button::Game3) &&
+         InputManager::isHeld(InputManager::Button::Game4);
+}
+
+void updatePowerModeChord(uint32_t now) {
+  if (state != State::Selecting || !powerModeChordHeld()) {
+    powerChordTracking = false;
+    powerChordHandled = false;
+    return;
+  }
+
+  if (!powerChordTracking) {
+    powerChordTracking = true;
+    powerChordStartedAt = now;
+    Serial.println(F("Hold Blue + Yellow to toggle power mode"));
+    return;
+  }
+
+  if (!powerChordHandled &&
+      static_cast<uint32_t>(now - powerChordStartedAt) >=
+          Config::POWER_MODE_TOGGLE_HOLD_MS) {
+    powerChordHandled = true;
+    PowerModeManager::toggleMode();
+    powerNoticeStartedAt = now;
+    powerNoticeActive = true;
+  }
+}
+
 void render(uint32_t now) {
   if (state == State::Selecting) {
     LedManager::clearStrip();
-    LedManager::setModePixel(gameColor(selectedGame));
+    if (powerNoticeActive) {
+      const uint32_t noticeColor =
+          PowerModeManager::isPsuMode() ? Config::POWER_TEST_READY_COLOR
+                                        : Config::BENCH_MODE_READY_COLOR;
+      LedManager::setModePixel(noticeColor);
+      for (uint8_t index = 0; index < 12; ++index) {
+        LedManager::setStripPixel(index, noticeColor);
+      }
+    } else if (powerChordTracking && !powerChordHandled) {
+      LedManager::setModePixel(Config::PSU_MODE_ARMING_COLOR);
+      uint8_t progress = static_cast<uint8_t>(
+          (static_cast<uint32_t>(now - powerChordStartedAt) * 12U) /
+          Config::POWER_MODE_TOGGLE_HOLD_MS);
+      if (progress > 12) {
+        progress = 12;
+      }
+      for (uint8_t index = 0; index < progress; ++index) {
+        LedManager::setStripPixel(index, Config::PSU_MODE_ARMING_COLOR);
+      }
+    } else {
+      LedManager::setModePixel(gameColor(selectedGame));
+    }
   } else if (state == State::PowerCheck) {
     powerTest.render();
   } else {
@@ -151,6 +207,7 @@ void begin(uint32_t now) {
   lastRenderAt = now - Config::RENDER_INTERVAL_MS;
   Serial.println(F("Mode button: short press selects, long press confirms"));
   Serial.println(F("Mode/setup button exits a running game"));
+  Serial.println(F("At selector: hold Blue + Yellow to toggle power mode"));
   printSelection();
 }
 
@@ -160,6 +217,13 @@ void update(uint32_t now) {
       InputManager::wasPressed(InputManager::Button::ModeSelect);
   const bool modeReleased =
       InputManager::wasReleased(InputManager::Button::ModeSelect);
+
+  if (powerNoticeActive &&
+      static_cast<uint32_t>(now - powerNoticeStartedAt) >=
+          Config::POWER_MODE_NOTICE_MS) {
+    powerNoticeActive = false;
+  }
+  updatePowerModeChord(now);
 
   if (modePressed) {
     modeButtonPressedAt = now;
