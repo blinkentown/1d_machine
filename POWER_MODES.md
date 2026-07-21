@@ -31,7 +31,7 @@ the power preflight.
 - Global brightness: 85/255. FastLED scales dense frames to the configured
   current ceiling while allowing sparse game effects to use the extra
   brightness.
-- The power preflight adds a timed 10-second stage with all 288 pixels white.
+- The power preflight adds a timed 2-second stage with all 288 pixels white.
 - Verify the actual current during that stage; the FastLED limit is an
   estimate, not a current sensor.
 - Measured full-white current with the 3000 mA software setting and 85/255

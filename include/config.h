@@ -12,6 +12,18 @@ constexpr uint8_t GAME_SEGMENT_WIDTH_MULTIPLIER = 4;
 constexpr uint8_t GAME_PIXEL_WIDTH =
     TAPE_PIXEL_WIDTH * GAME_SEGMENT_WIDTH_MULTIPLIER;
 constexpr uint8_t EXPLOSION_INTENSITY = GAME_PIXEL_WIDTH;
+constexpr uint8_t GAMEPLAY_SPEED_PERCENT = 100;
+constexpr uint8_t SNAKE_SPEED_PERCENT = 80;
+
+constexpr uint16_t gameplayInterval(uint16_t intervalMs,
+                                    uint8_t gameSpeedPercent = 100) {
+  return static_cast<uint16_t>(
+      (static_cast<uint32_t>(intervalMs) * 10000UL) /
+      (static_cast<uint16_t>(GAMEPLAY_SPEED_PERCENT) * gameSpeedPercent));
+}
+
+static_assert(GAMEPLAY_SPEED_PERCENT > 0, "Gameplay speed must be non-zero");
+static_assert(SNAKE_SPEED_PERCENT > 0, "Snake speed must be non-zero");
 constexpr uint8_t LED_SUPPLY_VOLTS = 5;
 constexpr uint8_t BENCH_LED_BRIGHTNESS = 32;
 constexpr uint16_t BENCH_LED_MAX_MILLIAMPS = 100;
@@ -44,7 +56,7 @@ constexpr uint32_t MODE_METEOR_DODGE_COLOR = 0xFF0000UL;
 constexpr uint32_t MODE_MEMORY_COLOR = 0x8000FFUL;
 
 constexpr uint16_t POWER_TEST_STAGE_MS = 1200;
-constexpr uint16_t POWER_TEST_FULL_LOAD_MS = 10000;
+constexpr uint16_t POWER_TEST_FULL_LOAD_MS = 2000;
 constexpr uint32_t POWER_TEST_COLOR = 0xFFFFFFUL;
 constexpr uint32_t POWER_TEST_READY_COLOR = 0x00FF00UL;
 constexpr uint32_t PSU_MODE_ARMING_COLOR = 0xFFFF00UL;

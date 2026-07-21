@@ -20,7 +20,8 @@ static_assert(Config::GAME_PIXEL_WIDTH <
 void ColourShooterGame::start(uint32_t now) {
   score_ = 0;
   lives_ = Config::COLOUR_SHOOTER_STARTING_LIVES;
-  stepIntervalMs_ = Config::COLOUR_SHOOTER_INITIAL_STEP_MS;
+  stepIntervalMs_ =
+      Config::gameplayInterval(Config::COLOUR_SHOOTER_INITIAL_STEP_MS);
   randomState_ = static_cast<uint16_t>(micros()) ^ static_cast<uint16_t>(now);
   if (randomState_ == 0) {
     randomState_ = 1;
@@ -140,7 +141,8 @@ bool ColourShooterGame::farEndIsClear() const {
 
 void ColourShooterGame::spawnTargetAtFarEnd(uint32_t now) {
   if (static_cast<uint32_t>(now - lastSpawnAt_) <
-          Config::COLOUR_SHOOTER_SPAWN_INTERVAL_MS ||
+          Config::gameplayInterval(
+              Config::COLOUR_SHOOTER_SPAWN_INTERVAL_MS) ||
       !farEndIsClear()) {
     return;
   }
@@ -227,13 +229,13 @@ bool ColourShooterGame::resolveShotCollision(Shot& shot, uint32_t now) {
     startDissolve(hitPosition, color, now);
 
     if (score_ % Config::COLOUR_SHOOTER_SPEEDUP_EVERY == 0 &&
-        stepIntervalMs_ > Config::COLOUR_SHOOTER_MINIMUM_STEP_MS) {
+        stepIntervalMs_ > Config::gameplayInterval(
+                              Config::COLOUR_SHOOTER_MINIMUM_STEP_MS)) {
       const uint16_t faster = stepIntervalMs_ -
                               Config::COLOUR_SHOOTER_SPEEDUP_MS;
-      stepIntervalMs_ =
-          faster < Config::COLOUR_SHOOTER_MINIMUM_STEP_MS
-              ? Config::COLOUR_SHOOTER_MINIMUM_STEP_MS
-              : faster;
+      const uint16_t minimum = Config::gameplayInterval(
+          Config::COLOUR_SHOOTER_MINIMUM_STEP_MS);
+      stepIntervalMs_ = faster < minimum ? minimum : faster;
     }
 
     Serial.print(F("Dissolved. Score: "));
@@ -252,16 +254,17 @@ void ColourShooterGame::updateShots(uint32_t now) {
       continue;
     }
 
-    uint8_t steps = static_cast<uint8_t>(
-        (now - shot.lastStepAt) / Config::COLOUR_SHOOTER_SHOT_STEP_MS);
+    const uint16_t shotInterval =
+        Config::gameplayInterval(Config::COLOUR_SHOOTER_SHOT_STEP_MS);
+    uint8_t steps =
+        static_cast<uint8_t>((now - shot.lastStepAt) / shotInterval);
     if (steps > 8) {
       steps = 8;
     }
     if (steps == 0) {
       continue;
     }
-    shot.lastStepAt +=
-        static_cast<uint32_t>(steps) * Config::COLOUR_SHOOTER_SHOT_STEP_MS;
+    shot.lastStepAt += static_cast<uint32_t>(steps) * shotInterval;
 
     while (steps-- > 0 && shot.active) {
       if (shot.position >= Config::LED_COUNT - 1) {

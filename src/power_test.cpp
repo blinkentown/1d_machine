@@ -28,7 +28,7 @@ void PowerTest::advance(uint32_t now) {
     case Stage::GameLoad:
       if (PowerModeManager::isPsuMode()) {
         stage_ = Stage::FullStripLoad;
-        Serial.println(F("PSU test: all 288 pixels power-limited white for 10 s"));
+        Serial.println(F("PSU test: all 288 pixels power-limited white for 2 s"));
       } else {
         stage_ = Stage::Ready;
         Serial.println(F("Power preview complete"));

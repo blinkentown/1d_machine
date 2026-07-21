@@ -14,7 +14,8 @@ void Snake1DGame::start(uint32_t now) {
   score_ = 0;
   combo_ = 0;
   lives_ = Config::SNAKE_STARTING_LIVES;
-  baseStepIntervalMs_ = Config::SNAKE_INITIAL_STEP_MS;
+  baseStepIntervalMs_ = Config::gameplayInterval(
+      Config::SNAKE_INITIAL_STEP_MS, Config::SNAKE_SPEED_PERCENT);
   randomState_ = static_cast<uint16_t>(micros()) ^ static_cast<uint16_t>(now);
   if (randomState_ == 0) {
     randomState_ = 1;
@@ -27,7 +28,7 @@ void Snake1DGame::start(uint32_t now) {
 
   Serial.println(F("Snake 1D started"));
   Serial.println(F("Shoot the matching color at the continuous snake head"));
-  Serial.println(F("Rainbow armor needs three changing-color hits"));
+  Serial.println(F("Rainbow bonus accepts any three color shots"));
 }
 
 void Snake1DGame::resetObjects() {
@@ -45,14 +46,6 @@ uint8_t Snake1DGame::nextColorIndex() {
   randomState_ ^= randomState_ >> 9;
   randomState_ ^= randomState_ << 8;
   return static_cast<uint8_t>(randomState_ & 0x03U);
-}
-
-uint8_t Snake1DGame::nextRequiredColor(uint8_t previous) {
-  uint8_t next = nextColorIndex();
-  if (next == previous) {
-    next = static_cast<uint8_t>((next + 1U + (randomState_ & 0x01U)) & 0x03U);
-  }
-  return next;
 }
 
 uint32_t Snake1DGame::colorForIndex(uint8_t index) {
@@ -265,7 +258,7 @@ bool Snake1DGame::resolveShotCollision(Shot& shot, uint32_t now) {
 
   Segment& head = segments_[0];
   shot.active = false;
-  if (shot.colorIndex != head.colorIndex) {
+  if (!head.special && shot.colorIndex != head.colorIndex) {
     combo_ = 0;
     startBlast(headPosition_, Config::SNAKE_ERROR_COLOR,
                Config::EXPLOSION_INTENSITY, now);
@@ -278,7 +271,10 @@ bool Snake1DGame::resolveShotCollision(Shot& shot, uint32_t now) {
     ++combo_;
   }
   const uint8_t comboBoost = combo_ / 4U > 3U ? 3U : combo_ / 4U;
-  startBlast(headPosition_, colorForIndex(head.colorIndex),
+  const uint32_t impactColor =
+      head.special ? colorForIndex(shot.colorIndex)
+                   : colorForIndex(head.colorIndex);
+  startBlast(headPosition_, impactColor,
              Config::EXPLOSION_INTENSITY + comboBoost, now);
 
   headPosition_ += Config::GAME_PIXEL_WIDTH;
@@ -288,8 +284,7 @@ bool Snake1DGame::resolveShotCollision(Shot& shot, uint32_t now) {
       removeFrontSegment();
       Serial.println(F("Rainbow armor destroyed"));
     } else {
-      head.colorIndex = nextRequiredColor(head.colorIndex);
-      Serial.print(F("Rainbow armor hit. Remaining: "));
+      Serial.print(F("Rainbow bonus hit. Remaining: "));
       Serial.println(head.hitPoints);
     }
   } else {
@@ -297,11 +292,13 @@ bool Snake1DGame::resolveShotCollision(Shot& shot, uint32_t now) {
   }
 
   if (score_ % Config::SNAKE_SPEEDUP_EVERY == 0 &&
-      baseStepIntervalMs_ > Config::SNAKE_MINIMUM_STEP_MS) {
+      baseStepIntervalMs_ > Config::gameplayInterval(
+                                Config::SNAKE_MINIMUM_STEP_MS,
+                                Config::SNAKE_SPEED_PERCENT)) {
     const uint16_t faster = baseStepIntervalMs_ - Config::SNAKE_SPEEDUP_MS;
-    baseStepIntervalMs_ = faster < Config::SNAKE_MINIMUM_STEP_MS
-                              ? Config::SNAKE_MINIMUM_STEP_MS
-                              : faster;
+    const uint16_t minimum = Config::gameplayInterval(
+        Config::SNAKE_MINIMUM_STEP_MS, Config::SNAKE_SPEED_PERCENT);
+    baseStepIntervalMs_ = faster < minimum ? minimum : faster;
   }
 
   Serial.print(F("Snake hit. Score: "));
@@ -318,16 +315,17 @@ void Snake1DGame::updateShots(uint32_t now) {
       continue;
     }
 
-    uint8_t steps = static_cast<uint8_t>(
-        (now - shot.lastStepAt) / Config::SNAKE_SHOT_STEP_MS);
+    const uint16_t shotInterval =
+        Config::gameplayInterval(Config::SNAKE_SHOT_STEP_MS);
+    uint8_t steps =
+        static_cast<uint8_t>((now - shot.lastStepAt) / shotInterval);
     if (steps > 8) {
       steps = 8;
     }
     if (steps == 0) {
       continue;
     }
-    shot.lastStepAt +=
-        static_cast<uint32_t>(steps) * Config::SNAKE_SHOT_STEP_MS;
+    shot.lastStepAt += static_cast<uint32_t>(steps) * shotInterval;
 
     while (steps-- > 0 && shot.active) {
       if (shot.position >= Config::LED_COUNT - 1) {
@@ -454,10 +452,6 @@ void Snake1DGame::render(uint32_t now) const {
         const uint8_t rainbowPhase = static_cast<uint8_t>(
             (now / 70U + offset / Config::GAME_PIXEL_WIDTH) % 6U);
         color = rainbowColor(rainbowPhase);
-        if (offset < Config::GAME_PIXEL_WIDTH &&
-            ((now / 140U) % 2U) == 0U) {
-          color = colorForIndex(segment.colorIndex);
-        }
       } else {
         const uint8_t brightness = index == 0 ? 176U : 112U;
         color = scaleColor(colorForIndex(segment.colorIndex), brightness);

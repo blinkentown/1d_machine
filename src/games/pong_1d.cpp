@@ -17,7 +17,7 @@ void Pong1DGame::serve(uint32_t now) {
   ballPosition_ = Config::LED_COUNT / 2;
   ballDirection_ = nextServeDirection_;
   nextServeDirection_ = -nextServeDirection_;
-  stepIntervalMs_ = Config::PONG_INITIAL_STEP_MS;
+  stepIntervalMs_ = Config::gameplayInterval(Config::PONG_INITIAL_STEP_MS);
   lastStepAt_ = now;
   phase_ = Phase::Playing;
 }
@@ -28,7 +28,8 @@ void Pong1DGame::handleHits() {
       ballPosition_ <
           Config::PONG_HIT_ZONE_LENGTH * Config::GAME_PIXEL_WIDTH) {
     ballDirection_ = 1;
-    if (stepIntervalMs_ > Config::PONG_MINIMUM_STEP_MS) {
+    if (stepIntervalMs_ >
+        Config::gameplayInterval(Config::PONG_MINIMUM_STEP_MS)) {
       stepIntervalMs_ -= Config::PONG_SPEEDUP_MS;
     }
     Serial.println(F("Left player hit"));
@@ -40,7 +41,8 @@ void Pong1DGame::handleHits() {
   if (InputManager::wasPressed(InputManager::Button::Game3) &&
       ballDirection_ > 0 && ballPosition_ >= rightHitZoneStart) {
     ballDirection_ = -1;
-    if (stepIntervalMs_ > Config::PONG_MINIMUM_STEP_MS) {
+    if (stepIntervalMs_ >
+        Config::gameplayInterval(Config::PONG_MINIMUM_STEP_MS)) {
       stepIntervalMs_ -= Config::PONG_SPEEDUP_MS;
     }
     Serial.println(F("Right player hit"));

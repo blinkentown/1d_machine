@@ -56,7 +56,6 @@ class Snake1DGame {
                   uint32_t now);
   void updateBlasts(uint32_t now);
   uint8_t nextColorIndex();
-  uint8_t nextRequiredColor(uint8_t previous);
 
   static int8_t pressedColorIndex();
   static uint32_t colorForIndex(uint8_t index);
