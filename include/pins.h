@@ -18,4 +18,7 @@ constexpr uint8_t BUTTON_2 = 7;
 constexpr uint8_t BUTTON_3 = 8;
 constexpr uint8_t BUTTON_4 = 9;
 
+constexpr uint8_t MODE_PIXEL_DATA = 10;
+constexpr uint8_t MODE_BUTTON = 14;
+
 }  // namespace Pins
