@@ -1,6 +1,7 @@
 #include "game_manager.h"
 
 #include "config.h"
+#include "games/colour_shooter.h"
 #include "games/pong_1d.h"
 #include "input_manager.h"
 #include "led_manager.h"
@@ -26,8 +27,9 @@ enum class State : uint8_t {
   Running,
 };
 
-GameId selectedGame = GameId::Pong1D;
+GameId selectedGame = GameId::ColourShooter;
 State state = State::Selecting;
+ColourShooterGame colourShooter;
 Pong1DGame pong;
 PowerTest powerTest;
 uint32_t lastRenderAt = 0;
@@ -98,7 +100,8 @@ void changeSelection(int8_t direction) {
 }
 
 void beginPowerCheck(uint32_t now) {
-  if (selectedGame != GameId::Pong1D) {
+  if (selectedGame != GameId::ColourShooter &&
+      selectedGame != GameId::Pong1D) {
     Serial.print(gameName(selectedGame));
     Serial.println(F(" is not implemented yet"));
     return;
@@ -106,6 +109,15 @@ void beginPowerCheck(uint32_t now) {
 
   state = State::PowerCheck;
   powerTest.start(now);
+}
+
+void startSelectedGame(uint32_t now) {
+  state = State::Running;
+  if (selectedGame == GameId::ColourShooter) {
+    colourShooter.start(now);
+  } else {
+    pong.start(now);
+  }
 }
 
 void returnToSelector() {
@@ -122,7 +134,11 @@ void render(uint32_t now) {
   } else if (state == State::PowerCheck) {
     powerTest.render();
   } else {
-    pong.render(now);
+    if (selectedGame == GameId::ColourShooter) {
+      colourShooter.render(now);
+    } else {
+      pong.render(now);
+    }
     LedManager::setModePixel(gameColor(selectedGame));
   }
 
@@ -182,8 +198,7 @@ void update(uint32_t now) {
       if (powerTest.isReady() &&
           (modeLongPress ||
            InputManager::wasPressed(InputManager::Button::EncoderClick))) {
-        state = State::Running;
-        pong.start(now);
+        startSelectedGame(now);
       }
     }
   } else {
@@ -194,7 +209,11 @@ void update(uint32_t now) {
       }
       returnToSelector();
     } else {
-      pong.update(now);
+      if (selectedGame == GameId::ColourShooter) {
+        colourShooter.update(now);
+      } else {
+        pong.update(now);
+      }
     }
   }
 
