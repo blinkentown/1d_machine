@@ -21,6 +21,7 @@ There are no gameplay delays or dynamic allocations.
 | `power_mode_manager` | Bench/PSU limits and runtime mode switching |
 | `power_stress_test` | Abortable 10-second full-strip load test |
 | `game_manager` | Game selection, confirmation, dispatch, and exit behavior |
+| `games/twang` | Cell-mask dungeon, movement, dash, attack, and level states |
 | `games/colour_shooter` | Incoming targets, shots, lives, and impact effects |
 | `games/pong_1d` | Ball, paddles, scoring, point delay, and serve states |
 | `games/snake_1d` | Continuous segment queue, rainbow bonus, shots, and combo |
@@ -39,14 +40,18 @@ Pins are centralized in `include/pins.h`. Tunable values are centralized in
 
 Reviewed build baseline:
 
-- Static SRAM: 1802 / 2560 bytes
-- Flash: 22724 / 28672 bytes
-- Largest game states: Snake 240 bytes, Colour Shooter 124 bytes, Pong 24
-  bytes
+- Static SRAM: 1846 / 2560 bytes
+- Flash: 24766 / 28672 bytes
+- Largest game states: Snake 240 bytes, Colour Shooter 124 bytes, Twang 32
+  bytes, Pong 24 bytes
 
-The remaining 758 SRAM bytes also contain the runtime stack. Before adding all
+The remaining 714 SRAM bytes also contain the runtime stack. Before adding all
 four planned games, active game states should be overlaid in shared storage and
 duplicate projectile/explosion code should be consolidated.
+
+The AVR build enables link-time optimization, shared function prologues,
+reduced small-function inlining, unsplit wide values, and linker relaxation to
+preserve flash for game logic.
 
 ## Adding a game
 
@@ -64,8 +69,8 @@ duplicate projectile/explosion code should be consolidated.
 
 ## Review notes
 
-- Colour Shooter, 1D Pong, and Snake 1D are implemented.
-- Twang, Reaction Race, Meteor Dodge, and Memory Sequence remain selectable
+- Twang, Colour Shooter, 1D Pong, and Snake 1D are implemented.
+- Reaction Race, Meteor Dodge, and Memory Sequence remain selectable
   placeholders and do not start when confirmed.
 - Encoder decoding exists in firmware, but the current hardware build does not
   depend on the encoder.

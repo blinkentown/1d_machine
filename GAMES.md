@@ -31,6 +31,7 @@ the blue and yellow game buttons together for two seconds.
 | Stress-test hold progress | Alternating red and blue |
 | Stress test with PSU limits | Red; strip output is solid white |
 | Stress test with bench limits | Green; strip output is solid white |
+| Twang selected/running | Orange |
 | Colour Shooter selected/running | Yellow |
 | 1D Pong selected/running | Blue |
 | Snake 1D selected/running | Cyan |
@@ -49,6 +50,23 @@ Reaction Race selection.
 
 Press the illuminated selector during any running game to return to game
 selection. The selector output then shows the selected game's color.
+
+## Twang
+
+Selector output: orange.
+
+- Red / Left and green / Right move the white player by one 12-LED cell.
+- The blue direction marker shows which way the player faces.
+- Blue / Action sends a blue-white twang up to three cells in that direction.
+- A twang destroys the first pulsing red enemy in range but stops at lava.
+- Yellow / Special dashes two cells in the facing direction, with a 600 ms
+  recharge. A dash can cross one dangerous cell but must land safely.
+- Orange flickering cells are lava. Landing on lava removes one of three green
+  life indicators and clears that lava cell.
+- The green cell at the far end is the dungeon exit. Reaching it produces a
+  green strip sweep and generates a denser next level.
+- Three lost lives produce a red-white game-over explosion at strip center.
+- Any color game button restarts after game over.
 
 ## Running the power stress test
 
