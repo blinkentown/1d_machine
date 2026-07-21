@@ -18,8 +18,8 @@ bool psuMode = false;
 uint32_t armStartedAt = 0;
 
 bool bootChordHeld() {
-  return InputManager::isHeld(InputManager::Button::Game3) &&
-         InputManager::isHeld(InputManager::Button::Game4);
+  return InputManager::isHeld(InputManager::Button::Blue) &&
+         InputManager::isHeld(InputManager::Button::Yellow);
 }
 
 void applyBenchMode() {
@@ -64,8 +64,8 @@ void update(uint32_t now) {
   }
 
   if (startupState == StartupState::WaitingForRelease) {
-    if (!InputManager::isHeld(InputManager::Button::Game3) &&
-        !InputManager::isHeld(InputManager::Button::Game4)) {
+    if (!InputManager::isHeld(InputManager::Button::Blue) &&
+        !InputManager::isHeld(InputManager::Button::Yellow)) {
       startupState = StartupState::Ready;
     }
     return;

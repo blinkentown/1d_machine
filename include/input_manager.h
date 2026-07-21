@@ -5,10 +5,10 @@
 namespace InputManager {
 
 enum class Button : uint8_t {
-  Game1,
-  Game2,
-  Game3,
-  Game4,
+  Red,
+  Green,
+  Blue,
+  Yellow,
   EncoderClick,
   Setup,
   ModeSelect,

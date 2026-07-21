@@ -46,6 +46,10 @@ rails must not be tied together without proper power-source isolation.
 
 All switches use `INPUT_PULLUP`: released is `HIGH`, pressed is `LOW`.
 
+For non-color games, the additional labels are red `P1-A/Left`, green
+`P1-B/Right`, blue `P2-A/Action`, and yellow `P2-B/Special`. See
+[GAMES.md](GAMES.md) for per-game assignments.
+
 ## Build and upload
 
 ```powershell
@@ -74,7 +78,7 @@ All tunable constants live in `include/config.h`.
 The reviewed three-game build uses:
 
 - SRAM: 1796 / 2560 bytes (70.2%)
-- Flash: 22312 / 28672 bytes (77.8%)
+- Flash: 22160 / 28672 bytes (77.3%)
 
 The SRAM figure does not include peak stack usage. Future games must use small,
 fixed state and no additional LED framebuffer.

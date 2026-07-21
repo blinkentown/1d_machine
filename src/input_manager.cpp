@@ -52,10 +52,10 @@ class DebouncedInput {
   uint32_t rawChangedAt_ = 0;
 };
 
-DebouncedInput game1(Pins::BUTTON_1, Config::BUTTON_DEBOUNCE_MS);
-DebouncedInput game2(Pins::BUTTON_2, Config::BUTTON_DEBOUNCE_MS);
-DebouncedInput game3(Pins::BUTTON_3, Config::BUTTON_DEBOUNCE_MS);
-DebouncedInput game4(Pins::BUTTON_4, Config::BUTTON_DEBOUNCE_MS);
+DebouncedInput redButton(Pins::BUTTON_1, Config::BUTTON_DEBOUNCE_MS);
+DebouncedInput greenButton(Pins::BUTTON_2, Config::BUTTON_DEBOUNCE_MS);
+DebouncedInput blueButton(Pins::BUTTON_3, Config::BUTTON_DEBOUNCE_MS);
+DebouncedInput yellowButton(Pins::BUTTON_4, Config::BUTTON_DEBOUNCE_MS);
 DebouncedInput encoderClick(Pins::ENCODER_CLICK, Config::BUTTON_DEBOUNCE_MS);
 DebouncedInput setup(Pins::SETUP_BUTTON, Config::BUTTON_DEBOUNCE_MS);
 DebouncedInput modeSelect(Pins::MODE_BUTTON, Config::BUTTON_DEBOUNCE_MS);
@@ -75,14 +75,14 @@ const int8_t ENCODER_TRANSITIONS[16] PROGMEM = {
 
 DebouncedInput& inputFor(Button button) {
   switch (button) {
-    case Button::Game1:
-      return game1;
-    case Button::Game2:
-      return game2;
-    case Button::Game3:
-      return game3;
-    case Button::Game4:
-      return game4;
+    case Button::Red:
+      return redButton;
+    case Button::Green:
+      return greenButton;
+    case Button::Blue:
+      return blueButton;
+    case Button::Yellow:
+      return yellowButton;
     case Button::EncoderClick:
       return encoderClick;
     case Button::Setup:
@@ -91,7 +91,7 @@ DebouncedInput& inputFor(Button button) {
       return modeSelect;
   }
 
-  return game1;
+  return redButton;
 }
 
 void updateEncoder() {
@@ -126,10 +126,10 @@ void updateEncoder() {
 }  // namespace
 
 void begin() {
-  game1.begin();
-  game2.begin();
-  game3.begin();
-  game4.begin();
+  redButton.begin();
+  greenButton.begin();
+  blueButton.begin();
+  yellowButton.begin();
   encoderClick.begin();
   setup.begin();
   modeSelect.begin();
@@ -142,10 +142,10 @@ void begin() {
 }
 
 void update(uint32_t now) {
-  game1.update(now);
-  game2.update(now);
-  game3.update(now);
-  game4.update(now);
+  redButton.update(now);
+  greenButton.update(now);
+  blueButton.update(now);
+  yellowButton.update(now);
   encoderClick.update(now);
   setup.update(now);
   modeSelect.update(now);

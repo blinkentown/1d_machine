@@ -140,9 +140,9 @@ void returnToSelector() {
 }
 
 bool powerModeChordHeld() {
-  return InputManager::isHeld(InputManager::Button::Game3) &&
-         InputManager::isHeld(InputManager::Button::Game4) &&
-         !InputManager::isHeld(InputManager::Button::Game1);
+  return InputManager::isHeld(InputManager::Button::Blue) &&
+         InputManager::isHeld(InputManager::Button::Yellow) &&
+         !InputManager::isHeld(InputManager::Button::Red);
 }
 
 void updatePowerModeChord(uint32_t now) {
@@ -170,9 +170,9 @@ void updatePowerModeChord(uint32_t now) {
 }
 
 bool powerStressChordHeld() {
-  return InputManager::isHeld(InputManager::Button::Game1) &&
-         InputManager::isHeld(InputManager::Button::Game3) &&
-         !InputManager::isHeld(InputManager::Button::Game4);
+  return InputManager::isHeld(InputManager::Button::Red) &&
+         InputManager::isHeld(InputManager::Button::Blue) &&
+         !InputManager::isHeld(InputManager::Button::Yellow);
 }
 
 void updatePowerStressChord(uint32_t now) {
@@ -200,10 +200,10 @@ void updatePowerStressChord(uint32_t now) {
 }
 
 bool anyButtonPressed() {
-  return InputManager::wasPressed(InputManager::Button::Game1) ||
-         InputManager::wasPressed(InputManager::Button::Game2) ||
-         InputManager::wasPressed(InputManager::Button::Game3) ||
-         InputManager::wasPressed(InputManager::Button::Game4) ||
+  return InputManager::wasPressed(InputManager::Button::Red) ||
+         InputManager::wasPressed(InputManager::Button::Green) ||
+         InputManager::wasPressed(InputManager::Button::Blue) ||
+         InputManager::wasPressed(InputManager::Button::Yellow) ||
          InputManager::wasPressed(InputManager::Button::EncoderClick) ||
          InputManager::wasPressed(InputManager::Button::Setup) ||
          InputManager::wasPressed(InputManager::Button::ModeSelect);

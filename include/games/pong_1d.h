@@ -11,8 +11,7 @@ class Pong1DGame {
  private:
   enum class Phase : uint8_t {
     Playing,
-    Paused,
-    PointPause,
+    PointDelay,
     GameOver,
   };
 

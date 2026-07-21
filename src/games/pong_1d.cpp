@@ -1,6 +1,7 @@
 #include "games/pong_1d.h"
 
 #include "config.h"
+#include "controls.h"
 #include "input_manager.h"
 #include "led_manager.h"
 
@@ -9,7 +10,7 @@ void Pong1DGame::start(uint32_t now) {
   rightScore_ = 0;
   nextServeDirection_ = 1;
   Serial.println(F("1D Pong started"));
-  Serial.println(F("Button 1: left hit, Button 3: right hit, Button 4: pause"));
+  Serial.println(F("Red/P1-A: left hit, Blue/P2-A: right hit"));
   serve(now);
 }
 
@@ -23,7 +24,7 @@ void Pong1DGame::serve(uint32_t now) {
 }
 
 void Pong1DGame::handleHits() {
-  if (InputManager::wasPressed(InputManager::Button::Game1) &&
+  if (InputManager::wasPressed(Controls::PLAYER_1_PRIMARY) &&
       ballDirection_ < 0 &&
       ballPosition_ <
           Config::PONG_HIT_ZONE_LENGTH * Config::GAME_PIXEL_WIDTH) {
@@ -38,7 +39,7 @@ void Pong1DGame::handleHits() {
   const uint16_t rightHitZoneStart =
       Config::LED_COUNT -
       Config::PONG_HIT_ZONE_LENGTH * Config::GAME_PIXEL_WIDTH;
-  if (InputManager::wasPressed(InputManager::Button::Game3) &&
+  if (InputManager::wasPressed(Controls::PLAYER_2_PRIMARY) &&
       ballDirection_ > 0 && ballPosition_ >= rightHitZoneStart) {
     ballDirection_ = -1;
     if (stepIntervalMs_ >
@@ -85,7 +86,7 @@ void Pong1DGame::awardPoint(bool leftPlayerScored, uint32_t now) {
     Serial.print(leftScore_ > rightScore_ ? F("Left") : F("Right"));
     Serial.println(F(" player wins. Press any color button to restart."));
   } else {
-    phase_ = Phase::PointPause;
+    phase_ = Phase::PointDelay;
   }
 }
 
@@ -97,36 +98,20 @@ void Pong1DGame::printScore() const {
 }
 
 void Pong1DGame::update(uint32_t now) {
-  if (InputManager::wasPressed(InputManager::Button::Game4) &&
-      phase_ != Phase::GameOver && phase_ != Phase::PointPause) {
-    if (phase_ == Phase::Paused) {
-      phase_ = Phase::Playing;
-      lastStepAt_ = now;
-      Serial.println(F("Pong resumed"));
-    } else {
-      phase_ = Phase::Paused;
-      Serial.println(F("Pong paused"));
-    }
-  }
-
-  if (phase_ == Phase::Paused) {
-    return;
-  }
-
   if (phase_ == Phase::GameOver) {
-    if (InputManager::wasPressed(InputManager::Button::Game1) ||
-        InputManager::wasPressed(InputManager::Button::Game2) ||
-        InputManager::wasPressed(InputManager::Button::Game3) ||
-        InputManager::wasPressed(InputManager::Button::Game4) ||
+    if (InputManager::wasPressed(InputManager::Button::Red) ||
+        InputManager::wasPressed(InputManager::Button::Green) ||
+        InputManager::wasPressed(InputManager::Button::Blue) ||
+        InputManager::wasPressed(InputManager::Button::Yellow) ||
         InputManager::wasPressed(InputManager::Button::EncoderClick)) {
       start(now);
     }
     return;
   }
 
-  if (phase_ == Phase::PointPause) {
+  if (phase_ == Phase::PointDelay) {
     if (static_cast<uint32_t>(now - phaseChangedAt_) >=
-        Config::PONG_POINT_PAUSE_MS) {
+        Config::PONG_POINT_DELAY_MS) {
       serve(now);
     }
     return;
@@ -160,10 +145,6 @@ void Pong1DGame::render(uint32_t now) const {
     LedManager::setStripPixel(index, Config::PONG_LEFT_PLAYER_COLOR);
     LedManager::setStripPixel(Config::LED_COUNT - 1 - index,
                               Config::PONG_RIGHT_PLAYER_COLOR);
-  }
-
-  if (phase_ == Phase::Paused && ((now / 300U) % 2U == 0U)) {
-    return;
   }
 
   for (uint8_t width = 0; width < Config::GAME_PIXEL_WIDTH; ++width) {

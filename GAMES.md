@@ -1,5 +1,20 @@
 # Controls and games
 
+## Physical button labels
+
+The four game buttons are mounted left-to-right as red, green, blue, yellow.
+Use these additional labels for games that do not directly match colors:
+
+| Physical color | Two-player label | One-player label |
+| --- | --- | --- |
+| Red | P1-A | Left |
+| Green | P1-B | Right |
+| Blue | P2-A | Action |
+| Yellow | P2-B | Special |
+
+Color-matching games use red, green, blue, and yellow as colors rather than
+these action labels. There is currently no dedicated pause input.
+
 ## Selector and power-mode outputs
 
 At the game selector, short-press the illuminated selector to advance one game.
@@ -64,9 +79,9 @@ Selector output: yellow.
 
 Selector output: blue.
 
-- Red button: left player hit.
-- Blue button: right player hit.
-- Yellow button: pause or resume.
+- Red / P1-A: left player hit.
+- Blue / P2-A: right player hit.
+- Green / P1-B and yellow / P2-B: unused.
 - The 12-LED ball accelerates after successful returns.
 - Each visible 24-LED paddle is also the complete hit zone.
 - First player to five points wins.

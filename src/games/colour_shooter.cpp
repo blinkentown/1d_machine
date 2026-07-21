@@ -94,16 +94,16 @@ uint32_t ColourShooterGame::scaleColor(uint32_t color, uint8_t scale) {
 }
 
 int8_t ColourShooterGame::pressedColorIndex() {
-  if (InputManager::wasPressed(InputManager::Button::Game1)) {
+  if (InputManager::wasPressed(InputManager::Button::Red)) {
     return 0;
   }
-  if (InputManager::wasPressed(InputManager::Button::Game2)) {
+  if (InputManager::wasPressed(InputManager::Button::Green)) {
     return 1;
   }
-  if (InputManager::wasPressed(InputManager::Button::Game3)) {
+  if (InputManager::wasPressed(InputManager::Button::Blue)) {
     return 2;
   }
-  if (InputManager::wasPressed(InputManager::Button::Game4)) {
+  if (InputManager::wasPressed(InputManager::Button::Yellow)) {
     return 3;
   }
   return -1;
@@ -166,16 +166,16 @@ void ColourShooterGame::launchShot(uint8_t colorIndex, uint32_t now) {
 }
 
 void ColourShooterGame::handleButtonPress(uint32_t now) {
-  if (InputManager::wasPressed(InputManager::Button::Game1)) {
+  if (InputManager::wasPressed(InputManager::Button::Red)) {
     launchShot(0, now);
   }
-  if (InputManager::wasPressed(InputManager::Button::Game2)) {
+  if (InputManager::wasPressed(InputManager::Button::Green)) {
     launchShot(1, now);
   }
-  if (InputManager::wasPressed(InputManager::Button::Game3)) {
+  if (InputManager::wasPressed(InputManager::Button::Blue)) {
     launchShot(2, now);
   }
-  if (InputManager::wasPressed(InputManager::Button::Game4)) {
+  if (InputManager::wasPressed(InputManager::Button::Yellow)) {
     launchShot(3, now);
   }
 }

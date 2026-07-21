@@ -16,12 +16,13 @@ There are no gameplay delays or dynamic allocations.
 | Module | Responsibility |
 | --- | --- |
 | `input_manager` | Debounced active-low buttons and encoder decoding |
+| `controls.h` | Zero-cost player and one-player aliases for color buttons |
 | `led_manager` | The only 288-pixel framebuffer, selector pixel, FastLED output |
 | `power_mode_manager` | Bench/PSU limits and runtime mode switching |
 | `power_stress_test` | Abortable 10-second full-strip load test |
 | `game_manager` | Game selection, confirmation, dispatch, and exit behavior |
 | `games/colour_shooter` | Incoming targets, shots, lives, and impact effects |
-| `games/pong_1d` | Ball, paddles, scoring, pause, and serve states |
+| `games/pong_1d` | Ball, paddles, scoring, point delay, and serve states |
 | `games/snake_1d` | Continuous segment queue, rainbow bonus, shots, and combo |
 
 Pins are centralized in `include/pins.h`. Tunable values are centralized in
@@ -39,7 +40,7 @@ Pins are centralized in `include/pins.h`. Tunable values are centralized in
 Reviewed build baseline:
 
 - Static SRAM: 1796 / 2560 bytes
-- Flash: 22312 / 28672 bytes
+- Flash: 22160 / 28672 bytes
 - Largest game states: Snake 240 bytes, Colour Shooter 124 bytes, Pong 17
   bytes
 
@@ -53,11 +54,13 @@ duplicate projectile/explosion code should be consolidated.
 2. Use `Config::GAME_PIXEL_WIDTH` for logical object width.
 3. Use `Config::EXPLOSION_INTENSITY` as the base effect scale.
 4. Apply `Config::gameplayInterval()` to movement timings.
-5. Add the game to the explicit implemented-game checks and dispatch in
+5. Use the aliases in `controls.h` when controls are actions rather than
+   colors.
+6. Add the game to the explicit implemented-game checks and dispatch in
    `game_manager.cpp`.
-6. Keep power stress available only from the game selector.
-7. Document input controls and every visible selector/strip output.
-8. Build without warnings, inspect SRAM/flash, test on hardware, then commit.
+7. Keep power stress available only from the game selector.
+8. Document input controls and every visible selector/strip output.
+9. Build without warnings, inspect SRAM/flash, test on hardware, then commit.
 
 ## Review notes
 
