@@ -7,8 +7,8 @@
 
 static_assert(Pins::LED_DATA == MOSI, "LED data must use the hardware-SPI MOSI pin");
 static_assert(Pins::LED_CLOCK == SCK, "LED clock must use the hardware-SPI SCK pin");
-static_assert(Config::TEST_LED_INDEX < Config::LED_COUNT,
-              "Test LED index must be inside the strip");
+static_assert(Config::TEST_PIXEL_START_INDEX < Config::LED_COUNT,
+              "Test pixel start index must be inside the strip");
 
 namespace {
 
@@ -70,6 +70,7 @@ DebouncedInput encoderB(Pins::ENCODER_B, Config::ENCODER_DEBOUNCE_MS);
 uint8_t previousEncoderState = 0;
 int8_t encoderStepAccumulator = 0;
 int32_t encoderPosition = 0;
+uint16_t scanPixelPosition = Config::TEST_PIXEL_START_INDEX;
 uint32_t lastLedFrameAt = 0;
 
 const int8_t ENCODER_TRANSITIONS[16] PROGMEM = {
@@ -180,13 +181,14 @@ void updateLedTest(uint32_t now) {
   }
   lastLedFrameAt = now;
 
-  CRGB activeColor(Config::IDLE_PIXEL_COLOR);
+  CRGB activeColor(Config::SCAN_PIXEL_COLOR);
   selectedButtonColor(activeColor);
 
   fill_solid(leds, Config::LED_COUNT, CRGB::Black);
-  leds[Config::TEST_LED_INDEX] = activeColor;
+  leds[scanPixelPosition] = activeColor;
 
   FastLED.show();
+  scanPixelPosition = (scanPixelPosition + 1) % Config::LED_COUNT;
 }
 
 }  // namespace
