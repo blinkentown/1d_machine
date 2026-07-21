@@ -9,6 +9,12 @@ namespace {
 constexpr uint8_t TARGET_TRAIL_LENGTH = 2;
 constexpr uint8_t SHOT_TRAIL_LENGTH = 2;
 
+static_assert(Config::COLOUR_SHOOTER_PIXEL_WIDTH > 0,
+              "Colour Shooter pixel width must be at least one LED");
+static_assert(Config::COLOUR_SHOOTER_PIXEL_WIDTH <
+                  Config::COLOUR_SHOOTER_TARGET_SPACING,
+              "Colour Shooter pixels must fit between targets");
+
 }  // namespace
 
 void ColourShooterGame::start(uint32_t now) {
@@ -374,9 +380,16 @@ void ColourShooterGame::render(uint32_t now) const {
       continue;
     }
     const uint32_t color = colorForIndex(target.colorIndex);
-    LedManager::setStripPixel(target.position, color);
+    for (uint8_t width = 0; width < Config::COLOUR_SHOOTER_PIXEL_WIDTH;
+         ++width) {
+      const uint16_t bodyPosition = target.position + width;
+      if (bodyPosition < Config::LED_COUNT) {
+        LedManager::setStripPixel(bodyPosition, color);
+      }
+    }
     for (uint8_t trail = 1; trail <= TARGET_TRAIL_LENGTH; ++trail) {
-      const uint16_t trailPosition = target.position + trail;
+      const uint16_t trailPosition =
+          target.position + Config::COLOUR_SHOOTER_PIXEL_WIDTH + trail - 1;
       if (trailPosition < Config::LED_COUNT) {
         LedManager::setStripPixel(
             trailPosition,
@@ -391,11 +404,18 @@ void ColourShooterGame::render(uint32_t now) const {
       continue;
     }
     const uint32_t color = colorForIndex(shot.colorIndex);
-    LedManager::setStripPixel(shot.position, color);
+    for (uint8_t width = 0; width < Config::COLOUR_SHOOTER_PIXEL_WIDTH;
+         ++width) {
+      if (shot.position >= width) {
+        LedManager::setStripPixel(shot.position - width, color);
+      }
+    }
     for (uint8_t trail = 1; trail <= SHOT_TRAIL_LENGTH; ++trail) {
-      if (shot.position >= trail) {
+      const uint8_t trailOffset =
+          Config::COLOUR_SHOOTER_PIXEL_WIDTH + trail - 1;
+      if (shot.position >= trailOffset) {
         LedManager::setStripPixel(
-            shot.position - trail,
+            shot.position - trailOffset,
             scaleColor(color, trail == 1 ? 128 : 48));
       }
     }
