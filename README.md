@@ -25,7 +25,8 @@ rules are in [ARCHITECTURE.md](ARCHITECTURE.md).
 - One 288-pixel APA102/SK9822 strip on hardware SPI
 - Four color game buttons: red, green, blue, yellow
 - One illuminated selector button with a NeoPixel
-- Optional rotary encoder and setup button inputs
+- Rotary encoder and setup button inputs; firmware support is present, hardware
+  validation is pending
 - External fused 5 V supply for the LED strip
 
 The controller, strip, and PSU require a common ground. USB and PSU positive
@@ -100,6 +101,7 @@ All tunable constants live in `include/config.h`.
 - PSU limit: FastLED estimate of 3000 mA at brightness 85/255
 - Measured full-white PSU current: approximately 3.5 A
 - Full-white stress-test duration: 10 seconds; any button aborts
+- Render interval: 20 ms (50 frames per second)
 
 ## Memory baseline
 
@@ -110,3 +112,16 @@ The reviewed seven-game build uses:
 
 The SRAM figure does not include peak stack usage. Future games must use small,
 fixed state and no additional LED framebuffer.
+
+## Planned user interface work
+
+The rotary encoder is already decoded in firmware: rotation changes the game
+selection in either direction and the encoder click starts the selected game.
+The remaining task is a hardware test and, if needed, adjustment of direction,
+debounce, or steps per detent in `include/config.h`.
+
+A score/game-mode display is not assigned to pins yet. A conventional buffered
+128x64 monochrome display needs 1024 bytes of framebuffer RAM and does not fit
+the current 656-byte static SRAM reserve. Flash is also limited to 754 bytes.
+See [ARCHITECTURE.md](ARCHITECTURE.md) for display constraints and the proposed
+integration order.

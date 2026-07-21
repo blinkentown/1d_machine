@@ -44,6 +44,7 @@ Pins are centralized in `include/pins.h`. Tunable values are centralized in
 Reviewed build baseline:
 
 - Static SRAM: 1904 / 2560 bytes
+- SRAM sections: 658 bytes `.data` and 1246 bytes `.bss`
 - Flash: 27918 / 28672 bytes
 - Largest game states: Snake 240 bytes, Colour Shooter 124 bytes, Twang 29
   bytes, Pong 24 bytes, Meteor Dodge 20 bytes, Reaction Race 18 bytes,
@@ -58,6 +59,59 @@ reserve, not a target for another game.
 The AVR build enables link-time optimization, shared function prologues,
 reduced small-function inlining, unsplit wide values, and linker relaxation to
 preserve flash for game logic.
+
+## Performance review
+
+- The render interval is 20 ms, or at most 50 frames per second.
+- The compiled APA102 hardware-SPI divider is 2, which is 8 MHz on the 16 MHz
+  ATmega32U4. One 288-pixel APA102 transfer is about 1196 protocol bytes, or
+  about 1.2 ms of raw wire time. Rendering, FastLED power calculation, and the
+  one-pixel NeoPixel transfer add CPU time, but the LED transfer is well below
+  the 20 ms frame budget.
+- Input and game updates remain non-blocking. Serial messages occur on state or
+  score events, not once per frame.
+- Encoder A/B are polled with 2 ms debounce. This is suitable for normal hand
+  rotation but must be tested with the installed encoder; very fast movement
+  can skip transitions during LED output. D2/D3 support an interrupt-based
+  decoder later if polling proves insufficient.
+- No large local arrays were found. The 656-byte SRAM reserve still includes
+  the unknown runtime stack, so a stack high-water measurement is recommended
+  before adding another persistent buffer.
+
+## Rotary encoder status
+
+The firmware already initializes D2/D3 with `INPUT_PULLUP`, debounces both
+signals, decodes the quadrature transition table, accumulates four transitions
+per detent, and applies `Config::ENCODER_DIRECTION`. At the selector, rotation
+moves backward or forward through all seven games and the D4 encoder click
+starts the selected game. Hardware validation remains outstanding.
+
+## Score and game-mode display constraints
+
+- Hardware I2C uses D2/D3, which are already assigned to the encoder.
+- Hardware SPI uses D15/D16 and is occupied by the APA102 string, which has no
+  chip-select input. A display cannot safely share arbitrary SPI traffic with
+  that string.
+- A 128x64 one-bit framebuffer needs 1024 bytes; 128x32 needs 512 bytes. Both
+  are unsafe with only 656 static bytes left for stack and future state.
+- Only 754 application-flash bytes remain. The 67 current flash strings occupy
+  approximately 1653 bytes before print code, so optional serial diagnostics
+  are the first candidate for a display build profile, but removing them alone
+  may not fit a general graphics library.
+- The games do not yet expose a common score model: Pong and Reaction Race have
+  two scores, Twang has level/lives, and the other games use different
+  score/life/round values. A small `UiSnapshot` interface should be added before
+  a display driver so display code does not depend on private game internals.
+
+Recommended integration order:
+
+1. Hardware-test encoder direction and detent count.
+2. Select the exact display and decide between free GPIO/software bus or a
+   controller change.
+3. Add a fixed-size, allocation-free `UiSnapshot` for mode and scores.
+4. Reclaim flash with an optional reduced-serial build profile.
+5. Add a low-RAM text or numeric driver, then repeat clean build, stack, timing,
+   power, and hardware tests.
 
 ## Adding a game
 
@@ -76,7 +130,8 @@ preserve flash for game logic.
 ## Review notes
 
 - All seven selectable games are implemented.
-- Encoder decoding exists in firmware, but the current hardware build does not
-  depend on the encoder.
+- Encoder decoding and selector integration exist in firmware; installed
+  hardware behavior has not yet been validated.
+- No display driver or shared score/mode view model is implemented.
 - FastLED current limiting is an estimate. The measured 3000 mA setting draws
   approximately 3.5 A during the full-white test.

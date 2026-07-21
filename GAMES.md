@@ -18,7 +18,10 @@ these action labels. There is currently no dedicated pause input.
 ## Selector and power-mode outputs
 
 At the game selector, short-press the illuminated selector to advance one game.
-Hold it for about 0.8 seconds to confirm the displayed game.
+Hold it for about 0.8 seconds to confirm the displayed game. Alternatively,
+turn the rotary encoder to select in either direction and press the encoder to
+start. Encoder direction and steps per detent are configurable; hardware
+validation is still pending.
 
 To change power mode without restarting, remain at the game selector and hold
 the blue and yellow game buttons together for two seconds.
@@ -46,13 +49,18 @@ Reaction Race selection.
 
 ## Starting a game
 
-1. Short-press the illuminated selector until it shows the desired game color.
-2. Hold the illuminated selector for about 0.8 seconds.
-3. An implemented game starts immediately. Its selector output remains the
-   selected game's color.
+Use either control path:
 
-Press the illuminated selector during any running game to return to game
-selection. The selector output then shows the selected game's color.
+- Short-press the illuminated selector until it shows the desired game color,
+  then hold it for about 0.8 seconds.
+- Or turn the rotary encoder to the desired color and press the encoder.
+
+The selected game starts immediately and the selector output remains its game
+color.
+
+Press the illuminated selector or the setup button during any running game to
+return to game selection. The selector output then shows the selected game's
+color.
 
 ## Twang
 
