@@ -45,7 +45,7 @@ Pins are centralized in `include/pins.h`. Tunable values are centralized in
 Reviewed encoder-and-display build baseline:
 
 - Static SRAM: 1897 / 2560 bytes
-- Flash: 26522 / 28672 bytes
+- Flash: 26664 / 28672 bytes
 - Largest game states: Snake 240 bytes, Colour Shooter 124 bytes, Twang 29
   bytes, Pong 24 bytes, Meteor Dodge 20 bytes, Reaction Race 18 bytes,
   Memory Sequence 15 bytes
@@ -53,7 +53,7 @@ Reviewed encoder-and-display build baseline:
 The remaining 663 SRAM bytes also contain the runtime stack. All seven game
 states currently fit as fixed globals. Any substantial future game or feature
 should overlay inactive game states in shared storage and consolidate repeated
-projectile/effect code first. The remaining 2150 flash bytes are maintenance
+projectile/effect code first. The remaining 2008 flash bytes are maintenance
 reserve, not a target for another large game.
 
 The AVR build enables link-time optimization, shared function prologues,
@@ -72,8 +72,8 @@ preserve flash for game logic.
   are compiled out by default; the USB startup message remains.
 - The TM1637 driver retains only six previous segment bytes and one state byte.
   It compares display content every rendered frame but transmits only after a
-  visible change. Its approximately 167 kHz bit clock is below the controller's
-  500 kHz maximum.
+  visible change. The hardware-validated 100 us half-clock timing follows the
+  conservative reference-driver default.
 - Encoder A/B are polled with 2 ms debounce. Normal hand rotation and encoder
   click are hardware-validated; very fast movement can still skip transitions
   during LED output. D2/D3 support an interrupt-based decoder later if polling
@@ -104,6 +104,11 @@ first two digits hold a fixed game abbreviation. The last four show one
 four-digit value or two two-digit player scores. Decimal points serve as the
 life indicators or the divider between player scores.
 
+The installed module exposes its physical grids in `3-2-1-6-5-4` order and is
+viewed rotated by 180 degrees. The final output transform therefore remaps the
+six grid addresses, reverses the viewing order, and rotates segments A through
+F while preserving the center segment and decimal-point bit.
+
 ## Adding a game
 
 1. Add a small state-machine class under `include/games` and `src/games`.
@@ -123,7 +128,7 @@ life indicators or the divider between player scores.
 - All seven selectable games are implemented.
 - Encoder decoding, selector integration, and installed hardware behavior are
   validated.
-- The encoder and six-digit TM1637 display are integrated; display wiring and
-  digit order still require validation on the physical module.
+- The encoder and six-digit TM1637 display are integrated and hardware-tested.
+  All six digits and all six decimal points are validated on A0/A1.
 - FastLED current limiting is an estimate. The measured 3000 mA setting draws
   approximately 3.5 A during the full-white test.

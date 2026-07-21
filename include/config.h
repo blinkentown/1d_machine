@@ -43,7 +43,8 @@ constexpr uint8_t PSU_LED_BRIGHTNESS = 85;
 constexpr uint16_t PSU_LED_MAX_MILLIAMPS = 3000;
 constexpr uint16_t RENDER_INTERVAL_MS = 20;
 constexpr uint8_t TM1637_BRIGHTNESS = 2;
-constexpr uint8_t TM1637_HALF_CLOCK_US = 3;
+constexpr uint8_t TM1637_HALF_CLOCK_US = 100;
+constexpr bool TM1637_ROTATE_180 = true;
 
 static_assert(TM1637_BRIGHTNESS <= 7, "TM1637 brightness must be 0..7");
 

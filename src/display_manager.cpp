@@ -45,7 +45,10 @@ void lineLow(uint8_t pin) {
   pinMode(pin, OUTPUT);
 }
 
-void lineHigh(uint8_t pin) { pinMode(pin, INPUT_PULLUP); }
+void lineHigh(uint8_t pin) {
+  digitalWrite(pin, LOW);
+  pinMode(pin, INPUT);
+}
 
 void busDelay() { delayMicroseconds(Config::TM1637_HALF_CLOCK_US); }
 
@@ -93,6 +96,37 @@ uint8_t digitGlyph(uint8_t digit) {
   return pgm_read_byte(&DIGIT_GLYPHS[digit % 10U]);
 }
 
+uint8_t rotateGlyph180(uint8_t glyph) {
+  uint8_t rotated = glyph & (SEGMENT_DP | 0x40U);
+  rotated |= (glyph & 0x01U) << 3U;  // A -> D
+  rotated |= (glyph & 0x02U) << 3U;  // B -> E
+  rotated |= (glyph & 0x04U) << 3U;  // C -> F
+  rotated |= (glyph & 0x08U) >> 3U;  // D -> A
+  rotated |= (glyph & 0x10U) >> 3U;  // E -> B
+  rotated |= (glyph & 0x20U) >> 3U;  // F -> C
+  return rotated;
+}
+
+void mapDigitsToModule(const uint8_t* logical, uint8_t* physical) {
+  if (Config::TM1637_ROTATE_180) {
+    physical[0] = rotateGlyph180(logical[3]);
+    physical[1] = rotateGlyph180(logical[4]);
+    physical[2] = rotateGlyph180(logical[5]);
+    physical[3] = rotateGlyph180(logical[0]);
+    physical[4] = rotateGlyph180(logical[1]);
+    physical[5] = rotateGlyph180(logical[2]);
+    return;
+  }
+
+  // Common six-digit modules wire their grids as 3, 2, 1, 6, 5, 4.
+  physical[0] = logical[2];
+  physical[1] = logical[1];
+  physical[2] = logical[0];
+  physical[3] = logical[5];
+  physical[4] = logical[4];
+  physical[5] = logical[3];
+}
+
 void setModeGlyphs(uint8_t* digits, Mode mode) {
   const uint8_t offset = static_cast<uint8_t>(mode) * 2U;
   digits[0] = pgm_read_byte(&MODE_GLYPHS[offset]);
@@ -100,9 +134,11 @@ void setModeGlyphs(uint8_t* digits, Mode mode) {
 }
 
 void writeDisplay(const uint8_t* digits) {
+  uint8_t mappedDigits[DIGIT_COUNT];
+  mapDigitsToModule(digits, mappedDigits);
   bool changed = !displayInitialized;
   for (uint8_t index = 0; index < DIGIT_COUNT; ++index) {
-    if (digits[index] != previousDigits[index]) {
+    if (mappedDigits[index] != previousDigits[index]) {
       changed = true;
     }
   }
@@ -117,8 +153,8 @@ void writeDisplay(const uint8_t* digits) {
   startCondition();
   writeByte(0xC0);
   for (uint8_t index = 0; index < DIGIT_COUNT; ++index) {
-    writeByte(digits[index]);
-    previousDigits[index] = digits[index];
+    writeByte(mappedDigits[index]);
+    previousDigits[index] = mappedDigits[index];
   }
   stopCondition();
 

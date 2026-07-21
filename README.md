@@ -98,6 +98,10 @@ ground, `CLK` to A0, and `DIO` to A1. It is a two-wire TM1637 interface, not
 I2C. The firmware uses a small allocation-free driver and updates the module
 only when its content changes.
 
+The installed display is viewed rotated by 180 degrees. The firmware corrects
+both the module's `3-2-1-6-5-4` grid order and the rotated segment geometry;
+`TM1637_ROTATE_180` in `include/config.h` records that mounting orientation.
+
 The first two digits identify the game: `tG`, `CS`, `PG`, `rC`, `Sn`, `Mt`,
 or `ME`. During selection the remaining four digits are blank. Single-player
 games use the last four digits for level, score, or sequence length. Up to
@@ -125,7 +129,7 @@ All tunable constants live in `include/config.h`.
 The reviewed seven-game build with encoder and TM1637 display uses:
 
 - SRAM: 1897 / 2560 bytes (74.1%)
-- Flash: 26522 / 28672 bytes (92.5%)
+- Flash: 26664 / 28672 bytes (93.0%)
 
 The SRAM figure does not include peak stack usage. Future games must use small,
 fixed state and no additional LED framebuffer.
