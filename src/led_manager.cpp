@@ -22,10 +22,15 @@ void begin() {
   FastLED.addLeds<APA102, Pins::LED_DATA, Pins::LED_CLOCK, BGR>(
       stripLeds, Config::LED_COUNT);
   FastLED.addLeds<NEOPIXEL, Pins::MODE_PIXEL_DATA>(modePixel, 1);
-  FastLED.setBrightness(Config::LED_BRIGHTNESS);
-  FastLED.setMaxPowerInVoltsAndMilliamps(Config::LED_SUPPLY_VOLTS,
-                                        Config::LED_MAX_MILLIAMPS);
+  setPowerLimits(Config::BENCH_LED_BRIGHTNESS,
+                 Config::BENCH_LED_MAX_MILLIAMPS);
   FastLED.clear(true);
+}
+
+void setPowerLimits(uint8_t brightness, uint16_t maxMilliamps) {
+  FastLED.setBrightness(brightness);
+  FastLED.setMaxPowerInVoltsAndMilliamps(Config::LED_SUPPLY_VOLTS,
+                                        maxMilliamps);
 }
 
 void clearStrip() {

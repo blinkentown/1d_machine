@@ -1,42 +1,35 @@
 # Power modes
 
-The firmware has two compile-time power profiles. The bench binary does not
-contain an active full-strip-white test path. The PSU profile must be selected
-explicitly when building or uploading.
+One firmware contains two runtime power modes. Upload it once at the desk; no
+upload connection is required when the machine is powered from its PSU.
 
-## Bench profile
+## Bench mode
 
-Environment: `sparkfun_promicro16_bench`
+Bench mode is selected on every normal boot.
 
-- Default PlatformIO environment.
 - FastLED limit: 100 mA.
 - Global brightness: 32/255.
-- Power preflight stops after the five-pixel game-load preview.
-- The external strip power supply should be off and the strip power connection
-  should be disconnected while working on USB power alone.
+- The power preflight stops after the five-pixel game-load preview.
+- The 288-pixel white stage remains runtime-locked.
 
-Build and upload:
+## PSU mode
 
-```powershell
-platformio run -e sparkfun_promicro16_bench
-platformio run -e sparkfun_promicro16_bench -t upload
-```
+To enter PSU mode, hold both Setup and the illuminated selector while powering
+on. Keep both held for two seconds. Releasing either button early cancels the
+arming sequence and leaves the firmware in bench mode.
 
-## PSU profile
-
-Environment: `sparkfun_promicro16_psu`
-
-- Must be selected explicitly.
 - FastLED limit: 6000 mA.
 - Global brightness: 16/255 for the first full-strip measurement.
-- Adds a timed 10-second stage with all 288 pixels white.
+- The power preflight adds a timed 10-second stage with all 288 pixels white.
 - The strip is cleared automatically after the measurement stage.
+- PSU mode remains latched until reset or power-off.
+- Every normal restart returns to bench mode.
 
-Build and upload:
+Build and upload the single firmware at the desk:
 
 ```powershell
-platformio run -e sparkfun_promicro16_psu
-platformio run -e sparkfun_promicro16_psu -t upload
+platformio run -e sparkfun_promicro16
+platformio run -e sparkfun_promicro16 -t upload
 ```
 
 ## Power wiring boundary

@@ -4,20 +4,43 @@
 #include "game_manager.h"
 #include "input_manager.h"
 #include "led_manager.h"
+#include "power_mode_manager.h"
+
+namespace {
+
+bool gameManagerStarted = false;
+
+}  // namespace
 
 void setup() {
   Serial.begin(Config::SERIAL_BAUD_RATE);
   InputManager::begin();
   LedManager::begin();
-  GameManager::begin(millis());
+  const uint32_t now = millis();
+  PowerModeManager::begin(now);
 
   Serial.println(F("1d_machine game firmware ready"));
-  Serial.print(F("Power profile: "));
-  Serial.println(Config::PSU_POWER_PROFILE ? F("PSU") : F("BENCH"));
+
+  if (PowerModeManager::isReady()) {
+    GameManager::begin(now);
+    gameManagerStarted = true;
+  }
 }
 
 void loop() {
   const uint32_t now = millis();
   InputManager::update(now);
+  PowerModeManager::update(now);
+
+  if (!PowerModeManager::isReady()) {
+    return;
+  }
+
+  if (!gameManagerStarted) {
+    GameManager::begin(now);
+    gameManagerStarted = true;
+    return;
+  }
+
   GameManager::update(now);
 }
