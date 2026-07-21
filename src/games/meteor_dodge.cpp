@@ -26,8 +26,8 @@ void MeteorDodgeGame::start(uint32_t now) {
   if (randomState_ == 0) {
     randomState_ = 1;
   }
-  Serial.println(F("Meteor Dodge started"));
-  Serial.println(F("Red/Green move, Blue dashes, Yellow shields"));
+  DEBUG_PRINTLN(F("Meteor Dodge started"));
+  DEBUG_PRINTLN(F("Red/Green move, Blue dashes, Yellow shields"));
   startMeteor(now);
 }
 

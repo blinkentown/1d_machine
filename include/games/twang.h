@@ -7,6 +7,8 @@ class TwangGame {
   void start(uint32_t now);
   void update(uint32_t now);
   void render(uint32_t now) const;
+  uint8_t level() const { return level_; }
+  uint8_t lives() const { return lives_; }
 
  private:
   enum class Phase : uint8_t {

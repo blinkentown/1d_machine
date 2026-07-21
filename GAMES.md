@@ -61,6 +61,26 @@ Press the illuminated selector or the setup button during any running game to
 return to game selection. The selector output then shows the selected game's
 color.
 
+## Six-digit display
+
+The first two characters identify the selected or running game:
+
+| Game | Display prefix |
+| --- | --- |
+| Twang | `tG` |
+| Colour Shooter | `CS` |
+| 1D Pong | `PG` |
+| Reaction Race | `rC` |
+| Snake 1D | `Sn` |
+| Meteor Dodge | `Mt` |
+| Memory Sequence | `ME` |
+
+While selecting, the last four digits are blank. Twang shows its level; Colour
+Shooter, Snake, and Meteor Dodge show score; Memory Sequence shows sequence
+length. Their rightmost decimal points show up to three remaining lives. Pong
+and Reaction Race show `P1.P2`, using two score digits per player and the point
+after Player 1 as the separator.
+
 ## Twang
 
 Selector output: orange.

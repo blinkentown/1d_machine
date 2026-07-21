@@ -11,7 +11,7 @@ void MemorySequenceGame::start(uint32_t now) {
   }
   length_ = Config::MEMORY_START_LENGTH;
   won_ = false;
-  Serial.println(F("Memory Sequence started: repeat R/G/B/Y"));
+  DEBUG_PRINTLN(F("Memory Sequence started: repeat R/G/B/Y"));
   beginShowing(now);
 }
 

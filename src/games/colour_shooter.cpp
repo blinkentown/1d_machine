@@ -40,8 +40,8 @@ void ColourShooterGame::start(uint32_t now) {
   lastSpawnAt_ = now;
   phase_ = Phase::Playing;
 
-  Serial.println(F("Colour Shooter: Incoming Wave"));
-  Serial.println(F("Fire matching R/G/B/Y pixels into the incoming row"));
+  DEBUG_PRINTLN(F("Colour Shooter: Incoming Wave"));
+  DEBUG_PRINTLN(F("Fire matching R/G/B/Y pixels into the incoming row"));
 }
 
 void ColourShooterGame::resetObjects() {
@@ -238,11 +238,11 @@ bool ColourShooterGame::resolveShotCollision(Shot& shot, uint32_t now) {
       stepIntervalMs_ = faster < minimum ? minimum : faster;
     }
 
-    Serial.print(F("Dissolved. Score: "));
-    Serial.println(score_);
+    DEBUG_PRINT(F("Dissolved. Score: "));
+    DEBUG_PRINTLN(score_);
   } else {
     startDissolve(hitPosition, Config::COLOUR_SHOOTER_ERROR_COLOR, now);
-    Serial.println(F("Wrong shot blocked"));
+    DEBUG_PRINTLN(F("Wrong shot blocked"));
   }
   return true;
 }
@@ -285,15 +285,15 @@ void ColourShooterGame::loseLife(uint32_t now,
   startDissolve(Config::COLOUR_SHOOTER_HOME_POSITION,
                 Config::COLOUR_SHOOTER_ERROR_COLOR, now);
 
-  Serial.print(reason);
-  Serial.print(F(". Lives: "));
-  Serial.println(lives_);
+  DEBUG_PRINT(reason);
+  DEBUG_PRINT(F(". Lives: "));
+  DEBUG_PRINTLN(lives_);
 
   if (lives_ == 0) {
     phase_ = Phase::GameOver;
-    Serial.print(F("Game over. Score: "));
-    Serial.println(score_);
-    Serial.println(F("Press any color button to restart"));
+    DEBUG_PRINT(F("Game over. Score: "));
+    DEBUG_PRINTLN(score_);
+    DEBUG_PRINTLN(F("Press any color button to restart"));
   }
 }
 

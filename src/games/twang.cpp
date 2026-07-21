@@ -25,8 +25,8 @@ void TwangGame::start(uint32_t now) {
     randomState_ = 1;
   }
 
-  Serial.println(F("Twang started"));
-  Serial.println(F("Red/Green move, Blue attacks, Yellow dashes"));
+  DEBUG_PRINTLN(F("Twang started"));
+  DEBUG_PRINTLN(F("Red/Green move, Blue attacks, Yellow dashes"));
   startLevel(now);
 }
 

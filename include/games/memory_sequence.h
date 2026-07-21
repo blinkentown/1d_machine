@@ -7,6 +7,7 @@ class MemorySequenceGame {
   void start(uint32_t now);
   void update(uint32_t now);
   void render(uint32_t now) const;
+  uint8_t length() const { return length_; }
 
  private:
   enum class Phase : uint8_t {

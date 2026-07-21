@@ -29,7 +29,7 @@ void applyBenchMode() {
   LedManager::clearStrip();
   LedManager::setModePixel(0);
   LedManager::show();
-  Serial.println(F("Power mode: BENCH"));
+  DEBUG_PRINTLN(F("Power mode: BENCH"));
 }
 
 void applyPsuMode() {
@@ -39,7 +39,7 @@ void applyPsuMode() {
   LedManager::clearStrip();
   LedManager::setModePixel(Config::PSU_MODE_READY_COLOR);
   LedManager::show();
-  Serial.println(F("Power mode: PSU"));
+  DEBUG_PRINTLN(F("Power mode: PSU"));
 }
 
 }  // namespace
@@ -52,7 +52,7 @@ void begin(uint32_t now) {
     armStartedAt = now;
     LedManager::setModePixel(Config::PSU_MODE_ARMING_COLOR);
     LedManager::show();
-    Serial.println(F("Hold Blue + Yellow for 2 seconds to arm PSU mode"));
+    DEBUG_PRINTLN(F("Hold Blue + Yellow for 2 seconds to arm PSU mode"));
   } else {
     startupState = StartupState::Ready;
   }
@@ -74,7 +74,7 @@ void update(uint32_t now) {
   if (!bootChordHeld()) {
     startupState = StartupState::WaitingForRelease;
     applyBenchMode();
-    Serial.println(F("PSU mode arming cancelled"));
+    DEBUG_PRINTLN(F("PSU mode arming cancelled"));
     return;
   }
 

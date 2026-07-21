@@ -20,8 +20,8 @@ void ReactionRaceGame::start(uint32_t now) {
   if (randomState_ == 0) {
     randomState_ = 1;
   }
-  Serial.println(F("Reaction Race started"));
-  Serial.println(F("P1 alternates Red/Green; P2 alternates Blue/Yellow"));
+  DEBUG_PRINTLN(F("Reaction Race started"));
+  DEBUG_PRINTLN(F("P1 alternates Red/Green; P2 alternates Blue/Yellow"));
   prepareRound(now);
 }
 

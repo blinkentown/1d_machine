@@ -26,9 +26,9 @@ void Snake1DGame::start(uint32_t now) {
   lastSnakeStepAt_ = now;
   phase_ = Phase::Playing;
 
-  Serial.println(F("Snake 1D started"));
-  Serial.println(F("Shoot the matching color at the continuous snake head"));
-  Serial.println(F("Rainbow bonus accepts any three color shots"));
+  DEBUG_PRINTLN(F("Snake 1D started"));
+  DEBUG_PRINTLN(F("Shoot the matching color at the continuous snake head"));
+  DEBUG_PRINTLN(F("Rainbow bonus accepts any three color shots"));
 }
 
 void Snake1DGame::resetObjects() {
@@ -271,7 +271,7 @@ bool Snake1DGame::resolveShotCollision(Shot& shot, uint32_t now) {
     combo_ = 0;
     startBlast(headPosition_, Config::SNAKE_ERROR_COLOR,
                Config::EXPLOSION_INTENSITY, now);
-    Serial.println(F("Wrong color blocked by snake head"));
+    DEBUG_PRINTLN(F("Wrong color blocked by snake head"));
     return true;
   }
 
@@ -291,10 +291,10 @@ bool Snake1DGame::resolveShotCollision(Shot& shot, uint32_t now) {
     --head.hitPoints;
     if (head.hitPoints == 0) {
       removeFrontSegment();
-      Serial.println(F("Rainbow armor destroyed"));
+      DEBUG_PRINTLN(F("Rainbow armor destroyed"));
     } else {
-      Serial.print(F("Rainbow bonus hit. Remaining: "));
-      Serial.println(head.hitPoints);
+      DEBUG_PRINT(F("Rainbow bonus hit. Remaining: "));
+      DEBUG_PRINTLN(head.hitPoints);
     }
   } else {
     removeFrontSegment();
@@ -310,10 +310,10 @@ bool Snake1DGame::resolveShotCollision(Shot& shot, uint32_t now) {
     baseStepIntervalMs_ = faster < minimum ? minimum : faster;
   }
 
-  Serial.print(F("Snake hit. Score: "));
-  Serial.print(score_);
-  Serial.print(F(" Combo: "));
-  Serial.println(combo_);
+  DEBUG_PRINT(F("Snake hit. Score: "));
+  DEBUG_PRINT(score_);
+  DEBUG_PRINT(F(" Combo: "));
+  DEBUG_PRINTLN(combo_);
   return true;
 }
 
@@ -371,13 +371,13 @@ void Snake1DGame::handleBreach(uint32_t now) {
   startBlast(Config::SNAKE_HOME_POSITION, Config::SNAKE_ERROR_COLOR,
              Config::EXPLOSION_INTENSITY + 2U, now);
 
-  Serial.print(F("Snake breached. Lives: "));
-  Serial.println(lives_);
+  DEBUG_PRINT(F("Snake breached. Lives: "));
+  DEBUG_PRINTLN(lives_);
   if (lives_ == 0) {
     phase_ = Phase::GameOver;
-    Serial.print(F("Snake game over. Score: "));
-    Serial.println(score_);
-    Serial.println(F("Press any color button to restart"));
+    DEBUG_PRINT(F("Snake game over. Score: "));
+    DEBUG_PRINTLN(score_);
+    DEBUG_PRINTLN(F("Press any color button to restart"));
     return;
   }
 

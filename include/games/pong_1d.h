@@ -7,6 +7,8 @@ class Pong1DGame {
   void start(uint32_t now);
   void update(uint32_t now);
   void render(uint32_t now) const;
+  uint8_t leftScore() const { return leftScore_; }
+  uint8_t rightScore() const { return rightScore_; }
 
  private:
   enum class Phase : uint8_t {

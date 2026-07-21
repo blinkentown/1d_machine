@@ -9,6 +9,8 @@ class Snake1DGame {
   void start(uint32_t now);
   void update(uint32_t now);
   void render(uint32_t now) const;
+  uint16_t score() const { return score_; }
+  uint8_t lives() const { return lives_; }
 
  private:
   enum class Phase : uint8_t {

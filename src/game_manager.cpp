@@ -1,6 +1,7 @@
 #include "game_manager.h"
 
 #include "config.h"
+#include "display_manager.h"
 #include "games/colour_shooter.h"
 #include "games/meteor_dodge.h"
 #include "games/memory_sequence.h"
@@ -16,16 +17,7 @@
 namespace GameManager {
 namespace {
 
-enum class GameId : uint8_t {
-  Twang,
-  ColourShooter,
-  Pong1D,
-  ReactionRace,
-  Snake1D,
-  MeteorDodge,
-  MemorySequence,
-  Count,
-};
+using GameId = DisplayManager::Mode;
 
 enum class State : uint8_t {
   Selecting,
@@ -55,6 +47,7 @@ uint32_t stressChordStartedAt = 0;
 bool stressChordTracking = false;
 bool stressChordHandled = false;
 
+#if ENABLE_SERIAL_DIAGNOSTICS
 const __FlashStringHelper* gameName(GameId game) {
   switch (game) {
     case GameId::Twang:
@@ -77,6 +70,7 @@ const __FlashStringHelper* gameName(GameId game) {
 
   return F("Unknown");
 }
+#endif
 
 uint32_t gameColor(GameId game) {
   switch (game) {
@@ -102,8 +96,8 @@ uint32_t gameColor(GameId game) {
 }
 
 void printSelection() {
-  Serial.print(F("Selected: "));
-  Serial.println(gameName(selectedGame));
+  DEBUG_PRINT(F("Selected: "));
+  DEBUG_PRINTLN(gameName(selectedGame));
 }
 
 void changeSelection(int8_t direction) {
@@ -150,7 +144,7 @@ void startSelectedGame(uint32_t now) {
 void returnToSelector() {
   state = State::Selecting;
   LedManager::clearStrip();
-  Serial.println(F("Returned to game selector"));
+  DEBUG_PRINTLN(F("Returned to game selector"));
   printSelection();
 }
 
@@ -170,7 +164,7 @@ void updatePowerModeChord(uint32_t now) {
   if (!powerChordTracking) {
     powerChordTracking = true;
     powerChordStartedAt = now;
-    Serial.println(F("Hold Blue + Yellow to toggle power mode"));
+    DEBUG_PRINTLN(F("Hold Blue + Yellow to toggle power mode"));
     return;
   }
 
@@ -200,7 +194,7 @@ void updatePowerStressChord(uint32_t now) {
   if (!stressChordTracking) {
     stressChordTracking = true;
     stressChordStartedAt = now;
-    Serial.println(F("Hold Red + Blue to start power stress"));
+    DEBUG_PRINTLN(F("Hold Red + Blue to start power stress"));
     return;
   }
 
@@ -265,30 +259,45 @@ void render(uint32_t now) {
     } else {
       LedManager::setModePixel(gameColor(selectedGame));
     }
+    DisplayManager::showSelection(selectedGame);
   } else if (state == State::PowerStress) {
     powerStressTest.render();
   } else {
     switch (selectedGame) {
       case GameId::Twang:
         twang.render(now);
+        DisplayManager::showSingleScore(selectedGame, twang.level(),
+                                        twang.lives());
         break;
       case GameId::ColourShooter:
         colourShooter.render(now);
+        DisplayManager::showSingleScore(selectedGame, colourShooter.score(),
+                                        colourShooter.lives());
         break;
       case GameId::Pong1D:
         pong.render(now);
+        DisplayManager::showVersusScore(selectedGame, pong.leftScore(),
+                                        pong.rightScore());
         break;
       case GameId::ReactionRace:
         reactionRace.render(now);
+        DisplayManager::showVersusScore(selectedGame,
+                                        reactionRace.player1Score(),
+                                        reactionRace.player2Score());
         break;
       case GameId::Snake1D:
         snake.render(now);
+        DisplayManager::showSingleScore(selectedGame, snake.score(),
+                                        snake.lives());
         break;
       case GameId::MeteorDodge:
         meteorDodge.render(now);
+        DisplayManager::showSingleScore(selectedGame, meteorDodge.score(),
+                                        meteorDodge.lives());
         break;
       case GameId::MemorySequence:
         memorySequence.render(now);
+        DisplayManager::showSingleScore(selectedGame, memorySequence.length());
         break;
       default:
         LedManager::clearStrip();
@@ -304,10 +313,10 @@ void render(uint32_t now) {
 
 void begin(uint32_t now) {
   lastRenderAt = now - Config::RENDER_INTERVAL_MS;
-  Serial.println(F("Mode button: short press selects, long press confirms"));
-  Serial.println(F("Mode/setup button exits a running game"));
-  Serial.println(F("At selector: hold Blue + Yellow to toggle power mode"));
-  Serial.println(F("At selector: hold Red + Blue to start 10 s power stress"));
+  DEBUG_PRINTLN(F("Mode button: short press selects, long press confirms"));
+  DEBUG_PRINTLN(F("Mode/setup button exits a running game"));
+  DEBUG_PRINTLN(F("At selector: hold Blue + Yellow to toggle power mode"));
+  DEBUG_PRINTLN(F("At selector: hold Red + Blue to start 10 s power stress"));
   printSelection();
 }
 

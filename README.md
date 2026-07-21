@@ -27,6 +27,7 @@ rules are in [ARCHITECTURE.md](ARCHITECTURE.md).
 - One illuminated selector button with a NeoPixel
 - Rotary encoder and setup button inputs; encoder selection and click are
   hardware-validated
+- Six-digit, six-decimal-point TM1637 score display
 - External fused 5 V supply for the LED strip
 
 The controller, strip, and PSU require a common ground. USB and PSU positive
@@ -44,6 +45,8 @@ rails must not be tied together without proper power-source isolation.
 | Red / green / blue / yellow buttons | D6 / D7 / D8 / D9 |
 | Selector NeoPixel data | D10 |
 | Selector switch | D14 |
+| TM1637 display clock / CLK | A0 |
+| TM1637 display data / DIO | A1 |
 
 All switches use `INPUT_PULLUP`: released is `HIGH`, pressed is `LOW`.
 
@@ -88,6 +91,20 @@ reset can interrupt the bootloader while it is programming.
 
 The serial monitor runs at 115200 baud.
 
+## Score display
+
+Connect the four-pin TM1637 module as follows: `VCC` to 5 V, `GND` to common
+ground, `CLK` to A0, and `DIO` to A1. It is a two-wire TM1637 interface, not
+I2C. The firmware uses a small allocation-free driver and updates the module
+only when its content changes.
+
+The first two digits identify the game: `tG`, `CS`, `PG`, `rC`, `Sn`, `Mt`,
+or `ME`. During selection the remaining four digits are blank. Single-player
+games use the last four digits for level, score, or sequence length. Up to
+three rightmost decimal points indicate remaining lives. Pong and Reaction
+Race show the two player scores as `P1.P2`, with two digits available to each
+player.
+
 ## Main configuration
 
 All tunable constants live in `include/config.h`.
@@ -105,23 +122,17 @@ All tunable constants live in `include/config.h`.
 
 ## Memory baseline
 
-The reviewed seven-game build uses:
+The reviewed seven-game build with encoder and TM1637 display uses:
 
-- SRAM: 1904 / 2560 bytes (74.4%)
-- Flash: 27918 / 28672 bytes (97.4%)
+- SRAM: 1897 / 2560 bytes (74.1%)
+- Flash: 26522 / 28672 bytes (92.5%)
 
 The SRAM figure does not include peak stack usage. Future games must use small,
 fixed state and no additional LED framebuffer.
 
-## Planned user interface work
+## Rotary encoder
 
 The rotary encoder is decoded and hardware-tested: rotation changes the game
 selection in either direction and the encoder click starts the selected game.
 Direction, debounce, and steps per detent remain configurable in
 `include/config.h`.
-
-A score/game-mode display is not assigned to pins yet. A conventional buffered
-128x64 monochrome display needs 1024 bytes of framebuffer RAM and does not fit
-the current 656-byte static SRAM reserve. Flash is also limited to 754 bytes.
-See [ARCHITECTURE.md](ARCHITECTURE.md) for display constraints and the proposed
-integration order.

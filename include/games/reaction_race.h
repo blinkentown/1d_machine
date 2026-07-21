@@ -7,6 +7,8 @@ class ReactionRaceGame {
   void start(uint32_t now);
   void update(uint32_t now);
   void render(uint32_t now) const;
+  uint8_t player1Score() const { return player1Score_; }
+  uint8_t player2Score() const { return player2Score_; }
 
  private:
   enum class Phase : uint8_t {

@@ -18,6 +18,7 @@ There are no gameplay delays or dynamic allocations.
 | `input_manager` | Debounced active-low buttons and encoder decoding |
 | `controls.h` | Zero-cost player and one-player aliases for color buttons |
 | `led_manager` | The only 288-pixel framebuffer, selector pixel, FastLED output |
+| `display_manager` | Six-digit TM1637 mode, score, and life output |
 | `power_mode_manager` | Bench/PSU limits and runtime mode switching |
 | `power_stress_test` | Abortable 10-second full-strip load test |
 | `game_manager` | Game selection, confirmation, dispatch, and exit behavior |
@@ -41,20 +42,19 @@ Pins are centralized in `include/pins.h`. Tunable values are centralized in
 - Render game objects directly into the shared LED buffer.
 - Check both SRAM and flash after every playable step.
 
-Reviewed build baseline:
+Reviewed encoder-and-display build baseline:
 
-- Static SRAM: 1904 / 2560 bytes
-- SRAM sections: 658 bytes `.data` and 1246 bytes `.bss`
-- Flash: 27918 / 28672 bytes
+- Static SRAM: 1897 / 2560 bytes
+- Flash: 26522 / 28672 bytes
 - Largest game states: Snake 240 bytes, Colour Shooter 124 bytes, Twang 29
   bytes, Pong 24 bytes, Meteor Dodge 20 bytes, Reaction Race 18 bytes,
   Memory Sequence 15 bytes
 
-The remaining 656 SRAM bytes also contain the runtime stack. All seven game
+The remaining 663 SRAM bytes also contain the runtime stack. All seven game
 states currently fit as fixed globals. Any substantial future game or feature
 should overlay inactive game states in shared storage and consolidate repeated
-projectile/effect code first. The remaining 754 flash bytes are maintenance
-reserve, not a target for another game.
+projectile/effect code first. The remaining 2150 flash bytes are maintenance
+reserve, not a target for another large game.
 
 The AVR build enables link-time optimization, shared function prologues,
 reduced small-function inlining, unsplit wide values, and linker relaxation to
@@ -68,13 +68,17 @@ preserve flash for game logic.
   about 1.2 ms of raw wire time. Rendering, FastLED power calculation, and the
   one-pixel NeoPixel transfer add CPU time, but the LED transfer is well below
   the 20 ms frame budget.
-- Input and game updates remain non-blocking. Serial messages occur on state or
-  score events, not once per frame.
+- Input and game updates remain non-blocking. Detailed serial event diagnostics
+  are compiled out by default; the USB startup message remains.
+- The TM1637 driver retains only six previous segment bytes and one state byte.
+  It compares display content every rendered frame but transmits only after a
+  visible change. Its approximately 167 kHz bit clock is below the controller's
+  500 kHz maximum.
 - Encoder A/B are polled with 2 ms debounce. Normal hand rotation and encoder
   click are hardware-validated; very fast movement can still skip transitions
   during LED output. D2/D3 support an interrupt-based decoder later if polling
   proves insufficient.
-- No large local arrays were found. The 656-byte SRAM reserve still includes
+- No large local arrays were found. The 663-byte SRAM reserve still includes
   the unknown runtime stack, so a stack high-water measurement is recommended
   before adding another persistent buffer.
 
@@ -87,31 +91,18 @@ moves backward or forward through all seven games and the D4 encoder click
 starts the selected game. Normal selection, reverse selection, and click
 behavior are hardware-validated.
 
-## Score and game-mode display constraints
+## Score and game-mode display
 
-- Hardware I2C uses D2/D3, which are already assigned to the encoder.
-- Hardware SPI uses D15/D16 and is occupied by the APA102 string, which has no
-  chip-select input. A display cannot safely share arbitrary SPI traffic with
-  that string.
-- A 128x64 one-bit framebuffer needs 1024 bytes; 128x32 needs 512 bytes. Both
-  are unsafe with only 656 static bytes left for stack and future state.
-- Only 754 application-flash bytes remain. The 67 current flash strings occupy
-  approximately 1653 bytes before print code, so optional serial diagnostics
-  are the first candidate for a display build profile, but removing them alone
-  may not fit a general graphics library.
-- The games do not yet expose a common score model: Pong and Reaction Race have
-  two scores, Twang has level/lives, and the other games use different
-  score/life/round values. A small `UiSnapshot` interface should be added before
-  a display driver so display code does not depend on private game internals.
+The six-digit TM1637 module uses A0 for `CLK` and A1 for `DIO`; its power pins
+connect to 5 V and common ground. The protocol is bit-banged directly because
+D2/D3 remain dedicated to the encoder. The driver ignores acknowledgements so
+the firmware also runs normally when the display is disconnected.
 
-Recommended integration order:
-
-1. Select the exact display and decide between free GPIO/software bus or a
-   controller change.
-2. Add a fixed-size, allocation-free `UiSnapshot` for mode and scores.
-3. Reclaim flash with an optional reduced-serial build profile.
-4. Add a low-RAM text or numeric driver, then repeat clean build, stack, timing,
-   power, and hardware tests.
+No display library, heap allocation, text buffer, or framebuffer is used. Each
+game exposes only its small numeric status through constant-time getters. The
+first two digits hold a fixed game abbreviation. The last four show one
+four-digit value or two two-digit player scores. Decimal points serve as the
+life indicators or the divider between player scores.
 
 ## Adding a game
 
@@ -132,6 +123,7 @@ Recommended integration order:
 - All seven selectable games are implemented.
 - Encoder decoding, selector integration, and installed hardware behavior are
   validated.
-- No display driver or shared score/mode view model is implemented.
+- The encoder and six-digit TM1637 display are integrated; display wiring and
+  digit order still require validation on the physical module.
 - FastLED current limiting is an estimate. The measured 3000 mA setting draws
   approximately 3.5 A during the full-white test.

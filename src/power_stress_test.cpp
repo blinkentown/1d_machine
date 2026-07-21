@@ -7,9 +7,9 @@
 void PowerStressTest::start(uint32_t now) {
   startedAt_ = now;
   active_ = true;
-  Serial.print(F("Power stress started with "));
-  Serial.print(PowerModeManager::isPsuMode() ? F("PSU") : F("BENCH"));
-  Serial.println(F(" limits; press any button to stop"));
+  DEBUG_PRINT(F("Power stress started with "));
+  DEBUG_PRINT(PowerModeManager::isPsuMode() ? F("PSU") : F("BENCH"));
+  DEBUG_PRINTLN(F(" limits; press any button to stop"));
 }
 
 void PowerStressTest::update(uint32_t now) {
@@ -17,14 +17,14 @@ void PowerStressTest::update(uint32_t now) {
       static_cast<uint32_t>(now - startedAt_) >=
           Config::POWER_STRESS_DURATION_MS) {
     active_ = false;
-    Serial.println(F("Power stress completed"));
+    DEBUG_PRINTLN(F("Power stress completed"));
   }
 }
 
 void PowerStressTest::stop() {
   if (active_) {
     active_ = false;
-    Serial.println(F("Power stress stopped by button"));
+    DEBUG_PRINTLN(F("Power stress stopped by button"));
   }
 }
 

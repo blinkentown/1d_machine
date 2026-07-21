@@ -2,6 +2,18 @@
 
 #include <Arduino.h>
 
+#ifndef ENABLE_SERIAL_DIAGNOSTICS
+#define ENABLE_SERIAL_DIAGNOSTICS 0
+#endif
+
+#if ENABLE_SERIAL_DIAGNOSTICS
+#define DEBUG_PRINT(...) Serial.print(__VA_ARGS__)
+#define DEBUG_PRINTLN(...) Serial.println(__VA_ARGS__)
+#else
+#define DEBUG_PRINT(...) do { } while (0)
+#define DEBUG_PRINTLN(...) do { } while (0)
+#endif
+
 namespace Config {
 
 constexpr uint32_t SERIAL_BAUD_RATE = 115200UL;
@@ -30,6 +42,10 @@ constexpr uint16_t BENCH_LED_MAX_MILLIAMPS = 100;
 constexpr uint8_t PSU_LED_BRIGHTNESS = 85;
 constexpr uint16_t PSU_LED_MAX_MILLIAMPS = 3000;
 constexpr uint16_t RENDER_INTERVAL_MS = 20;
+constexpr uint8_t TM1637_BRIGHTNESS = 2;
+constexpr uint8_t TM1637_HALF_CLOCK_US = 3;
+
+static_assert(TM1637_BRIGHTNESS <= 7, "TM1637 brightness must be 0..7");
 
 constexpr uint16_t BUTTON_DEBOUNCE_MS = 20;
 constexpr uint16_t MODE_BUTTON_LONG_PRESS_MS = 800;

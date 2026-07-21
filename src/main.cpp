@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
 #include "config.h"
+#include "display_manager.h"
 #include "game_manager.h"
 #include "input_manager.h"
 #include "led_manager.h"
@@ -15,6 +16,7 @@ bool gameManagerStarted = false;
 void setup() {
   Serial.begin(Config::SERIAL_BAUD_RATE);
   InputManager::begin();
+  DisplayManager::begin();
   LedManager::begin();
   const uint32_t now = millis();
   PowerModeManager::begin(now);

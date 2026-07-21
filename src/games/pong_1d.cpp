@@ -12,9 +12,9 @@ void Pong1DGame::start(uint32_t now) {
   perfectHitSide_ = 0;
   serveIntervalMs_ =
       Config::gameplayInterval(Config::PONG_INITIAL_STEP_MS);
-  Serial.println(F("1D Pong started"));
-  Serial.println(F("Red/P1-A: left hit, Blue/P2-A: right hit"));
-  Serial.println(F("Deeper hits return the ball faster"));
+  DEBUG_PRINTLN(F("1D Pong started"));
+  DEBUG_PRINTLN(F("Red/P1-A: left hit, Blue/P2-A: right hit"));
+  DEBUG_PRINTLN(F("Deeper hits return the ball faster"));
   serve(now);
 }
 
@@ -66,19 +66,19 @@ void Pong1DGame::applyHit(uint8_t depth, int8_t playerSide, uint32_t now) {
     stepIntervalMs_ -= speedup < availableSpeedup ? speedup : availableSpeedup;
   }
 
-  Serial.print(playerSide < 0 ? F("Left") : F("Right"));
-  Serial.print(F(" player hit, quality "));
-  Serial.print(quality);
-  Serial.print(F("/"));
-  Serial.print(Config::PONG_HIT_QUALITY_BANDS);
-  Serial.print(F(", interval "));
-  Serial.print(stepIntervalMs_);
-  Serial.println(F(" ms"));
+  DEBUG_PRINT(playerSide < 0 ? F("Left") : F("Right"));
+  DEBUG_PRINT(F(" player hit, quality "));
+  DEBUG_PRINT(quality);
+  DEBUG_PRINT(F("/"));
+  DEBUG_PRINT(Config::PONG_HIT_QUALITY_BANDS);
+  DEBUG_PRINT(F(", interval "));
+  DEBUG_PRINT(stepIntervalMs_);
+  DEBUG_PRINTLN(F(" ms"));
 
   if (quality == Config::PONG_HIT_QUALITY_BANDS) {
     perfectHitAt_ = now;
     perfectHitSide_ = playerSide;
-    Serial.println(F("Perfect hit!"));
+    DEBUG_PRINTLN(F("Perfect hit!"));
   }
 }
 
@@ -104,10 +104,10 @@ void Pong1DGame::moveBall(uint32_t now) {
 void Pong1DGame::awardPoint(bool leftPlayerScored, uint32_t now) {
   if (leftPlayerScored) {
     ++leftScore_;
-    Serial.println(F("Point: left player"));
+    DEBUG_PRINTLN(F("Point: left player"));
   } else {
     ++rightScore_;
-    Serial.println(F("Point: right player"));
+    DEBUG_PRINTLN(F("Point: right player"));
   }
   printScore();
 
@@ -125,18 +125,18 @@ void Pong1DGame::awardPoint(bool leftPlayerScored, uint32_t now) {
   if (leftScore_ >= Config::PONG_WINNING_SCORE ||
       rightScore_ >= Config::PONG_WINNING_SCORE) {
     phase_ = Phase::GameOver;
-    Serial.print(leftScore_ > rightScore_ ? F("Left") : F("Right"));
-    Serial.println(F(" player wins. Press any color button to restart."));
+    DEBUG_PRINT(leftScore_ > rightScore_ ? F("Left") : F("Right"));
+    DEBUG_PRINTLN(F(" player wins. Press any color button to restart."));
   } else {
     phase_ = Phase::PointDelay;
   }
 }
 
 void Pong1DGame::printScore() const {
-  Serial.print(F("Score "));
-  Serial.print(leftScore_);
-  Serial.print(F(" - "));
-  Serial.println(rightScore_);
+  DEBUG_PRINT(F("Score "));
+  DEBUG_PRINT(leftScore_);
+  DEBUG_PRINT(F(" - "));
+  DEBUG_PRINTLN(rightScore_);
 }
 
 void Pong1DGame::update(uint32_t now) {
