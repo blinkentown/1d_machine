@@ -3,6 +3,7 @@
 #include "config.h"
 #include "games/colour_shooter.h"
 #include "games/pong_1d.h"
+#include "games/snake_1d.h"
 #include "input_manager.h"
 #include "led_manager.h"
 #include "power_mode_manager.h"
@@ -32,6 +33,7 @@ GameId selectedGame = GameId::ColourShooter;
 State state = State::Selecting;
 ColourShooterGame colourShooter;
 Pong1DGame pong;
+Snake1DGame snake;
 PowerTest powerTest;
 uint32_t lastRenderAt = 0;
 uint32_t modeButtonPressedAt = 0;
@@ -107,7 +109,7 @@ void changeSelection(int8_t direction) {
 
 void beginPowerCheck(uint32_t now) {
   if (selectedGame != GameId::ColourShooter &&
-      selectedGame != GameId::Pong1D) {
+      selectedGame != GameId::Pong1D && selectedGame != GameId::Snake1D) {
     Serial.print(gameName(selectedGame));
     Serial.println(F(" is not implemented yet"));
     return;
@@ -121,8 +123,10 @@ void startSelectedGame(uint32_t now) {
   state = State::Running;
   if (selectedGame == GameId::ColourShooter) {
     colourShooter.start(now);
-  } else {
+  } else if (selectedGame == GameId::Pong1D) {
     pong.start(now);
+  } else {
+    snake.start(now);
   }
 }
 
@@ -192,8 +196,10 @@ void render(uint32_t now) {
   } else {
     if (selectedGame == GameId::ColourShooter) {
       colourShooter.render(now);
-    } else {
+    } else if (selectedGame == GameId::Pong1D) {
       pong.render(now);
+    } else {
+      snake.render(now);
     }
     LedManager::setModePixel(gameColor(selectedGame));
   }
@@ -275,8 +281,10 @@ void update(uint32_t now) {
     } else {
       if (selectedGame == GameId::ColourShooter) {
         colourShooter.update(now);
-      } else {
+      } else if (selectedGame == GameId::Pong1D) {
         pong.update(now);
+      } else {
+        snake.update(now);
       }
     }
   }

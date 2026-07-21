@@ -7,6 +7,8 @@ namespace Config {
 constexpr uint32_t SERIAL_BAUD_RATE = 115200UL;
 
 constexpr uint16_t LED_COUNT = 288;
+constexpr uint8_t GAME_PIXEL_WIDTH = 3;
+constexpr uint8_t EXPLOSION_INTENSITY = GAME_PIXEL_WIDTH;
 constexpr uint8_t LED_SUPPLY_VOLTS = 5;
 constexpr uint8_t BENCH_LED_BRIGHTNESS = 32;
 constexpr uint16_t BENCH_LED_MAX_MILLIAMPS = 100;
@@ -46,7 +48,7 @@ constexpr uint32_t PSU_MODE_ARMING_COLOR = 0xFFFF00UL;
 constexpr uint32_t BENCH_MODE_READY_COLOR = 0x0080FFUL;
 
 constexpr uint8_t PONG_PADDLE_LENGTH = 2;
-constexpr uint8_t PONG_HIT_ZONE_LENGTH = 12;
+constexpr uint8_t PONG_HIT_ZONE_LENGTH = 4;
 constexpr uint16_t PONG_INITIAL_STEP_MS = 20;
 constexpr uint16_t PONG_MINIMUM_STEP_MS = 8;
 constexpr uint8_t PONG_SPEEDUP_MS = 1;
@@ -57,7 +59,6 @@ constexpr uint32_t PONG_LEFT_PLAYER_COLOR = BUTTON_1_COLOR;
 constexpr uint32_t PONG_RIGHT_PLAYER_COLOR = BUTTON_3_COLOR;
 
 constexpr uint8_t COLOUR_SHOOTER_STARTING_LIVES = 3;
-constexpr uint8_t COLOUR_SHOOTER_PIXEL_WIDTH = 3;
 constexpr uint8_t COLOUR_SHOOTER_TARGET_COUNT = 8;
 constexpr uint8_t COLOUR_SHOOTER_MAX_SHOTS = 4;
 constexpr uint8_t COLOUR_SHOOTER_MAX_DISSOLVES = 4;
@@ -73,7 +74,28 @@ constexpr uint16_t COLOUR_SHOOTER_SPAWN_INTERVAL_MS = 500;
 constexpr uint16_t COLOUR_SHOOTER_DISSOLVE_MS = 560;
 constexpr uint16_t COLOUR_SHOOTER_STROBE_MS = 200;
 constexpr uint8_t COLOUR_SHOOTER_STROBE_PERIOD_MS = 25;
-constexpr uint8_t COLOUR_SHOOTER_BLAST_RADIUS = 22;
+constexpr uint8_t COLOUR_SHOOTER_BLAST_RADIUS =
+    EXPLOSION_INTENSITY * 7U + 1U;
 constexpr uint32_t COLOUR_SHOOTER_ERROR_COLOR = 0xFF0000UL;
+
+constexpr uint8_t SNAKE_STARTING_LIVES = 3;
+constexpr uint8_t SNAKE_MAX_SEGMENTS = 48;
+constexpr uint8_t SNAKE_MAX_SHOTS = 4;
+constexpr uint8_t SNAKE_MAX_BLASTS = 4;
+constexpr uint8_t SNAKE_INITIAL_LENGTH_CELLS = 24;
+constexpr uint8_t SNAKE_SPECIAL_WIDTH_CELLS = 3;
+constexpr uint8_t SNAKE_SPECIAL_HITS = 3;
+constexpr uint8_t SNAKE_SPECIAL_CHANCE = 7;
+constexpr uint8_t SNAKE_HOME_POSITION = 4;
+constexpr uint16_t SNAKE_INITIAL_STEP_MS = 72;
+constexpr uint16_t SNAKE_MINIMUM_STEP_MS = 26;
+constexpr uint8_t SNAKE_SPEEDUP_MS = 2;
+constexpr uint8_t SNAKE_SPEEDUP_EVERY = 4;
+constexpr uint8_t SNAKE_SHOT_STEP_MS = 6;
+constexpr uint8_t SNAKE_SLOW_ZONE_CELLS = 18;
+constexpr uint8_t SNAKE_CLOSE_SLOWDOWN_PERCENT = 30;
+constexpr uint8_t SNAKE_BREACH_PUSHBACK_CELLS = 8;
+constexpr uint16_t SNAKE_BLAST_MS = 420;
+constexpr uint32_t SNAKE_ERROR_COLOR = 0xFF0000UL;
 
 }  // namespace Config

@@ -34,6 +34,8 @@ the power preflight.
 - The power preflight adds a timed 10-second stage with all 288 pixels white.
 - Verify the actual current during that stage; the FastLED limit is an
   estimate, not a current sensor.
+- Measured full-white current with the 3000 mA software setting and 85/255
+  brightness: approximately 3.5 A.
 - The strip is cleared automatically after the measurement stage.
 - The selected mode remains active until changed or reset.
 - Every normal restart returns to bench mode.

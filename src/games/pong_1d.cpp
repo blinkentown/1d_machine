@@ -24,7 +24,9 @@ void Pong1DGame::serve(uint32_t now) {
 
 void Pong1DGame::handleHits() {
   if (InputManager::wasPressed(InputManager::Button::Game1) &&
-      ballDirection_ < 0 && ballPosition_ < Config::PONG_HIT_ZONE_LENGTH) {
+      ballDirection_ < 0 &&
+      ballPosition_ <
+          Config::PONG_HIT_ZONE_LENGTH * Config::GAME_PIXEL_WIDTH) {
     ballDirection_ = 1;
     if (stepIntervalMs_ > Config::PONG_MINIMUM_STEP_MS) {
       stepIntervalMs_ -= Config::PONG_SPEEDUP_MS;
@@ -33,7 +35,8 @@ void Pong1DGame::handleHits() {
   }
 
   const uint16_t rightHitZoneStart =
-      Config::LED_COUNT - Config::PONG_HIT_ZONE_LENGTH;
+      Config::LED_COUNT -
+      Config::PONG_HIT_ZONE_LENGTH * Config::GAME_PIXEL_WIDTH;
   if (InputManager::wasPressed(InputManager::Button::Game3) &&
       ballDirection_ > 0 && ballPosition_ >= rightHitZoneStart) {
     ballDirection_ = -1;
@@ -130,7 +133,9 @@ void Pong1DGame::update(uint32_t now) {
 void Pong1DGame::render(uint32_t now) const {
   LedManager::clearStrip();
 
-  for (uint8_t index = 0; index < Config::PONG_PADDLE_LENGTH; ++index) {
+  const uint8_t paddleWidth =
+      Config::PONG_PADDLE_LENGTH * Config::GAME_PIXEL_WIDTH;
+  for (uint8_t index = 0; index < paddleWidth; ++index) {
     LedManager::setStripPixel(index, Config::PONG_LEFT_PLAYER_COLOR);
     LedManager::setStripPixel(Config::LED_COUNT - 1 - index,
                               Config::PONG_RIGHT_PLAYER_COLOR);
@@ -140,5 +145,13 @@ void Pong1DGame::render(uint32_t now) const {
     return;
   }
 
-  LedManager::setStripPixel(ballPosition_, Config::PONG_BALL_COLOR);
+  for (uint8_t width = 0; width < Config::GAME_PIXEL_WIDTH; ++width) {
+    if (ballDirection_ < 0) {
+      LedManager::setStripPixel(ballPosition_ + width,
+                                Config::PONG_BALL_COLOR);
+    } else if (ballPosition_ >= width) {
+      LedManager::setStripPixel(ballPosition_ - width,
+                                Config::PONG_BALL_COLOR);
+    }
+  }
 }

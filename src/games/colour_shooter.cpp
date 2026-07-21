@@ -9,9 +9,9 @@ namespace {
 constexpr uint8_t TARGET_TRAIL_LENGTH = 2;
 constexpr uint8_t SHOT_TRAIL_LENGTH = 2;
 
-static_assert(Config::COLOUR_SHOOTER_PIXEL_WIDTH > 0,
-              "Colour Shooter pixel width must be at least one LED");
-static_assert(Config::COLOUR_SHOOTER_PIXEL_WIDTH <
+static_assert(Config::GAME_PIXEL_WIDTH > 0,
+              "Game pixel width must be at least one LED");
+static_assert(Config::GAME_PIXEL_WIDTH <
                   Config::COLOUR_SHOOTER_TARGET_SPACING,
               "Colour Shooter pixels must fit between targets");
 
@@ -153,7 +153,8 @@ void ColourShooterGame::spawnTargetAtFarEnd(uint32_t now) {
 void ColourShooterGame::launchShot(uint8_t colorIndex, uint32_t now) {
   for (uint8_t index = 0; index < Config::COLOUR_SHOOTER_MAX_SHOTS; ++index) {
     if (!shots_[index].active) {
-      shots_[index].position = Config::COLOUR_SHOOTER_HOME_POSITION + 1;
+      shots_[index].position =
+          Config::COLOUR_SHOOTER_HOME_POSITION + Config::GAME_PIXEL_WIDTH;
       shots_[index].lastStepAt = now;
       shots_[index].colorIndex = colorIndex;
       shots_[index].active = true;
@@ -381,7 +382,7 @@ void ColourShooterGame::render(uint32_t now) const {
     }
     const uint32_t color = colorForIndex(target.colorIndex);
     const uint32_t bodyColor = scaleColor(color, 128);
-    for (uint8_t width = 0; width < Config::COLOUR_SHOOTER_PIXEL_WIDTH;
+    for (uint8_t width = 0; width < Config::GAME_PIXEL_WIDTH;
          ++width) {
       const uint16_t bodyPosition = target.position + width;
       if (bodyPosition < Config::LED_COUNT) {
@@ -390,7 +391,7 @@ void ColourShooterGame::render(uint32_t now) const {
     }
     for (uint8_t trail = 1; trail <= TARGET_TRAIL_LENGTH; ++trail) {
       const uint16_t trailPosition =
-          target.position + Config::COLOUR_SHOOTER_PIXEL_WIDTH + trail - 1;
+          target.position + Config::GAME_PIXEL_WIDTH + trail - 1;
       if (trailPosition < Config::LED_COUNT) {
         LedManager::setStripPixel(
             trailPosition,
@@ -406,7 +407,7 @@ void ColourShooterGame::render(uint32_t now) const {
     }
     const uint32_t color = colorForIndex(shot.colorIndex);
     const uint32_t bodyColor = scaleColor(color, 176);
-    for (uint8_t width = 0; width < Config::COLOUR_SHOOTER_PIXEL_WIDTH;
+    for (uint8_t width = 0; width < Config::GAME_PIXEL_WIDTH;
          ++width) {
       if (shot.position >= width) {
         LedManager::setStripPixel(shot.position - width, bodyColor);
@@ -414,7 +415,7 @@ void ColourShooterGame::render(uint32_t now) const {
     }
     for (uint8_t trail = 1; trail <= SHOT_TRAIL_LENGTH; ++trail) {
       const uint8_t trailOffset =
-          Config::COLOUR_SHOOTER_PIXEL_WIDTH + trail - 1;
+          Config::GAME_PIXEL_WIDTH + trail - 1;
       if (shot.position >= trailOffset) {
         LedManager::setStripPixel(
             shot.position - trailOffset,
@@ -434,7 +435,7 @@ void ColourShooterGame::render(uint32_t now) const {
       const uint8_t pulse = static_cast<uint8_t>(
           elapsed / Config::COLOUR_SHOOTER_STROBE_PERIOD_MS);
       const uint8_t radius = static_cast<uint8_t>(
-          Config::COLOUR_SHOOTER_PIXEL_WIDTH + pulse * 2U);
+          Config::EXPLOSION_INTENSITY + pulse * 2U);
 
       if ((pulse & 0x01U) == 0U) {
         for (int16_t offset = -static_cast<int16_t>(radius);
