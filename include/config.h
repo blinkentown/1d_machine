@@ -2,14 +2,23 @@
 
 #include <Arduino.h>
 
+#ifndef POWER_PROFILE_PSU
+#error "Select an explicit PlatformIO bench or PSU environment"
+#endif
+
+#if POWER_PROFILE_PSU != 0 && POWER_PROFILE_PSU != 1
+#error "POWER_PROFILE_PSU must be 0 or 1"
+#endif
+
 namespace Config {
 
 constexpr uint32_t SERIAL_BAUD_RATE = 115200UL;
 
+constexpr bool PSU_POWER_PROFILE = POWER_PROFILE_PSU == 1;
 constexpr uint16_t LED_COUNT = 288;
-constexpr uint8_t LED_BRIGHTNESS = 32;
+constexpr uint8_t LED_BRIGHTNESS = PSU_POWER_PROFILE ? 16 : 32;
 constexpr uint8_t LED_SUPPLY_VOLTS = 5;
-constexpr uint16_t LED_MAX_MILLIAMPS = 100;
+constexpr uint16_t LED_MAX_MILLIAMPS = PSU_POWER_PROFILE ? 6000 : 100;
 constexpr uint16_t RENDER_INTERVAL_MS = 20;
 
 constexpr uint16_t BUTTON_DEBOUNCE_MS = 20;
@@ -34,6 +43,7 @@ constexpr uint32_t MODE_METEOR_DODGE_COLOR = 0xFF0000UL;
 constexpr uint32_t MODE_MEMORY_COLOR = 0x8000FFUL;
 
 constexpr uint16_t POWER_TEST_STAGE_MS = 1200;
+constexpr uint16_t POWER_TEST_FULL_LOAD_MS = 10000;
 constexpr uint32_t POWER_TEST_COLOR = 0xFFFFFFUL;
 constexpr uint32_t POWER_TEST_READY_COLOR = 0x00FF00UL;
 

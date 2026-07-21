@@ -14,6 +14,7 @@ class PowerTest {
     DarkBaseline,
     SinglePixel,
     GameLoad,
+    FullStripLoad,
     Ready,
   };
 

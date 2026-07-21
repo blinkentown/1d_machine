@@ -12,6 +12,8 @@ void setup() {
   GameManager::begin(millis());
 
   Serial.println(F("1d_machine game firmware ready"));
+  Serial.print(F("Power profile: "));
+  Serial.println(Config::PSU_POWER_PROFILE ? F("PSU") : F("BENCH"));
 }
 
 void loop() {

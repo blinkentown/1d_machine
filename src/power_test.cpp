@@ -7,6 +7,8 @@ void PowerTest::start(uint32_t now) {
   stage_ = Stage::DarkBaseline;
   stageStartedAt_ = now;
   Serial.println(F("Power preflight: dark baseline"));
+  Serial.print(F("Profile: "));
+  Serial.println(Config::PSU_POWER_PROFILE ? F("PSU") : F("BENCH"));
   Serial.println(F("Software-limited preview only; no current sensor is fitted"));
 }
 
@@ -23,9 +25,19 @@ void PowerTest::advance(uint32_t now) {
       Serial.println(F("Power preflight: five-pixel worst-case game preview"));
       break;
     case Stage::GameLoad:
+#if POWER_PROFILE_PSU
+      stage_ = Stage::FullStripLoad;
+      Serial.println(F("PSU test: all 288 pixels low-brightness white for 10 s"));
+#else
       stage_ = Stage::Ready;
       Serial.println(F("Power preview complete"));
-      Serial.println(F("Press encoder to confirm and start the game"));
+      Serial.println(F("Press/hold the selector to start the game"));
+#endif
+      break;
+    case Stage::FullStripLoad:
+      stage_ = Stage::Ready;
+      Serial.println(F("PSU full-strip measurement stage complete"));
+      Serial.println(F("Press/hold the selector to start the game"));
       break;
     case Stage::Ready:
       break;
@@ -33,9 +45,15 @@ void PowerTest::advance(uint32_t now) {
 }
 
 void PowerTest::update(uint32_t now) {
+  uint16_t stageDurationMs = Config::POWER_TEST_STAGE_MS;
+#if POWER_PROFILE_PSU
+  if (stage_ == Stage::FullStripLoad) {
+    stageDurationMs = Config::POWER_TEST_FULL_LOAD_MS;
+  }
+#endif
+
   if (stage_ != Stage::Ready &&
-      static_cast<uint32_t>(now - stageStartedAt_) >=
-          Config::POWER_TEST_STAGE_MS) {
+      static_cast<uint32_t>(now - stageStartedAt_) >= stageDurationMs) {
     advance(now);
   }
 }
@@ -62,6 +80,16 @@ void PowerTest::render() const {
       LedManager::setStripPixel(Config::LED_COUNT - 1,
                                 Config::POWER_TEST_COLOR);
       LedManager::setModePixel(Config::POWER_TEST_COLOR);
+      break;
+    case Stage::FullStripLoad:
+#if POWER_PROFILE_PSU
+      for (uint16_t index = 0; index < Config::LED_COUNT; ++index) {
+        LedManager::setStripPixel(index, Config::POWER_TEST_COLOR);
+      }
+      LedManager::setModePixel(Config::POWER_TEST_COLOR);
+#else
+      LedManager::setModePixel(0);
+#endif
       break;
     case Stage::Ready:
       LedManager::setModePixel(Config::POWER_TEST_READY_COLOR);
