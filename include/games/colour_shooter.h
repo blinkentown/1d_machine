@@ -11,28 +11,54 @@ class ColourShooterGame {
  private:
   enum class Phase : uint8_t {
     Playing,
-    Feedback,
     GameOver,
   };
 
-  void spawnTarget(uint32_t now);
+  struct Target {
+    uint16_t position;
+    uint8_t colorIndex;
+    bool active;
+  };
+
+  struct Shot {
+    uint16_t position;
+    uint32_t lastStepAt;
+    uint8_t colorIndex;
+    bool active;
+  };
+
+  struct Dissolve {
+    uint16_t position;
+    uint32_t startedAt;
+    uint32_t color;
+    bool active;
+  };
+
+  void resetObjects();
+  bool spawnTarget(uint16_t position);
+  void spawnTargetAtFarEnd(uint32_t now);
   void handleButtonPress(uint32_t now);
-  void handleMiss(uint32_t now);
+  void launchShot(uint8_t colorIndex, uint32_t now);
+  void updateShots(uint32_t now);
+  void updateTargets(uint32_t now);
+  void updateDissolves(uint32_t now);
+  bool resolveShotCollision(Shot& shot, uint32_t now);
+  void startDissolve(uint16_t position, uint32_t color, uint32_t now);
   void loseLife(uint32_t now, const __FlashStringHelper* reason);
-  void beginFeedback(uint32_t now, uint16_t durationMs, uint32_t color);
   uint8_t nextColorIndex();
+  bool farEndIsClear() const;
   static uint32_t colorForIndex(uint8_t index);
+  static uint32_t scaleColor(uint32_t color, uint8_t scale);
   static int8_t pressedColorIndex();
 
   Phase phase_ = Phase::Playing;
-  uint16_t targetPosition_ = 0;
+  Target targets_[8] = {};
+  Shot shots_[4] = {};
+  Dissolve dissolves_[4] = {};
   uint16_t stepIntervalMs_ = 0;
-  uint16_t feedbackDurationMs_ = 0;
   uint16_t randomState_ = 1;
-  uint32_t lastStepAt_ = 0;
-  uint32_t phaseChangedAt_ = 0;
-  uint32_t feedbackColor_ = 0;
+  uint32_t lastTargetStepAt_ = 0;
+  uint32_t lastSpawnAt_ = 0;
   uint16_t score_ = 0;
   uint8_t lives_ = 0;
-  uint8_t targetColorIndex_ = 0;
 };
