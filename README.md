@@ -7,13 +7,13 @@ APA102/SK9822 strip and a SparkFun Pro Micro 5 V / 16 MHz.
 
 | Selector output | Game | Status |
 | --- | --- | --- |
-| Orange | Twang | Planned |
+| Orange | Twang | Playable |
 | Yellow | Colour Shooter | Playable |
 | Blue | 1D Pong | Playable |
-| Green | Reaction Race | Planned |
+| Green | Reaction Race | Playable |
 | Cyan | Snake 1D | Playable |
-| Red | Meteor Dodge | Planned |
-| Purple | Memory Sequence | Planned |
+| Red | Meteor Dodge | Playable |
+| Purple | Memory Sequence | Playable |
 
 Detailed controls are in [GAMES.md](GAMES.md). Power wiring and runtime power
 modes are in [POWER_MODES.md](POWER_MODES.md). Firmware structure and memory
@@ -103,10 +103,10 @@ All tunable constants live in `include/config.h`.
 
 ## Memory baseline
 
-The reviewed three-game build uses:
+The reviewed seven-game build uses:
 
-- SRAM: 1802 / 2560 bytes (70.4%)
-- Flash: 22724 / 28672 bytes (79.3%)
+- SRAM: 1904 / 2560 bytes (74.4%)
+- Flash: 27918 / 28672 bytes (97.4%)
 
 The SRAM figure does not include peak stack usage. Future games must use small,
 fixed state and no additional LED framebuffer.

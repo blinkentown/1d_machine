@@ -21,8 +21,12 @@ There are no gameplay delays or dynamic allocations.
 | `power_mode_manager` | Bench/PSU limits and runtime mode switching |
 | `power_stress_test` | Abortable 10-second full-strip load test |
 | `game_manager` | Game selection, confirmation, dispatch, and exit behavior |
+| `games/twang` | Cell-mask dungeon, movement, dash, attack, and level states |
+| `games/meteor_dodge` | Warning, movement, dash, shield, and impact states |
+| `games/memory_sequence` | Seeded sequence playback, input, and round states |
 | `games/colour_shooter` | Incoming targets, shots, lives, and impact effects |
 | `games/pong_1d` | Ball, paddles, scoring, point delay, and serve states |
+| `games/reaction_race` | Random start, false starts, alternating inputs, rounds |
 | `games/snake_1d` | Continuous segment queue, rainbow bonus, shots, and combo |
 
 Pins are centralized in `include/pins.h`. Tunable values are centralized in
@@ -39,14 +43,21 @@ Pins are centralized in `include/pins.h`. Tunable values are centralized in
 
 Reviewed build baseline:
 
-- Static SRAM: 1802 / 2560 bytes
-- Flash: 22724 / 28672 bytes
-- Largest game states: Snake 240 bytes, Colour Shooter 124 bytes, Pong 24
-  bytes
+- Static SRAM: 1904 / 2560 bytes
+- Flash: 27918 / 28672 bytes
+- Largest game states: Snake 240 bytes, Colour Shooter 124 bytes, Twang 29
+  bytes, Pong 24 bytes, Meteor Dodge 20 bytes, Reaction Race 18 bytes,
+  Memory Sequence 15 bytes
 
-The remaining 758 SRAM bytes also contain the runtime stack. Before adding all
-four planned games, active game states should be overlaid in shared storage and
-duplicate projectile/explosion code should be consolidated.
+The remaining 656 SRAM bytes also contain the runtime stack. All seven game
+states currently fit as fixed globals. Any substantial future game or feature
+should overlay inactive game states in shared storage and consolidate repeated
+projectile/effect code first. The remaining 754 flash bytes are maintenance
+reserve, not a target for another game.
+
+The AVR build enables link-time optimization, shared function prologues,
+reduced small-function inlining, unsplit wide values, and linker relaxation to
+preserve flash for game logic.
 
 ## Adding a game
 
@@ -64,9 +75,7 @@ duplicate projectile/explosion code should be consolidated.
 
 ## Review notes
 
-- Colour Shooter, 1D Pong, and Snake 1D are implemented.
-- Twang, Reaction Race, Meteor Dodge, and Memory Sequence remain selectable
-  placeholders and do not start when confirmed.
+- All seven selectable games are implemented.
 - Encoder decoding exists in firmware, but the current hardware build does not
   depend on the encoder.
 - FastLED current limiting is an estimate. The measured 3000 mA setting draws
