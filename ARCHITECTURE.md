@@ -24,6 +24,7 @@ There are no gameplay delays or dynamic allocations.
 | `games/twang` | Cell-mask dungeon, movement, dash, attack, and level states |
 | `games/colour_shooter` | Incoming targets, shots, lives, and impact effects |
 | `games/pong_1d` | Ball, paddles, scoring, point delay, and serve states |
+| `games/reaction_race` | Random start, false starts, alternating inputs, rounds |
 | `games/snake_1d` | Continuous segment queue, rainbow bonus, shots, and combo |
 
 Pins are centralized in `include/pins.h`. Tunable values are centralized in
@@ -40,12 +41,12 @@ Pins are centralized in `include/pins.h`. Tunable values are centralized in
 
 Reviewed build baseline:
 
-- Static SRAM: 1846 / 2560 bytes
-- Flash: 24766 / 28672 bytes
+- Static SRAM: 1864 / 2560 bytes
+- Flash: 26184 / 28672 bytes
 - Largest game states: Snake 240 bytes, Colour Shooter 124 bytes, Twang 32
-  bytes, Pong 24 bytes
+  bytes, Pong 24 bytes, Reaction Race 18 bytes
 
-The remaining 714 SRAM bytes also contain the runtime stack. Before adding all
+The remaining 696 SRAM bytes also contain the runtime stack. Before adding all
 four planned games, active game states should be overlaid in shared storage and
 duplicate projectile/explosion code should be consolidated.
 
@@ -69,8 +70,8 @@ preserve flash for game logic.
 
 ## Review notes
 
-- Twang, Colour Shooter, 1D Pong, and Snake 1D are implemented.
-- Reaction Race, Meteor Dodge, and Memory Sequence remain selectable
+- Twang, Colour Shooter, 1D Pong, Reaction Race, and Snake 1D are implemented.
+- Meteor Dodge and Memory Sequence remain selectable
   placeholders and do not start when confirmed.
 - Encoder decoding exists in firmware, but the current hardware build does not
   depend on the encoder.

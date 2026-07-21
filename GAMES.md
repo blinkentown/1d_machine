@@ -34,6 +34,7 @@ the blue and yellow game buttons together for two seconds.
 | Twang selected/running | Orange |
 | Colour Shooter selected/running | Yellow |
 | 1D Pong selected/running | Blue |
+| Reaction Race selected/running | Green |
 | Snake 1D selected/running | Cyan |
 
 After a one-second power confirmation, the selector output returns to the
@@ -111,6 +112,26 @@ Selector output: blue.
 - First player to five points wins.
 - Game-over output: the winning 24-LED paddle flashes red on the left or blue
   on the right.
+- Any color game button restarts after game over.
+
+## Reaction Race
+
+Selector output: green.
+
+- The center pulses amber during a randomized 1.5- to 4-second start delay.
+- Any early press is a false start and awards the round to the other player.
+  If both players false-start together, neither scores.
+- The two center cells turn green when the race begins.
+- Player 1 alternates red / P1-A and green / P1-B. A red trail advances from
+  the left.
+- Player 2 alternates blue / P2-A and yellow / P2-B. A blue trail advances
+  from the right.
+- Each moving tip displays the exact physical button color expected next.
+  Pressing the wrong button does not advance the racer.
+- The first racer to reach the center wins the round. A simultaneous finish is
+  a tie and awards no point.
+- First to three rounds wins. The winning color alternates with white across
+  the full strip.
 - Any color game button restarts after game over.
 
 ## Snake 1D

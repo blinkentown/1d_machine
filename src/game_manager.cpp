@@ -3,6 +3,7 @@
 #include "config.h"
 #include "games/colour_shooter.h"
 #include "games/pong_1d.h"
+#include "games/reaction_race.h"
 #include "games/snake_1d.h"
 #include "games/twang.h"
 #include "input_manager.h"
@@ -35,6 +36,7 @@ State state = State::Selecting;
 TwangGame twang;
 ColourShooterGame colourShooter;
 Pong1DGame pong;
+ReactionRaceGame reactionRace;
 Snake1DGame snake;
 PowerStressTest powerStressTest;
 uint32_t lastRenderAt = 0;
@@ -115,7 +117,9 @@ void changeSelection(int8_t direction) {
 bool selectedGameIsImplemented() {
   return selectedGame == GameId::Twang ||
          selectedGame == GameId::ColourShooter ||
-         selectedGame == GameId::Pong1D || selectedGame == GameId::Snake1D;
+         selectedGame == GameId::Pong1D ||
+         selectedGame == GameId::ReactionRace ||
+         selectedGame == GameId::Snake1D;
 }
 
 void startSelectedGame(uint32_t now) {
@@ -135,6 +139,9 @@ void startSelectedGame(uint32_t now) {
       break;
     case GameId::Pong1D:
       pong.start(now);
+      break;
+    case GameId::ReactionRace:
+      reactionRace.start(now);
       break;
     case GameId::Snake1D:
       snake.start(now);
@@ -275,6 +282,9 @@ void render(uint32_t now) {
       case GameId::Pong1D:
         pong.render(now);
         break;
+      case GameId::ReactionRace:
+        reactionRace.render(now);
+        break;
       case GameId::Snake1D:
         snake.render(now);
         break;
@@ -372,6 +382,9 @@ void update(uint32_t now) {
           break;
         case GameId::Pong1D:
           pong.update(now);
+          break;
+        case GameId::ReactionRace:
+          reactionRace.update(now);
           break;
         case GameId::Snake1D:
           snake.update(now);

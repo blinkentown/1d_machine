@@ -214,23 +214,15 @@ void TwangGame::update(uint32_t now) {
   }
 }
 
-void TwangGame::renderCell(uint8_t cell, uint32_t color) {
-  const uint16_t start =
-      static_cast<uint16_t>(cell) * Config::GAME_PIXEL_WIDTH;
-  for (uint8_t width = 0; width < Config::GAME_PIXEL_WIDTH; ++width) {
-    LedManager::setStripPixel(start + width, color);
-  }
-}
-
 void TwangGame::render(uint32_t now) const {
   LedManager::clearStrip();
 
   if (phase_ == Phase::GameOver) {
     if ((now / 180U) % 2U == 0U) {
       const uint8_t center = CELL_COUNT / 2U;
-      renderCell(center - 1U, Config::TWANG_ENEMY_COLOR);
-      renderCell(center, 0xFFFFFFUL);
-      renderCell(center + 1U, Config::TWANG_ENEMY_COLOR);
+      LedManager::setGameCell(center - 1U, Config::TWANG_ENEMY_COLOR);
+      LedManager::setGameCell(center, 0xFFFFFFUL);
+      LedManager::setGameCell(center + 1U, Config::TWANG_ENEMY_COLOR);
     }
     return;
   }
@@ -243,26 +235,26 @@ void TwangGame::render(uint32_t now) const {
       cells = CELL_COUNT;
     }
     for (uint8_t cell = 0; cell < cells; ++cell) {
-      renderCell(cell, Config::TWANG_EXIT_COLOR);
+      LedManager::setGameCell(cell, Config::TWANG_EXIT_COLOR);
     }
     return;
   }
 
-  renderCell(EXIT_CELL, Config::TWANG_EXIT_COLOR);
+  LedManager::setGameCell(EXIT_CELL, Config::TWANG_EXIT_COLOR);
   for (uint8_t cell = Config::TWANG_START_CELL; cell < EXIT_CELL; ++cell) {
     const uint32_t bit = cellBit(cell);
     if ((lavaMask_ & bit) != 0U) {
-      renderCell(cell, ((now / 90U + cell) & 0x01U) == 0U
-                           ? Config::TWANG_LAVA_COLOR
-                           : 0x401000UL);
+      LedManager::setGameCell(cell, ((now / 90U + cell) & 0x01U) == 0U
+                                       ? Config::TWANG_LAVA_COLOR
+                                       : 0x401000UL);
     } else if ((enemyMask_ & bit) != 0U) {
-      renderCell(cell, ((now / 140U + cell) & 0x01U) == 0U
-                           ? Config::TWANG_ENEMY_COLOR
-                           : 0x500000UL);
+      LedManager::setGameCell(cell, ((now / 140U + cell) & 0x01U) == 0U
+                                       ? Config::TWANG_ENEMY_COLOR
+                                       : 0x500000UL);
     }
   }
 
-  renderCell(playerCell_, Config::TWANG_PLAYER_COLOR);
+  LedManager::setGameCell(playerCell_, Config::TWANG_PLAYER_COLOR);
   const uint16_t directionPixel =
       static_cast<uint16_t>(playerCell_) * Config::GAME_PIXEL_WIDTH +
       (facing_ > 0 ? Config::GAME_PIXEL_WIDTH - 1U : 0U);

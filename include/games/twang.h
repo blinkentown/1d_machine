@@ -22,7 +22,6 @@ class TwangGame {
   void loseLife(uint32_t now, const __FlashStringHelper* reason);
   uint16_t nextRandom();
   static uint32_t cellBit(uint8_t cell);
-  static void renderCell(uint8_t cell, uint32_t color);
 
   Phase phase_ = Phase::Playing;
   uint32_t enemyMask_ = 0;

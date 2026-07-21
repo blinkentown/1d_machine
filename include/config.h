@@ -97,6 +97,16 @@ constexpr uint32_t TWANG_LAVA_COLOR = 0xFF4000UL;
 constexpr uint32_t TWANG_EXIT_COLOR = 0x00FF00UL;
 constexpr uint32_t TWANG_LIFE_COLOR = 0x004000UL;
 
+constexpr uint8_t REACTION_ROUNDS_TO_WIN = 3;
+constexpr uint16_t REACTION_WAIT_MIN_MS = 1500;
+constexpr uint16_t REACTION_WAIT_MAX_MS = 4000;
+constexpr uint16_t REACTION_ROUND_RESULT_MS = 1000;
+constexpr uint32_t REACTION_PLAYER_1_COLOR = 0xFF0000UL;
+constexpr uint32_t REACTION_PLAYER_2_COLOR = 0x0000FFUL;
+constexpr uint32_t REACTION_WAIT_COLOR = 0xFF8000UL;
+constexpr uint32_t REACTION_GO_COLOR = 0x00FF00UL;
+constexpr uint32_t REACTION_FALSE_START_COLOR = 0xFFFF00UL;
+
 constexpr uint8_t COLOUR_SHOOTER_STARTING_LIVES = 3;
 constexpr uint8_t COLOUR_SHOOTER_TARGET_COUNT = 8;
 constexpr uint8_t COLOUR_SHOOTER_MAX_SHOTS = 4;
