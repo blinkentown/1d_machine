@@ -83,7 +83,7 @@ void Pong1DGame::awardPoint(bool leftPlayerScored, uint32_t now) {
       rightScore_ >= Config::PONG_WINNING_SCORE) {
     phase_ = Phase::GameOver;
     Serial.print(leftScore_ > rightScore_ ? F("Left") : F("Right"));
-    Serial.println(F(" player wins. Press encoder to restart."));
+    Serial.println(F(" player wins. Press any color button to restart."));
   } else {
     phase_ = Phase::PointPause;
   }
@@ -114,7 +114,11 @@ void Pong1DGame::update(uint32_t now) {
   }
 
   if (phase_ == Phase::GameOver) {
-    if (InputManager::wasPressed(InputManager::Button::EncoderClick)) {
+    if (InputManager::wasPressed(InputManager::Button::Game1) ||
+        InputManager::wasPressed(InputManager::Button::Game2) ||
+        InputManager::wasPressed(InputManager::Button::Game3) ||
+        InputManager::wasPressed(InputManager::Button::Game4) ||
+        InputManager::wasPressed(InputManager::Button::EncoderClick)) {
       start(now);
     }
     return;
@@ -137,6 +141,21 @@ void Pong1DGame::render(uint32_t now) const {
 
   const uint8_t paddleWidth =
       Config::PONG_PADDLE_LENGTH * Config::GAME_PIXEL_WIDTH;
+
+  if (phase_ == Phase::GameOver) {
+    if ((now / 250U) % 2U == 0U) {
+      for (uint8_t index = 0; index < paddleWidth; ++index) {
+        if (leftScore_ > rightScore_) {
+          LedManager::setStripPixel(index, Config::PONG_LEFT_PLAYER_COLOR);
+        } else {
+          LedManager::setStripPixel(Config::LED_COUNT - 1 - index,
+                                    Config::PONG_RIGHT_PLAYER_COLOR);
+        }
+      }
+    }
+    return;
+  }
+
   for (uint8_t index = 0; index < paddleWidth; ++index) {
     LedManager::setStripPixel(index, Config::PONG_LEFT_PLAYER_COLOR);
     LedManager::setStripPixel(Config::LED_COUNT - 1 - index,

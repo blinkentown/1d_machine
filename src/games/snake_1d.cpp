@@ -127,10 +127,19 @@ bool Snake1DGame::appendSegment(bool special) {
     return false;
   }
 
+  uint8_t colorIndex = nextColorIndex();
+  if (!special && segmentCount_ > 0) {
+    const Segment& previous = segments_[segmentCount_ - 1];
+    if (!previous.special && colorIndex == previous.colorIndex) {
+      colorIndex = static_cast<uint8_t>(
+          (colorIndex + 1U + (randomState_ & 0x01U)) & 0x03U);
+    }
+  }
+
   Segment& segment = segments_[segmentCount_++];
   segment.special = special;
   segment.hitPoints = special ? Config::SNAKE_SPECIAL_HITS : 1U;
-  segment.colorIndex = nextColorIndex();
+  segment.colorIndex = colorIndex;
   return true;
 }
 
@@ -422,9 +431,11 @@ void Snake1DGame::render(uint32_t now) const {
 
   if (phase_ == Phase::GameOver) {
     if ((now / 180U) % 2U == 0U) {
-      for (uint8_t width = 0; width < Config::GAME_PIXEL_WIDTH * 3U;
-           ++width) {
-        LedManager::setStripPixel(Config::LED_COUNT / 2U + width,
+      const uint8_t gameOverWidth = Config::GAME_PIXEL_WIDTH * 3U;
+      const uint16_t gameOverStart =
+          Config::LED_COUNT / 2U - gameOverWidth / 2U;
+      for (uint8_t width = 0; width < gameOverWidth; ++width) {
+        LedManager::setStripPixel(gameOverStart + width,
                                   Config::SNAKE_ERROR_COLOR);
       }
     }

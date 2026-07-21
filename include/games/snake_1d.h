@@ -2,6 +2,8 @@
 
 #include <Arduino.h>
 
+#include "config.h"
+
 class Snake1DGame {
  public:
   void start(uint32_t now);
@@ -62,9 +64,9 @@ class Snake1DGame {
   static uint32_t rainbowColor(uint8_t index);
   static uint32_t scaleColor(uint32_t color, uint8_t scale);
 
-  Segment segments_[48] = {};
-  Shot shots_[4] = {};
-  Blast blasts_[4] = {};
+  Segment segments_[Config::SNAKE_MAX_SEGMENTS] = {};
+  Shot shots_[Config::SNAKE_MAX_SHOTS] = {};
+  Blast blasts_[Config::SNAKE_MAX_BLASTS] = {};
   Phase phase_ = Phase::Playing;
   uint16_t headPosition_ = 0;
   uint16_t baseStepIntervalMs_ = 0;

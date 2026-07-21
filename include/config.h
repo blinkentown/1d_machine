@@ -63,7 +63,7 @@ constexpr uint32_t PSU_MODE_ARMING_COLOR = 0xFFFF00UL;
 constexpr uint32_t BENCH_MODE_READY_COLOR = 0x0080FFUL;
 
 constexpr uint8_t PONG_PADDLE_LENGTH = 2;
-constexpr uint8_t PONG_HIT_ZONE_LENGTH = 1;
+constexpr uint8_t PONG_HIT_ZONE_LENGTH = PONG_PADDLE_LENGTH;
 constexpr uint16_t PONG_INITIAL_STEP_MS = 20;
 constexpr uint16_t PONG_MINIMUM_STEP_MS = 8;
 constexpr uint8_t PONG_SPEEDUP_MS = 1;

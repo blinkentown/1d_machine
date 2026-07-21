@@ -2,6 +2,8 @@
 
 #include <Arduino.h>
 
+#include "config.h"
+
 class ColourShooterGame {
  public:
   void start(uint32_t now);
@@ -52,9 +54,9 @@ class ColourShooterGame {
   static int8_t pressedColorIndex();
 
   Phase phase_ = Phase::Playing;
-  Target targets_[8] = {};
-  Shot shots_[4] = {};
-  Dissolve dissolves_[4] = {};
+  Target targets_[Config::COLOUR_SHOOTER_TARGET_COUNT] = {};
+  Shot shots_[Config::COLOUR_SHOOTER_MAX_SHOTS] = {};
+  Dissolve dissolves_[Config::COLOUR_SHOOTER_MAX_DISSOLVES] = {};
   uint16_t stepIntervalMs_ = 0;
   uint16_t randomState_ = 1;
   uint32_t lastTargetStepAt_ = 0;
