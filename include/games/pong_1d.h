@@ -27,6 +27,7 @@ class Pong1DGame {
   uint16_t ballPosition_ = 0;
   int8_t ballDirection_ = 1;
   int8_t nextServeDirection_ = 1;
+  uint16_t serveIntervalMs_ = 0;
   uint16_t stepIntervalMs_ = 0;
   uint32_t lastStepAt_ = 0;
   uint32_t phaseChangedAt_ = 0;

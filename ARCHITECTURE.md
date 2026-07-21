@@ -39,12 +39,12 @@ Pins are centralized in `include/pins.h`. Tunable values are centralized in
 
 Reviewed build baseline:
 
-- Static SRAM: 1800 / 2560 bytes
-- Flash: 22682 / 28672 bytes
-- Largest game states: Snake 240 bytes, Colour Shooter 124 bytes, Pong 22
+- Static SRAM: 1802 / 2560 bytes
+- Flash: 22724 / 28672 bytes
+- Largest game states: Snake 240 bytes, Colour Shooter 124 bytes, Pong 24
   bytes
 
-The remaining 760 SRAM bytes also contain the runtime stack. Before adding all
+The remaining 758 SRAM bytes also contain the runtime stack. Before adding all
 four planned games, active game states should be overlaid in shared storage and
 duplicate projectile/explosion code should be consolidated.
 

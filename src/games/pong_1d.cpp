@@ -10,6 +10,8 @@ void Pong1DGame::start(uint32_t now) {
   rightScore_ = 0;
   nextServeDirection_ = 1;
   perfectHitSide_ = 0;
+  serveIntervalMs_ =
+      Config::gameplayInterval(Config::PONG_INITIAL_STEP_MS);
   Serial.println(F("1D Pong started"));
   Serial.println(F("Red/P1-A: left hit, Blue/P2-A: right hit"));
   Serial.println(F("Deeper hits return the ball faster"));
@@ -20,7 +22,7 @@ void Pong1DGame::serve(uint32_t now) {
   ballPosition_ = Config::LED_COUNT / 2;
   ballDirection_ = nextServeDirection_;
   nextServeDirection_ = -nextServeDirection_;
-  stepIntervalMs_ = Config::gameplayInterval(Config::PONG_INITIAL_STEP_MS);
+  stepIntervalMs_ = serveIntervalMs_;
   lastStepAt_ = now;
   phase_ = Phase::Playing;
 }
@@ -108,6 +110,16 @@ void Pong1DGame::awardPoint(bool leftPlayerScored, uint32_t now) {
     Serial.println(F("Point: right player"));
   }
   printScore();
+
+  const uint16_t minimumServeInterval =
+      Config::gameplayInterval(Config::PONG_MINIMUM_SERVE_STEP_MS);
+  if (serveIntervalMs_ > minimumServeInterval) {
+    const uint16_t availableSpeedup =
+        serveIntervalMs_ - minimumServeInterval;
+    serveIntervalMs_ -= Config::PONG_SERVE_SPEEDUP_MS < availableSpeedup
+                            ? Config::PONG_SERVE_SPEEDUP_MS
+                            : availableSpeedup;
+  }
 
   phaseChangedAt_ = now;
   if (leftScore_ >= Config::PONG_WINNING_SCORE ||
