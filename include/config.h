@@ -13,6 +13,7 @@ constexpr uint16_t LED_MAX_MILLIAMPS = 100;
 constexpr uint16_t RENDER_INTERVAL_MS = 20;
 
 constexpr uint16_t BUTTON_DEBOUNCE_MS = 20;
+constexpr uint16_t MODE_BUTTON_LONG_PRESS_MS = 800;
 constexpr uint16_t ENCODER_DEBOUNCE_MS = 2;
 constexpr int8_t ENCODER_DIRECTION = 1;
 constexpr int8_t ENCODER_STEPS_PER_DETENT = 4;

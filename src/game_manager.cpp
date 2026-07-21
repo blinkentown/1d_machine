@@ -31,6 +31,8 @@ State state = State::Selecting;
 Pong1DGame pong;
 PowerTest powerTest;
 uint32_t lastRenderAt = 0;
+uint32_t modeButtonPressedAt = 0;
+bool modeButtonLongHandled = false;
 
 const __FlashStringHelper* gameName(GameId game) {
   switch (game) {
@@ -131,16 +133,38 @@ void render(uint32_t now) {
 
 void begin(uint32_t now) {
   lastRenderAt = now - Config::RENDER_INTERVAL_MS;
-  Serial.println(F("Mode button or encoder: select game"));
-  Serial.println(F("Encoder click: start, mode/setup button: exit game"));
+  Serial.println(F("Mode button: short press selects, long press confirms"));
+  Serial.println(F("Mode/setup button exits a running game"));
   printSelection();
 }
 
 void update(uint32_t now) {
   const int8_t encoderDelta = InputManager::takeEncoderDelta();
+  const bool modePressed =
+      InputManager::wasPressed(InputManager::Button::ModeSelect);
+  const bool modeReleased =
+      InputManager::wasReleased(InputManager::Button::ModeSelect);
+
+  if (modePressed) {
+    modeButtonPressedAt = now;
+    modeButtonLongHandled = false;
+  }
+
+  bool modeLongPress = false;
+  if (InputManager::isHeld(InputManager::Button::ModeSelect) &&
+      !modeButtonLongHandled &&
+      static_cast<uint32_t>(now - modeButtonPressedAt) >=
+          Config::MODE_BUTTON_LONG_PRESS_MS) {
+    modeButtonLongHandled = true;
+    modeLongPress = true;
+  }
+
+  const bool modeShortPress = modeReleased && !modeButtonLongHandled;
 
   if (state == State::Selecting) {
-    if (InputManager::wasPressed(InputManager::Button::ModeSelect)) {
+    if (modeLongPress) {
+      beginPowerCheck(now);
+    } else if (modeShortPress) {
       changeSelection(1);
     } else if (encoderDelta != 0) {
       changeSelection(encoderDelta > 0 ? 1 : -1);
@@ -150,20 +174,24 @@ void update(uint32_t now) {
       beginPowerCheck(now);
     }
   } else if (state == State::PowerCheck) {
-    if (InputManager::wasPressed(InputManager::Button::ModeSelect) ||
-        InputManager::wasPressed(InputManager::Button::Setup)) {
+    if (InputManager::wasPressed(InputManager::Button::Setup) ||
+        modeShortPress) {
       returnToSelector();
     } else {
       powerTest.update(now);
       if (powerTest.isReady() &&
-          InputManager::wasPressed(InputManager::Button::EncoderClick)) {
+          (modeLongPress ||
+           InputManager::wasPressed(InputManager::Button::EncoderClick))) {
         state = State::Running;
         pong.start(now);
       }
     }
   } else {
-    if (InputManager::wasPressed(InputManager::Button::ModeSelect) ||
+    if (modePressed ||
         InputManager::wasPressed(InputManager::Button::Setup)) {
+      if (modePressed) {
+        modeButtonLongHandled = true;
+      }
       returnToSelector();
     } else {
       pong.update(now);
