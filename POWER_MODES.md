@@ -18,9 +18,13 @@ To enter PSU mode, hold both the Blue and Yellow game buttons while powering
 on. Keep both held for two seconds. Releasing either button early cancels the
 arming sequence and leaves the firmware in bench mode.
 
-- FastLED limit: 6000 mA.
-- Global brightness: 16/255 for the first full-strip measurement.
+- FastLED limit: 3000 mA.
+- Global brightness: 85/255. FastLED scales dense frames to the configured
+  current ceiling while allowing sparse game effects to use the extra
+  brightness.
 - The power preflight adds a timed 10-second stage with all 288 pixels white.
+- Verify the actual current during that stage; the FastLED limit is an
+  estimate, not a current sensor.
 - The strip is cleared automatically after the measurement stage.
 - PSU mode remains latched until reset or power-off.
 - Every normal restart returns to bench mode.

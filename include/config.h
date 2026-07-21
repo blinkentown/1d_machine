@@ -10,8 +10,8 @@ constexpr uint16_t LED_COUNT = 288;
 constexpr uint8_t LED_SUPPLY_VOLTS = 5;
 constexpr uint8_t BENCH_LED_BRIGHTNESS = 32;
 constexpr uint16_t BENCH_LED_MAX_MILLIAMPS = 100;
-constexpr uint8_t PSU_LED_BRIGHTNESS = 16;
-constexpr uint16_t PSU_LED_MAX_MILLIAMPS = 6000;
+constexpr uint8_t PSU_LED_BRIGHTNESS = 85;
+constexpr uint16_t PSU_LED_MAX_MILLIAMPS = 3000;
 constexpr uint16_t RENDER_INTERVAL_MS = 20;
 
 constexpr uint16_t BUTTON_DEBOUNCE_MS = 20;
@@ -67,7 +67,10 @@ constexpr uint8_t COLOUR_SHOOTER_SPEEDUP_MS = 2;
 constexpr uint8_t COLOUR_SHOOTER_SPEEDUP_EVERY = 4;
 constexpr uint8_t COLOUR_SHOOTER_SHOT_STEP_MS = 6;
 constexpr uint16_t COLOUR_SHOOTER_SPAWN_INTERVAL_MS = 500;
-constexpr uint16_t COLOUR_SHOOTER_DISSOLVE_MS = 360;
+constexpr uint16_t COLOUR_SHOOTER_DISSOLVE_MS = 560;
+constexpr uint16_t COLOUR_SHOOTER_STROBE_MS = 200;
+constexpr uint8_t COLOUR_SHOOTER_STROBE_PERIOD_MS = 25;
+constexpr uint8_t COLOUR_SHOOTER_BLAST_RADIUS = 22;
 constexpr uint32_t COLOUR_SHOOTER_ERROR_COLOR = 0xFF0000UL;
 
 }  // namespace Config

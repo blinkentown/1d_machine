@@ -380,11 +380,12 @@ void ColourShooterGame::render(uint32_t now) const {
       continue;
     }
     const uint32_t color = colorForIndex(target.colorIndex);
+    const uint32_t bodyColor = scaleColor(color, 128);
     for (uint8_t width = 0; width < Config::COLOUR_SHOOTER_PIXEL_WIDTH;
          ++width) {
       const uint16_t bodyPosition = target.position + width;
       if (bodyPosition < Config::LED_COUNT) {
-        LedManager::setStripPixel(bodyPosition, color);
+        LedManager::setStripPixel(bodyPosition, bodyColor);
       }
     }
     for (uint8_t trail = 1; trail <= TARGET_TRAIL_LENGTH; ++trail) {
@@ -393,7 +394,7 @@ void ColourShooterGame::render(uint32_t now) const {
       if (trailPosition < Config::LED_COUNT) {
         LedManager::setStripPixel(
             trailPosition,
-            scaleColor(color, trail == 1 ? 96 : 32));
+            scaleColor(color, trail == 1 ? 64 : 24));
       }
     }
   }
@@ -404,10 +405,11 @@ void ColourShooterGame::render(uint32_t now) const {
       continue;
     }
     const uint32_t color = colorForIndex(shot.colorIndex);
+    const uint32_t bodyColor = scaleColor(color, 176);
     for (uint8_t width = 0; width < Config::COLOUR_SHOOTER_PIXEL_WIDTH;
          ++width) {
       if (shot.position >= width) {
-        LedManager::setStripPixel(shot.position - width, color);
+        LedManager::setStripPixel(shot.position - width, bodyColor);
       }
     }
     for (uint8_t trail = 1; trail <= SHOT_TRAIL_LENGTH; ++trail) {
@@ -416,7 +418,7 @@ void ColourShooterGame::render(uint32_t now) const {
       if (shot.position >= trailOffset) {
         LedManager::setStripPixel(
             shot.position - trailOffset,
-            scaleColor(color, trail == 1 ? 128 : 48));
+            scaleColor(color, trail == 1 ? 96 : 32));
       }
     }
   }
@@ -428,19 +430,72 @@ void ColourShooterGame::render(uint32_t now) const {
       continue;
     }
     const uint32_t elapsed = now - dissolve.startedAt;
-    const uint8_t radius = static_cast<uint8_t>(
-        1U + (elapsed * 7U) / Config::COLOUR_SHOOTER_DISSOLVE_MS);
-    const uint8_t brightness = static_cast<uint8_t>(
-        255U - (elapsed * 220U) / Config::COLOUR_SHOOTER_DISSOLVE_MS);
-    const uint32_t faded = scaleColor(dissolve.color, brightness);
+    if (elapsed < Config::COLOUR_SHOOTER_STROBE_MS) {
+      const uint8_t pulse = static_cast<uint8_t>(
+          elapsed / Config::COLOUR_SHOOTER_STROBE_PERIOD_MS);
+      const uint8_t radius = static_cast<uint8_t>(
+          Config::COLOUR_SHOOTER_PIXEL_WIDTH + pulse * 2U);
 
-    LedManager::setStripPixel(dissolve.position,
-                              scaleColor(dissolve.color, brightness / 3U));
-    if (dissolve.position >= radius) {
-      LedManager::setStripPixel(dissolve.position - radius, faded);
+      if ((pulse & 0x01U) == 0U) {
+        for (int16_t offset = -static_cast<int16_t>(radius);
+             offset <= static_cast<int16_t>(radius); ++offset) {
+          const int16_t position =
+              static_cast<int16_t>(dissolve.position) + offset;
+          if (position >= 0 &&
+              position < static_cast<int16_t>(Config::LED_COUNT)) {
+            const uint32_t flashColor =
+                (offset & 0x01) == 0 ? 0xFFFFFFUL : dissolve.color;
+            LedManager::setStripPixel(static_cast<uint16_t>(position),
+                                      flashColor);
+          }
+        }
+      } else {
+        LedManager::setStripPixel(dissolve.position, 0xFFFFFFUL);
+        if (dissolve.position >= radius) {
+          LedManager::setStripPixel(dissolve.position - radius,
+                                    dissolve.color);
+        }
+        if (dissolve.position + radius < Config::LED_COUNT) {
+          LedManager::setStripPixel(dissolve.position + radius,
+                                    dissolve.color);
+        }
+      }
+      continue;
     }
-    if (dissolve.position + radius < Config::LED_COUNT) {
-      LedManager::setStripPixel(dissolve.position + radius, faded);
+
+    const uint32_t fragmentElapsed =
+        elapsed - Config::COLOUR_SHOOTER_STROBE_MS;
+    const uint16_t fragmentDuration =
+        Config::COLOUR_SHOOTER_DISSOLVE_MS -
+        Config::COLOUR_SHOOTER_STROBE_MS;
+    const uint8_t radius = static_cast<uint8_t>(
+        2U + (fragmentElapsed * Config::COLOUR_SHOOTER_BLAST_RADIUS) /
+                 fragmentDuration);
+    const uint8_t brightness = static_cast<uint8_t>(
+        255U - (fragmentElapsed * 230U) / fragmentDuration);
+    const uint32_t outerColor = scaleColor(dissolve.color, brightness);
+    const uint32_t innerColor =
+        scaleColor(dissolve.color, brightness / 2U);
+    const uint8_t middleRadius = static_cast<uint8_t>((radius * 2U) / 3U);
+    const uint8_t innerRadius = static_cast<uint8_t>(radius / 3U);
+
+    const uint8_t radii[] = {radius, middleRadius, innerRadius};
+    for (uint8_t fragment = 0; fragment < 3; ++fragment) {
+      const uint8_t fragmentRadius = radii[fragment];
+      const uint32_t fragmentColor =
+          fragment == 0 ? outerColor : innerColor;
+      if (dissolve.position >= fragmentRadius) {
+        LedManager::setStripPixel(dissolve.position - fragmentRadius,
+                                  fragmentColor);
+      }
+      if (dissolve.position + fragmentRadius < Config::LED_COUNT) {
+        LedManager::setStripPixel(dissolve.position + fragmentRadius,
+                                  fragmentColor);
+      }
     }
+
+    LedManager::setStripPixel(
+        dissolve.position,
+        scaleColor(0xFFFFFFUL, static_cast<uint8_t>(brightness / 4U)));
   }
 }
