@@ -11,31 +11,40 @@ the blue and yellow game buttons together for two seconds.
 | Action or state | Illuminated selector output |
 | --- | --- |
 | Power-mode hold in progress | Yellow |
-| PSU mode confirmed | Green for one second |
-| Bench mode confirmed | Blue for one second |
+| PSU mode confirmed | Red for one second |
+| Bench mode confirmed | Green for one second |
+| Stress-test hold progress | Alternating red and blue |
+| Stress test with PSU limits | Red; strip output is solid white |
+| Stress test with bench limits | Green; strip output is solid white |
 | Colour Shooter selected/running | Yellow |
 | 1D Pong selected/running | Blue |
 | Snake 1D selected/running | Cyan |
 
 After a one-second power confirmation, the selector output returns to the
-selected game's color. Blue can therefore mean either the brief bench
-confirmation or the persistent 1D Pong selection.
+selected game's color. Red can therefore be the brief PSU confirmation or the
+Meteor Dodge selection; green can be the brief bench confirmation or the
+Reaction Race selection.
 
 ## Starting a game
 
 1. Short-press the illuminated selector until it shows the desired game color.
 2. Hold the illuminated selector for about 0.8 seconds.
-3. Observe the preflight outputs:
-   - Off: dark baseline.
-   - White with one white strip pixel: single-pixel test.
-   - White with five white strip pixels: game-load test.
-   - PSU mode only: all 288 strip pixels white for 2 seconds.
-   - Green: preflight ready.
-4. While the selector output is green, hold it again for about 0.8 seconds.
-5. The selected game starts and the selector returns to its game color.
+3. An implemented game starts immediately. Its selector output remains the
+   selected game's color.
 
 Press the illuminated selector during any running game to return to game
 selection. The selector output then shows the selected game's color.
+
+## Running the power stress test
+
+1. Return to game selection.
+2. Hold the red and blue game buttons together for two seconds.
+3. During the hold, the selector and progress output alternate red and blue.
+4. The strip output becomes solid white for up to 10 seconds.
+5. Selector output red means PSU limits; selector output green means bench
+   limits.
+6. Press any button to stop immediately. The strip turns off and the selector
+   returns to the selected game's color.
 
 ## Colour Shooter
 

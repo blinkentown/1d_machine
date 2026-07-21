@@ -36,6 +36,7 @@ constexpr uint16_t MODE_BUTTON_LONG_PRESS_MS = 800;
 constexpr uint16_t PSU_MODE_BOOT_HOLD_MS = 2000;
 constexpr uint16_t POWER_MODE_TOGGLE_HOLD_MS = 2000;
 constexpr uint16_t POWER_MODE_NOTICE_MS = 1000;
+constexpr uint16_t POWER_STRESS_HOLD_MS = 2000;
 constexpr uint16_t ENCODER_DEBOUNCE_MS = 2;
 constexpr int8_t ENCODER_DIRECTION = 1;
 constexpr int8_t ENCODER_STEPS_PER_DETENT = 4;
@@ -55,12 +56,11 @@ constexpr uint32_t MODE_SNAKE_COLOR = 0x00FFFFUL;
 constexpr uint32_t MODE_METEOR_DODGE_COLOR = 0xFF0000UL;
 constexpr uint32_t MODE_MEMORY_COLOR = 0x8000FFUL;
 
-constexpr uint16_t POWER_TEST_STAGE_MS = 1200;
-constexpr uint16_t POWER_TEST_FULL_LOAD_MS = 2000;
-constexpr uint32_t POWER_TEST_COLOR = 0xFFFFFFUL;
-constexpr uint32_t POWER_TEST_READY_COLOR = 0x00FF00UL;
+constexpr uint16_t POWER_STRESS_DURATION_MS = 10000;
+constexpr uint32_t POWER_STRESS_COLOR = 0xFFFFFFUL;
+constexpr uint32_t PSU_MODE_READY_COLOR = 0xFF0000UL;
 constexpr uint32_t PSU_MODE_ARMING_COLOR = 0xFFFF00UL;
-constexpr uint32_t BENCH_MODE_READY_COLOR = 0x0080FFUL;
+constexpr uint32_t BENCH_MODE_READY_COLOR = 0x00FF00UL;
 
 constexpr uint8_t PONG_PADDLE_LENGTH = 2;
 constexpr uint8_t PONG_HIT_ZONE_LENGTH = PONG_PADDLE_LENGTH;

@@ -9,8 +9,7 @@ Bench mode is selected on every normal boot.
 
 - FastLED limit: 100 mA.
 - Global brightness: 32/255.
-- The power preflight stops after the five-pixel game-load preview.
-- The 288-pixel white stage remains runtime-locked.
+- Games start directly without a power preflight.
 
 ## PSU mode
 
@@ -22,23 +21,35 @@ The power mode can also be changed without restarting:
 
 1. Return to the game selector.
 2. Hold the Blue and Yellow game buttons together for two seconds.
-3. Green confirms PSU mode; blue confirms bench mode.
+3. Red output confirms PSU mode; green output confirms bench mode.
 
-The runtime chord is ignored during a game. Entering PSU mode does not bypass
-the power preflight.
+The confirmation lasts one second, then the illuminated selector returns to
+the selected game's color. The runtime chord is ignored during a game.
 
 - FastLED limit: 3000 mA.
 - Global brightness: 85/255. FastLED scales dense frames to the configured
   current ceiling while allowing sparse game effects to use the extra
   brightness.
-- The power preflight adds a timed 2-second stage with all 288 pixels white.
-- Verify the actual current during that stage; the FastLED limit is an
-  estimate, not a current sensor.
 - Measured full-white current with the 3000 mA software setting and 85/255
   brightness: approximately 3.5 A.
-- The strip is cleared automatically after the measurement stage.
 - The selected mode remains active until changed or reset.
 - Every normal restart returns to bench mode.
+
+## Power stress test
+
+The stress test uses the limits of the currently selected bench or PSU mode.
+It is available only at the game selector.
+
+1. Hold the Red and Blue game buttons together for two seconds.
+2. Red/blue alternating output shows hold progress.
+3. At activation, all 288 strip pixels turn white for up to 10 seconds.
+4. The illuminated selector output is red under PSU limits or green under
+   bench limits.
+5. Press any button to stop immediately. Completion also clears the strip
+   automatically.
+
+Verify actual current during the test. FastLED limiting is an estimate, not a
+current sensor.
 
 Build and upload the single firmware at the desk:
 
@@ -65,5 +76,5 @@ Simultaneous external power and USB data requires proper isolation between the
 USB and PSU positive rails. Their grounds must remain common.
 
 Before a PSU test, verify polarity, common ground, fusing, and that the strip
-receives power injection at the planned points. The software limit and preview
-do not measure current and cannot detect a wiring fault.
+receives power injection at the planned points. The software limit does not
+measure current and cannot detect a wiring fault.

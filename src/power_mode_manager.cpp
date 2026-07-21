@@ -37,7 +37,7 @@ void applyPsuMode() {
   LedManager::setPowerLimits(Config::PSU_LED_BRIGHTNESS,
                              Config::PSU_LED_MAX_MILLIAMPS);
   LedManager::clearStrip();
-  LedManager::setModePixel(Config::POWER_TEST_READY_COLOR);
+  LedManager::setModePixel(Config::PSU_MODE_READY_COLOR);
   LedManager::show();
   Serial.println(F("Power mode: PSU"));
 }

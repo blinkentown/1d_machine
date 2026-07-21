@@ -67,14 +67,14 @@ All tunable constants live in `include/config.h`.
 - Bench limit: 100 mA at brightness 32/255
 - PSU limit: FastLED estimate of 3000 mA at brightness 85/255
 - Measured full-white PSU current: approximately 3.5 A
-- Full-white preflight duration: 2 seconds
+- Full-white stress-test duration: 10 seconds; any button aborts
 
 ## Memory baseline
 
 The reviewed three-game build uses:
 
-- SRAM: 1790 / 2560 bytes (69.9%)
-- Flash: 22368 / 28672 bytes (78.0%)
+- SRAM: 1796 / 2560 bytes (70.2%)
+- Flash: 22312 / 28672 bytes (77.8%)
 
 The SRAM figure does not include peak stack usage. Future games must use small,
 fixed state and no additional LED framebuffer.

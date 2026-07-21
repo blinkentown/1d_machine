@@ -7,7 +7,7 @@
 #include "input_manager.h"
 #include "led_manager.h"
 #include "power_mode_manager.h"
-#include "power_test.h"
+#include "power_stress_test.h"
 
 namespace GameManager {
 namespace {
@@ -25,7 +25,7 @@ enum class GameId : uint8_t {
 
 enum class State : uint8_t {
   Selecting,
-  PowerCheck,
+  PowerStress,
   Running,
 };
 
@@ -34,7 +34,7 @@ State state = State::Selecting;
 ColourShooterGame colourShooter;
 Pong1DGame pong;
 Snake1DGame snake;
-PowerTest powerTest;
+PowerStressTest powerStressTest;
 uint32_t lastRenderAt = 0;
 uint32_t modeButtonPressedAt = 0;
 bool modeButtonLongHandled = false;
@@ -43,6 +43,9 @@ uint32_t powerNoticeStartedAt = 0;
 bool powerChordTracking = false;
 bool powerChordHandled = false;
 bool powerNoticeActive = false;
+uint32_t stressChordStartedAt = 0;
+bool stressChordTracking = false;
+bool stressChordHandled = false;
 
 const __FlashStringHelper* gameName(GameId game) {
   switch (game) {
@@ -107,19 +110,18 @@ void changeSelection(int8_t direction) {
   printSelection();
 }
 
-void beginPowerCheck(uint32_t now) {
-  if (selectedGame != GameId::ColourShooter &&
-      selectedGame != GameId::Pong1D && selectedGame != GameId::Snake1D) {
+bool selectedGameIsImplemented() {
+  return selectedGame == GameId::ColourShooter ||
+         selectedGame == GameId::Pong1D || selectedGame == GameId::Snake1D;
+}
+
+void startSelectedGame(uint32_t now) {
+  if (!selectedGameIsImplemented()) {
     Serial.print(gameName(selectedGame));
     Serial.println(F(" is not implemented yet"));
     return;
   }
 
-  state = State::PowerCheck;
-  powerTest.start(now);
-}
-
-void startSelectedGame(uint32_t now) {
   state = State::Running;
   if (selectedGame == GameId::ColourShooter) {
     colourShooter.start(now);
@@ -139,7 +141,8 @@ void returnToSelector() {
 
 bool powerModeChordHeld() {
   return InputManager::isHeld(InputManager::Button::Game3) &&
-         InputManager::isHeld(InputManager::Button::Game4);
+         InputManager::isHeld(InputManager::Button::Game4) &&
+         !InputManager::isHeld(InputManager::Button::Game1);
 }
 
 void updatePowerModeChord(uint32_t now) {
@@ -166,16 +169,72 @@ void updatePowerModeChord(uint32_t now) {
   }
 }
 
+bool powerStressChordHeld() {
+  return InputManager::isHeld(InputManager::Button::Game1) &&
+         InputManager::isHeld(InputManager::Button::Game3) &&
+         !InputManager::isHeld(InputManager::Button::Game4);
+}
+
+void updatePowerStressChord(uint32_t now) {
+  if (state != State::Selecting || !powerStressChordHeld()) {
+    stressChordTracking = false;
+    stressChordHandled = false;
+    return;
+  }
+
+  if (!stressChordTracking) {
+    stressChordTracking = true;
+    stressChordStartedAt = now;
+    Serial.println(F("Hold Red + Blue to start power stress"));
+    return;
+  }
+
+  if (!stressChordHandled &&
+      static_cast<uint32_t>(now - stressChordStartedAt) >=
+          Config::POWER_STRESS_HOLD_MS) {
+    stressChordHandled = true;
+    powerNoticeActive = false;
+    state = State::PowerStress;
+    powerStressTest.start(now);
+  }
+}
+
+bool anyButtonPressed() {
+  return InputManager::wasPressed(InputManager::Button::Game1) ||
+         InputManager::wasPressed(InputManager::Button::Game2) ||
+         InputManager::wasPressed(InputManager::Button::Game3) ||
+         InputManager::wasPressed(InputManager::Button::Game4) ||
+         InputManager::wasPressed(InputManager::Button::EncoderClick) ||
+         InputManager::wasPressed(InputManager::Button::Setup) ||
+         InputManager::wasPressed(InputManager::Button::ModeSelect);
+}
+
 void render(uint32_t now) {
   if (state == State::Selecting) {
     LedManager::clearStrip();
     if (powerNoticeActive) {
       const uint32_t noticeColor =
-          PowerModeManager::isPsuMode() ? Config::POWER_TEST_READY_COLOR
+          PowerModeManager::isPsuMode() ? Config::PSU_MODE_READY_COLOR
                                         : Config::BENCH_MODE_READY_COLOR;
       LedManager::setModePixel(noticeColor);
       for (uint8_t index = 0; index < 12; ++index) {
         LedManager::setStripPixel(index, noticeColor);
+      }
+    } else if (stressChordTracking && !stressChordHandled) {
+      const uint32_t pulseColor =
+          ((now / 150U) % 2U) == 0U ? Config::BUTTON_1_COLOR
+                                     : Config::BUTTON_3_COLOR;
+      LedManager::setModePixel(pulseColor);
+      uint8_t progress = static_cast<uint8_t>(
+          (static_cast<uint32_t>(now - stressChordStartedAt) * 12U) /
+          Config::POWER_STRESS_HOLD_MS);
+      if (progress > 12) {
+        progress = 12;
+      }
+      for (uint8_t index = 0; index < progress; ++index) {
+        LedManager::setStripPixel(
+            index, (index & 0x01U) == 0U ? Config::BUTTON_1_COLOR
+                                         : Config::BUTTON_3_COLOR);
       }
     } else if (powerChordTracking && !powerChordHandled) {
       LedManager::setModePixel(Config::PSU_MODE_ARMING_COLOR);
@@ -191,8 +250,8 @@ void render(uint32_t now) {
     } else {
       LedManager::setModePixel(gameColor(selectedGame));
     }
-  } else if (state == State::PowerCheck) {
-    powerTest.render();
+  } else if (state == State::PowerStress) {
+    powerStressTest.render();
   } else {
     if (selectedGame == GameId::ColourShooter) {
       colourShooter.render(now);
@@ -214,6 +273,7 @@ void begin(uint32_t now) {
   Serial.println(F("Mode button: short press selects, long press confirms"));
   Serial.println(F("Mode/setup button exits a running game"));
   Serial.println(F("At selector: hold Blue + Yellow to toggle power mode"));
+  Serial.println(F("At selector: hold Red + Blue to start 10 s power stress"));
   printSelection();
 }
 
@@ -230,6 +290,7 @@ void update(uint32_t now) {
     powerNoticeActive = false;
   }
   updatePowerModeChord(now);
+  updatePowerStressChord(now);
 
   if (modePressed) {
     modeButtonPressedAt = now;
@@ -249,7 +310,7 @@ void update(uint32_t now) {
 
   if (state == State::Selecting) {
     if (modeLongPress) {
-      beginPowerCheck(now);
+      startSelectedGame(now);
     } else if (modeShortPress) {
       changeSelection(1);
     } else if (encoderDelta != 0) {
@@ -257,18 +318,19 @@ void update(uint32_t now) {
     }
 
     if (InputManager::wasPressed(InputManager::Button::EncoderClick)) {
-      beginPowerCheck(now);
+      startSelectedGame(now);
     }
-  } else if (state == State::PowerCheck) {
-    if (InputManager::wasPressed(InputManager::Button::Setup) ||
-        modeShortPress) {
+  } else if (state == State::PowerStress) {
+    if (anyButtonPressed()) {
+      if (modePressed) {
+        modeButtonLongHandled = true;
+      }
+      powerStressTest.stop();
       returnToSelector();
     } else {
-      powerTest.update(now);
-      if (powerTest.isReady() &&
-          (modeLongPress ||
-           InputManager::wasPressed(InputManager::Button::EncoderClick))) {
-        startSelectedGame(now);
+      powerStressTest.update(now);
+      if (powerStressTest.isFinished()) {
+        returnToSelector();
       }
     }
   } else {
