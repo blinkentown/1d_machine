@@ -77,8 +77,8 @@ All tunable constants live in `include/config.h`.
 
 The reviewed three-game build uses:
 
-- SRAM: 1796 / 2560 bytes (70.2%)
-- Flash: 22160 / 28672 bytes (77.3%)
+- SRAM: 1800 / 2560 bytes (70.3%)
+- Flash: 22682 / 28672 bytes (79.1%)
 
 The SRAM figure does not include peak stack usage. Future games must use small,
 fixed state and no additional LED framebuffer.

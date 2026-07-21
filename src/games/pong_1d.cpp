@@ -9,8 +9,10 @@ void Pong1DGame::start(uint32_t now) {
   leftScore_ = 0;
   rightScore_ = 0;
   nextServeDirection_ = 1;
+  perfectHitSide_ = 0;
   Serial.println(F("1D Pong started"));
   Serial.println(F("Red/P1-A: left hit, Blue/P2-A: right hit"));
+  Serial.println(F("Deeper hits return the ball faster"));
   serve(now);
 }
 
@@ -23,30 +25,58 @@ void Pong1DGame::serve(uint32_t now) {
   phase_ = Phase::Playing;
 }
 
-void Pong1DGame::handleHits() {
+void Pong1DGame::handleHits(uint32_t now) {
+  constexpr uint8_t hitZoneWidth =
+      Config::PONG_HIT_ZONE_LENGTH * Config::GAME_PIXEL_WIDTH;
+
   if (InputManager::wasPressed(Controls::PLAYER_1_PRIMARY) &&
-      ballDirection_ < 0 &&
-      ballPosition_ <
-          Config::PONG_HIT_ZONE_LENGTH * Config::GAME_PIXEL_WIDTH) {
+      ballDirection_ < 0 && ballPosition_ < hitZoneWidth) {
+    const uint8_t depth = hitZoneWidth - 1U - ballPosition_;
     ballDirection_ = 1;
-    if (stepIntervalMs_ >
-        Config::gameplayInterval(Config::PONG_MINIMUM_STEP_MS)) {
-      stepIntervalMs_ -= Config::PONG_SPEEDUP_MS;
-    }
-    Serial.println(F("Left player hit"));
+    applyHit(depth, -1, now);
   }
 
   const uint16_t rightHitZoneStart =
-      Config::LED_COUNT -
-      Config::PONG_HIT_ZONE_LENGTH * Config::GAME_PIXEL_WIDTH;
+      Config::LED_COUNT - hitZoneWidth;
   if (InputManager::wasPressed(Controls::PLAYER_2_PRIMARY) &&
       ballDirection_ > 0 && ballPosition_ >= rightHitZoneStart) {
+    const uint8_t depth = ballPosition_ - rightHitZoneStart;
     ballDirection_ = -1;
-    if (stepIntervalMs_ >
-        Config::gameplayInterval(Config::PONG_MINIMUM_STEP_MS)) {
-      stepIntervalMs_ -= Config::PONG_SPEEDUP_MS;
-    }
-    Serial.println(F("Right player hit"));
+    applyHit(depth, 1, now);
+  }
+}
+
+void Pong1DGame::applyHit(uint8_t depth, int8_t playerSide, uint32_t now) {
+  constexpr uint8_t hitZoneWidth =
+      Config::PONG_HIT_ZONE_LENGTH * Config::GAME_PIXEL_WIDTH;
+  constexpr uint8_t bandWidth =
+      hitZoneWidth / Config::PONG_HIT_QUALITY_BANDS;
+  uint8_t quality = depth / bandWidth + 1U;
+  if (quality > Config::PONG_HIT_QUALITY_BANDS) {
+    quality = Config::PONG_HIT_QUALITY_BANDS;
+  }
+
+  const uint16_t minimumInterval =
+      Config::gameplayInterval(Config::PONG_MINIMUM_STEP_MS);
+  const uint8_t speedup = Config::PONG_SPEEDUP_MS * quality;
+  if (stepIntervalMs_ > minimumInterval) {
+    const uint16_t availableSpeedup = stepIntervalMs_ - minimumInterval;
+    stepIntervalMs_ -= speedup < availableSpeedup ? speedup : availableSpeedup;
+  }
+
+  Serial.print(playerSide < 0 ? F("Left") : F("Right"));
+  Serial.print(F(" player hit, quality "));
+  Serial.print(quality);
+  Serial.print(F("/"));
+  Serial.print(Config::PONG_HIT_QUALITY_BANDS);
+  Serial.print(F(", interval "));
+  Serial.print(stepIntervalMs_);
+  Serial.println(F(" ms"));
+
+  if (quality == Config::PONG_HIT_QUALITY_BANDS) {
+    perfectHitAt_ = now;
+    perfectHitSide_ = playerSide;
+    Serial.println(F("Perfect hit!"));
   }
 }
 
@@ -117,8 +147,39 @@ void Pong1DGame::update(uint32_t now) {
     return;
   }
 
-  handleHits();
+  handleHits(now);
   moveBall(now);
+}
+
+void Pong1DGame::renderPerfectHit(uint32_t now) const {
+  if (perfectHitSide_ == 0) {
+    return;
+  }
+
+  const uint32_t elapsed = now - perfectHitAt_;
+  if (elapsed >= Config::PONG_PERFECT_HIT_EXPLOSION_MS) {
+    return;
+  }
+
+  const uint8_t radius = 1U + static_cast<uint8_t>(
+                                   elapsed * Config::PONG_PERFECT_HIT_RADIUS /
+                                   Config::PONG_PERFECT_HIT_EXPLOSION_MS);
+  const uint8_t frame = elapsed / Config::PONG_PERFECT_HIT_STROBE_MS;
+  const bool whiteStrobe = (frame & 1U) == 0U;
+  const uint32_t playerColor = perfectHitSide_ < 0
+                                   ? Config::PONG_LEFT_PLAYER_COLOR
+                                   : Config::PONG_RIGHT_PLAYER_COLOR;
+
+  for (uint8_t offset = 0; offset < radius; ++offset) {
+    const uint16_t pixel = perfectHitSide_ < 0
+                               ? offset
+                               : Config::LED_COUNT - 1U - offset;
+    if (whiteStrobe || ((offset + frame) % 4U) == 0U) {
+      LedManager::setStripPixel(pixel,
+                                whiteStrobe ? Config::PONG_BALL_COLOR
+                                            : playerColor);
+    }
+  }
 }
 
 void Pong1DGame::render(uint32_t now) const {
@@ -156,4 +217,6 @@ void Pong1DGame::render(uint32_t now) const {
                                 Config::PONG_BALL_COLOR);
     }
   }
+
+  renderPerfectHit(now);
 }

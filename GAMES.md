@@ -84,6 +84,10 @@ Selector output: blue.
 - Green / P1-B and yellow / P2-B: unused.
 - The 12-LED ball accelerates after successful returns.
 - Each visible 24-LED paddle is also the complete hit zone.
+- The hit zone has three 8-LED accuracy bands. Deeper hits speed up the ball by
+  1, 2, or 3 ms for the current rally.
+- A perfect hit in the final 8 LEDs produces a 240 ms expanding white and
+  player-colour explosion from that end of the strip.
 - First player to five points wins.
 - Game-over output: the winning 24-LED paddle flashes red on the left or blue
   on the right.

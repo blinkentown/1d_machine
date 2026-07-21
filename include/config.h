@@ -64,14 +64,22 @@ constexpr uint32_t BENCH_MODE_READY_COLOR = 0x00FF00UL;
 
 constexpr uint8_t PONG_PADDLE_LENGTH = 2;
 constexpr uint8_t PONG_HIT_ZONE_LENGTH = PONG_PADDLE_LENGTH;
+constexpr uint8_t PONG_HIT_QUALITY_BANDS = 3;
 constexpr uint16_t PONG_INITIAL_STEP_MS = 20;
 constexpr uint16_t PONG_MINIMUM_STEP_MS = 8;
 constexpr uint8_t PONG_SPEEDUP_MS = 1;
+constexpr uint16_t PONG_PERFECT_HIT_EXPLOSION_MS = 240;
+constexpr uint8_t PONG_PERFECT_HIT_STROBE_MS = 30;
+constexpr uint8_t PONG_PERFECT_HIT_RADIUS = EXPLOSION_INTENSITY * 4U;
 constexpr uint16_t PONG_POINT_DELAY_MS = 1000;
 constexpr uint8_t PONG_WINNING_SCORE = 5;
 constexpr uint32_t PONG_BALL_COLOR = 0xFFFFFFUL;
 constexpr uint32_t PONG_LEFT_PLAYER_COLOR = BUTTON_1_COLOR;
 constexpr uint32_t PONG_RIGHT_PLAYER_COLOR = BUTTON_3_COLOR;
+static_assert((PONG_HIT_ZONE_LENGTH * GAME_PIXEL_WIDTH) %
+                      PONG_HIT_QUALITY_BANDS ==
+                  0,
+              "Pong hit zone must divide into equal quality bands");
 
 constexpr uint8_t COLOUR_SHOOTER_STARTING_LIVES = 3;
 constexpr uint8_t COLOUR_SHOOTER_TARGET_COUNT = 8;
