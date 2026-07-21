@@ -7,9 +7,10 @@ namespace Config {
 constexpr uint32_t SERIAL_BAUD_RATE = 115200UL;
 
 constexpr uint16_t LED_COUNT = 288;
-constexpr uint8_t LED_BRIGHTNESS = 85;
+constexpr uint16_t TEST_LED_INDEX = 0;
+constexpr uint8_t LED_BRIGHTNESS = 32;
 constexpr uint8_t LED_SUPPLY_VOLTS = 5;
-constexpr uint16_t LED_MAX_MILLIAMPS = 6000;
+constexpr uint16_t LED_MAX_MILLIAMPS = 100;
 constexpr uint16_t LED_FRAME_INTERVAL_MS = 20;
 
 constexpr uint16_t BUTTON_DEBOUNCE_MS = 20;
