@@ -18,8 +18,8 @@ bool psuMode = false;
 uint32_t armStartedAt = 0;
 
 bool bootChordHeld() {
-  return InputManager::isHeld(InputManager::Button::Setup) &&
-         InputManager::isHeld(InputManager::Button::ModeSelect);
+  return InputManager::isHeld(InputManager::Button::Game3) &&
+         InputManager::isHeld(InputManager::Button::Game4);
 }
 
 void applyBenchMode() {
@@ -52,7 +52,7 @@ void begin(uint32_t now) {
     armStartedAt = now;
     LedManager::setModePixel(Config::PSU_MODE_ARMING_COLOR);
     LedManager::show();
-    Serial.println(F("Hold Setup + selector for 2 seconds to arm PSU mode"));
+    Serial.println(F("Hold Blue + Yellow for 2 seconds to arm PSU mode"));
   } else {
     startupState = StartupState::Ready;
   }
@@ -64,8 +64,8 @@ void update(uint32_t now) {
   }
 
   if (startupState == StartupState::WaitingForRelease) {
-    if (!InputManager::isHeld(InputManager::Button::Setup) &&
-        !InputManager::isHeld(InputManager::Button::ModeSelect)) {
+    if (!InputManager::isHeld(InputManager::Button::Game3) &&
+        !InputManager::isHeld(InputManager::Button::Game4)) {
       startupState = StartupState::Ready;
     }
     return;

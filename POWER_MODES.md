@@ -14,7 +14,7 @@ Bench mode is selected on every normal boot.
 
 ## PSU mode
 
-To enter PSU mode, hold both Setup and the illuminated selector while powering
+To enter PSU mode, hold both the Blue and Yellow game buttons while powering
 on. Keep both held for two seconds. Releasing either button early cancels the
 arming sequence and leaves the firmware in bench mode.
 
