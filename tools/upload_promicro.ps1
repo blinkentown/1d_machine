@@ -105,7 +105,9 @@ while ((Get-Date) -lt $deadline -and -not $bootloader) {
 
     if ($applicationDisappeared) {
         $targetCandidates = @($currentPorts | Where-Object {
-            (Get-PortKey $_) -notin $otherInitialKeys
+            $candidateKey = Get-PortKey $_
+            $candidateKey -ne $applicationKey -and
+                $candidateKey -notin $otherInitialKeys
         })
 
         if ($targetCandidates.Count -eq 1) {

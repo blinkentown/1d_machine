@@ -65,7 +65,10 @@ does not assume fixed application or bootloader COM numbers. It builds the
 firmware, identifies the connected application interface, and then waits for
 one quick `RST`-to-`GND` contact. After Windows exposes the bootloader on
 whichever COM port it assigns, the helper waits 350 ms for that interface to
-stabilize before starting AVR109 programming and verification.
+stabilize before starting AVR109 programming and verification. The normal
+application interface is never accepted as the bootloader if the short reset
+window is missed; the helper keeps waiting instead of uploading to the wrong
+port.
 
 If more than one compatible Pro Micro is connected, the helper refuses to
 guess. Select the intended application interface explicitly:
