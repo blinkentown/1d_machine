@@ -22,6 +22,7 @@ There are no gameplay delays or dynamic allocations.
 | `power_stress_test` | Abortable 10-second full-strip load test |
 | `game_manager` | Game selection, confirmation, dispatch, and exit behavior |
 | `games/twang` | Cell-mask dungeon, movement, dash, attack, and level states |
+| `games/meteor_dodge` | Warning, movement, dash, shield, and impact states |
 | `games/colour_shooter` | Incoming targets, shots, lives, and impact effects |
 | `games/pong_1d` | Ball, paddles, scoring, point delay, and serve states |
 | `games/reaction_race` | Random start, false starts, alternating inputs, rounds |
@@ -41,12 +42,12 @@ Pins are centralized in `include/pins.h`. Tunable values are centralized in
 
 Reviewed build baseline:
 
-- Static SRAM: 1864 / 2560 bytes
-- Flash: 26184 / 28672 bytes
+- Static SRAM: 1884 / 2560 bytes
+- Flash: 27518 / 28672 bytes
 - Largest game states: Snake 240 bytes, Colour Shooter 124 bytes, Twang 32
-  bytes, Pong 24 bytes, Reaction Race 18 bytes
+  bytes, Pong 24 bytes, Meteor Dodge 20 bytes, Reaction Race 18 bytes
 
-The remaining 696 SRAM bytes also contain the runtime stack. Before adding all
+The remaining 676 SRAM bytes also contain the runtime stack. Before adding all
 four planned games, active game states should be overlaid in shared storage and
 duplicate projectile/explosion code should be consolidated.
 
@@ -70,9 +71,10 @@ preserve flash for game logic.
 
 ## Review notes
 
-- Twang, Colour Shooter, 1D Pong, Reaction Race, and Snake 1D are implemented.
-- Meteor Dodge and Memory Sequence remain selectable
-  placeholders and do not start when confirmed.
+- Twang, Colour Shooter, 1D Pong, Reaction Race, Snake 1D, and Meteor Dodge
+  are implemented.
+- Memory Sequence remains a selectable placeholder and does not start when
+  confirmed.
 - Encoder decoding exists in firmware, but the current hardware build does not
   depend on the encoder.
 - FastLED current limiting is an estimate. The measured 3000 mA setting draws

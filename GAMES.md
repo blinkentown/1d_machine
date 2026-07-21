@@ -36,6 +36,7 @@ the blue and yellow game buttons together for two seconds.
 | 1D Pong selected/running | Blue |
 | Reaction Race selected/running | Green |
 | Snake 1D selected/running | Cyan |
+| Meteor Dodge selected/running | Red |
 
 After a one-second power confirmation, the selector output returns to the
 selected game's color. Red can therefore be the brief PSU confirmation or the
@@ -151,4 +152,22 @@ Selector output: cyan.
   back 24 LEDs.
 - Three breaches produce a flashing 36-LED red game-over output at the strip
   center.
+- Any color game button restarts after game over.
+
+## Meteor Dodge
+
+Selector output: red.
+
+- The white player begins at strip center. Red / Left and green / Right move
+  one 12-LED cell.
+- Blue / Action dashes three cells in the current direction, clamped inside
+  the play area, with a 700 ms recharge.
+- An orange pulsing cell warns where the next meteor will strike.
+- The impact expands across five cells as a rapid red-white blast. Being
+  within two cells of its center costs one of three green lives.
+- Yellow / Special spends one of three cyan shield indicators. The active
+  shield colors the player cyan and absorbs the next otherwise damaging hit.
+- Each clean dodge increases score. Warning time falls from 1.2 seconds toward
+  465 ms as score rises; the 360 ms impact animation remains constant.
+- Three hits produce a flashing red game-over blast at strip center.
 - Any color game button restarts after game over.

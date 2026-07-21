@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "games/colour_shooter.h"
+#include "games/meteor_dodge.h"
 #include "games/pong_1d.h"
 #include "games/reaction_race.h"
 #include "games/snake_1d.h"
@@ -35,6 +36,7 @@ GameId selectedGame = GameId::ColourShooter;
 State state = State::Selecting;
 TwangGame twang;
 ColourShooterGame colourShooter;
+MeteorDodgeGame meteorDodge;
 Pong1DGame pong;
 ReactionRaceGame reactionRace;
 Snake1DGame snake;
@@ -119,7 +121,8 @@ bool selectedGameIsImplemented() {
          selectedGame == GameId::ColourShooter ||
          selectedGame == GameId::Pong1D ||
          selectedGame == GameId::ReactionRace ||
-         selectedGame == GameId::Snake1D;
+         selectedGame == GameId::Snake1D ||
+         selectedGame == GameId::MeteorDodge;
 }
 
 void startSelectedGame(uint32_t now) {
@@ -145,6 +148,9 @@ void startSelectedGame(uint32_t now) {
       break;
     case GameId::Snake1D:
       snake.start(now);
+      break;
+    case GameId::MeteorDodge:
+      meteorDodge.start(now);
       break;
     default:
       break;
@@ -288,6 +294,9 @@ void render(uint32_t now) {
       case GameId::Snake1D:
         snake.render(now);
         break;
+      case GameId::MeteorDodge:
+        meteorDodge.render(now);
+        break;
       default:
         LedManager::clearStrip();
         break;
@@ -388,6 +397,9 @@ void update(uint32_t now) {
           break;
         case GameId::Snake1D:
           snake.update(now);
+          break;
+        case GameId::MeteorDodge:
+          meteorDodge.update(now);
           break;
         default:
           break;
