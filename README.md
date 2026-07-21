@@ -69,6 +69,9 @@ stabilize before starting AVR109 programming and verification. The normal
 application interface is never accepted as the bootloader if the short reset
 window is missed; the helper keeps waiting instead of uploading to the wrong
 port.
+This unit has been observed as `1B4F:9206` in application mode and as an
+Arduino Leonardo bootloader with `2341:0036` during upload. Both identities are
+included; COM numbers are still discovered dynamically.
 
 If more than one compatible Pro Micro is connected, the helper refuses to
 guess. Select the intended application interface explicitly:

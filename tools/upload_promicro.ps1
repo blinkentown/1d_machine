@@ -18,7 +18,7 @@ $avrdudeConfig = Join-Path $env:USERPROFILE ".platformio\packages\tool-avrdude\a
 $firmwareRelative = ".pio\build\$Environment\firmware.hex"
 $firmware = Join-Path $projectRoot $firmwareRelative
 $proMicroHardwarePattern =
-    "VID_1B4F&PID_(9205|9206)|VID_2341&PID_(0037|8037)"
+    "VID_1B4F&PID_(9205|9206)|VID_2341&PID_(0036|0037|8037)"
 
 function Get-ProMicroPorts {
     return @(Get-CimInstance Win32_SerialPort -ErrorAction SilentlyContinue |
