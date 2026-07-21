@@ -20,8 +20,7 @@ these action labels. There is currently no dedicated pause input.
 At the game selector, short-press the illuminated selector to advance one game.
 Hold it for about 0.8 seconds to confirm the displayed game. Alternatively,
 turn the rotary encoder to select in either direction and press the encoder to
-start. Encoder direction and steps per detent are configurable; hardware
-validation is still pending.
+start. Encoder direction and steps per detent are configurable.
 
 To change power mode without restarting, remain at the game selector and hold
 the blue and yellow game buttons together for two seconds.

@@ -25,8 +25,8 @@ rules are in [ARCHITECTURE.md](ARCHITECTURE.md).
 - One 288-pixel APA102/SK9822 strip on hardware SPI
 - Four color game buttons: red, green, blue, yellow
 - One illuminated selector button with a NeoPixel
-- Rotary encoder and setup button inputs; firmware support is present, hardware
-  validation is pending
+- Rotary encoder and setup button inputs; encoder selection and click are
+  hardware-validated
 - External fused 5 V supply for the LED strip
 
 The controller, strip, and PSU require a common ground. USB and PSU positive
@@ -115,10 +115,10 @@ fixed state and no additional LED framebuffer.
 
 ## Planned user interface work
 
-The rotary encoder is already decoded in firmware: rotation changes the game
+The rotary encoder is decoded and hardware-tested: rotation changes the game
 selection in either direction and the encoder click starts the selected game.
-The remaining task is a hardware test and, if needed, adjustment of direction,
-debounce, or steps per detent in `include/config.h`.
+Direction, debounce, and steps per detent remain configurable in
+`include/config.h`.
 
 A score/game-mode display is not assigned to pins yet. A conventional buffered
 128x64 monochrome display needs 1024 bytes of framebuffer RAM and does not fit

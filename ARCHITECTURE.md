@@ -70,10 +70,10 @@ preserve flash for game logic.
   the 20 ms frame budget.
 - Input and game updates remain non-blocking. Serial messages occur on state or
   score events, not once per frame.
-- Encoder A/B are polled with 2 ms debounce. This is suitable for normal hand
-  rotation but must be tested with the installed encoder; very fast movement
-  can skip transitions during LED output. D2/D3 support an interrupt-based
-  decoder later if polling proves insufficient.
+- Encoder A/B are polled with 2 ms debounce. Normal hand rotation and encoder
+  click are hardware-validated; very fast movement can still skip transitions
+  during LED output. D2/D3 support an interrupt-based decoder later if polling
+  proves insufficient.
 - No large local arrays were found. The 656-byte SRAM reserve still includes
   the unknown runtime stack, so a stack high-water measurement is recommended
   before adding another persistent buffer.
@@ -84,7 +84,8 @@ The firmware already initializes D2/D3 with `INPUT_PULLUP`, debounces both
 signals, decodes the quadrature transition table, accumulates four transitions
 per detent, and applies `Config::ENCODER_DIRECTION`. At the selector, rotation
 moves backward or forward through all seven games and the D4 encoder click
-starts the selected game. Hardware validation remains outstanding.
+starts the selected game. Normal selection, reverse selection, and click
+behavior are hardware-validated.
 
 ## Score and game-mode display constraints
 
@@ -105,12 +106,11 @@ starts the selected game. Hardware validation remains outstanding.
 
 Recommended integration order:
 
-1. Hardware-test encoder direction and detent count.
-2. Select the exact display and decide between free GPIO/software bus or a
+1. Select the exact display and decide between free GPIO/software bus or a
    controller change.
-3. Add a fixed-size, allocation-free `UiSnapshot` for mode and scores.
-4. Reclaim flash with an optional reduced-serial build profile.
-5. Add a low-RAM text or numeric driver, then repeat clean build, stack, timing,
+2. Add a fixed-size, allocation-free `UiSnapshot` for mode and scores.
+3. Reclaim flash with an optional reduced-serial build profile.
+4. Add a low-RAM text or numeric driver, then repeat clean build, stack, timing,
    power, and hardware tests.
 
 ## Adding a game
@@ -130,8 +130,8 @@ Recommended integration order:
 ## Review notes
 
 - All seven selectable games are implemented.
-- Encoder decoding and selector integration exist in firmware; installed
-  hardware behavior has not yet been validated.
+- Encoder decoding, selector integration, and installed hardware behavior are
+  validated.
 - No display driver or shared score/mode view model is implemented.
 - FastLED current limiting is an estimate. The measured 3000 mA setting draws
   approximately 3.5 A during the full-white test.
