@@ -129,6 +129,16 @@ static_assert(METEOR_INITIAL_WARNING_MS -
                   METEOR_MINIMUM_WARNING_MS,
               "Meteor warning speed must respect its minimum");
 
+constexpr uint8_t MEMORY_START_LENGTH = 1;
+constexpr uint8_t MEMORY_MAX_LENGTH = 32;
+constexpr uint16_t MEMORY_SHOW_ON_MS = 400;
+constexpr uint16_t MEMORY_SHOW_GAP_MS = 180;
+constexpr uint16_t MEMORY_INPUT_FEEDBACK_MS = 180;
+constexpr uint16_t MEMORY_INPUT_TIMEOUT_MS = 3500;
+constexpr uint16_t MEMORY_SUCCESS_MS = 700;
+constexpr uint32_t MEMORY_SUCCESS_COLOR = 0x00FF00UL;
+constexpr uint32_t MEMORY_ERROR_COLOR = 0xFF0000UL;
+
 constexpr uint8_t COLOUR_SHOOTER_STARTING_LIVES = 3;
 constexpr uint8_t COLOUR_SHOOTER_TARGET_COUNT = 8;
 constexpr uint8_t COLOUR_SHOOTER_MAX_SHOTS = 4;

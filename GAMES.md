@@ -37,6 +37,7 @@ the blue and yellow game buttons together for two seconds.
 | Reaction Race selected/running | Green |
 | Snake 1D selected/running | Cyan |
 | Meteor Dodge selected/running | Red |
+| Memory Sequence selected/running | Purple |
 
 After a one-second power confirmation, the selector output returns to the
 selected game's color. Red can therefore be the brief PSU confirmation or the
@@ -171,3 +172,21 @@ Selector output: red.
   465 ms as score rises; the 360 ms impact animation remains constant.
 - Three hits produce a flashing red game-over blast at strip center.
 - Any color game button restarts after game over.
+
+## Memory Sequence
+
+Selector output: purple.
+
+- Four dim 12-LED stations represent red, green, blue, and yellow at fixed
+  positions along the strip.
+- During playback, the required station becomes fully bright for 400 ms,
+  followed by a 180 ms dark gap.
+- Repeat the sequence using the matching red, green, blue, and yellow game
+  buttons. Correct input briefly brightens its station.
+- Completing a round produces a green sweep and adds one new color.
+- The sequence grows from one to a maximum of 32 colors without allocating a
+  sequence array; it is regenerated from a fixed seed.
+- A wrong color or 3.5 seconds without input produces a flashing red
+  game-over block at strip center.
+- Completing all 32 colors produces a full-strip four-color victory output.
+- Any color game button restarts after game over or victory.

@@ -19,7 +19,7 @@ class TwangGame {
   void generateDungeon();
   void move(int8_t direction, bool dash, uint32_t now);
   void attack(uint32_t now);
-  void loseLife(uint32_t now, const __FlashStringHelper* reason);
+  void loseLife(uint32_t now);
   uint16_t nextRandom();
   static uint32_t cellBit(uint8_t cell);
 
@@ -30,9 +30,7 @@ class TwangGame {
   uint32_t effectStartedAt_ = 0;
   uint32_t lastDashAt_ = 0;
   uint16_t randomState_ = 1;
-  uint16_t score_ = 0;
   int8_t facing_ = 1;
-  int8_t effectDirection_ = 1;
   uint8_t playerCell_ = 1;
   uint8_t effectCell_ = 1;
   uint8_t lives_ = 0;

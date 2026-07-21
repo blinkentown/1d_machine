@@ -17,7 +17,7 @@ class ReactionRaceGame {
   };
 
   void prepareRound(uint32_t now);
-  void finishRound(int8_t winner, uint32_t now, bool falseStart);
+  void finishRound(int8_t winner, uint32_t now);
   void handleRaceInputs(uint32_t now);
   uint16_t nextRandom();
 

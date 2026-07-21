@@ -82,11 +82,6 @@ void MeteorDodgeGame::resolveImpact(uint32_t now) {
 
   phaseChangedAt_ = now;
   phase_ = lives_ == 0 ? Phase::GameOver : Phase::Impact;
-  if (phase_ == Phase::GameOver) {
-    Serial.print(F("Meteor game over. Score: "));
-    Serial.println(score_);
-    Serial.println(F("Press any color button to restart"));
-  }
 }
 
 void MeteorDodgeGame::update(uint32_t now) {

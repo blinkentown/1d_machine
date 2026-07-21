@@ -43,11 +43,9 @@ void ReactionRaceGame::prepareRound(uint32_t now) {
           nextRandom() %
               (Config::REACTION_WAIT_MAX_MS - Config::REACTION_WAIT_MIN_MS);
   phase_ = Phase::Waiting;
-  Serial.println(F("Wait for green center signal"));
 }
 
-void ReactionRaceGame::finishRound(int8_t winner, uint32_t now,
-                                    bool falseStart) {
+void ReactionRaceGame::finishRound(int8_t winner, uint32_t now) {
   roundWinner_ = winner;
   phaseChangedAt_ = now;
 
@@ -57,18 +55,10 @@ void ReactionRaceGame::finishRound(int8_t winner, uint32_t now,
     ++player2Score_;
   }
 
-  Serial.print(falseStart ? F("False start. Score ") : F("Round. Score "));
-  Serial.print(player1Score_);
-  Serial.print(F(" - "));
-  Serial.println(player2Score_);
-
   phase_ = player1Score_ >= Config::REACTION_ROUNDS_TO_WIN ||
                    player2Score_ >= Config::REACTION_ROUNDS_TO_WIN
                ? Phase::GameOver
                : Phase::RoundResult;
-  if (phase_ == Phase::GameOver) {
-    Serial.println(F("Reaction match over. Press any color to restart"));
-  }
 }
 
 void ReactionRaceGame::handleRaceInputs(uint32_t now) {
@@ -96,7 +86,7 @@ void ReactionRaceGame::handleRaceInputs(uint32_t now) {
     finishRound(player1Finished == player2Finished
                     ? 0
                     : (player1Finished ? -1 : 1),
-                now, false);
+                now);
   }
 }
 
@@ -124,19 +114,17 @@ void ReactionRaceGame::update(uint32_t now) {
   }
 
   if (phase_ == Phase::Waiting) {
-    if (player1Pressed || player2Pressed) {
-      finishRound(player1Pressed == player2Pressed
-                      ? 0
-                      : (player1Pressed ? 1 : -1),
-                  now, true);
+    if (static_cast<int32_t>(now - goAt_) < 0) {
+      if (player1Pressed || player2Pressed) {
+        finishRound(player1Pressed == player2Pressed
+                        ? 0
+                        : (player1Pressed ? 1 : -1),
+                    now);
+      }
       return;
     }
-    if (static_cast<int32_t>(now - goAt_) >= 0) {
-      phase_ = Phase::Racing;
-      phaseChangedAt_ = now;
-      Serial.println(F("GO"));
-    }
-    return;
+    phase_ = Phase::Racing;
+    phaseChangedAt_ = now;
   }
 
   handleRaceInputs(now);

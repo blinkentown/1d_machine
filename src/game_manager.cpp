@@ -3,6 +3,7 @@
 #include "config.h"
 #include "games/colour_shooter.h"
 #include "games/meteor_dodge.h"
+#include "games/memory_sequence.h"
 #include "games/pong_1d.h"
 #include "games/reaction_race.h"
 #include "games/snake_1d.h"
@@ -37,6 +38,7 @@ State state = State::Selecting;
 TwangGame twang;
 ColourShooterGame colourShooter;
 MeteorDodgeGame meteorDodge;
+MemorySequenceGame memorySequence;
 Pong1DGame pong;
 ReactionRaceGame reactionRace;
 Snake1DGame snake;
@@ -116,22 +118,7 @@ void changeSelection(int8_t direction) {
   printSelection();
 }
 
-bool selectedGameIsImplemented() {
-  return selectedGame == GameId::Twang ||
-         selectedGame == GameId::ColourShooter ||
-         selectedGame == GameId::Pong1D ||
-         selectedGame == GameId::ReactionRace ||
-         selectedGame == GameId::Snake1D ||
-         selectedGame == GameId::MeteorDodge;
-}
-
 void startSelectedGame(uint32_t now) {
-  if (!selectedGameIsImplemented()) {
-    Serial.print(gameName(selectedGame));
-    Serial.println(F(" is not implemented yet"));
-    return;
-  }
-
   state = State::Running;
   switch (selectedGame) {
     case GameId::Twang:
@@ -151,6 +138,9 @@ void startSelectedGame(uint32_t now) {
       break;
     case GameId::MeteorDodge:
       meteorDodge.start(now);
+      break;
+    case GameId::MemorySequence:
+      memorySequence.start(now);
       break;
     default:
       break;
@@ -297,6 +287,9 @@ void render(uint32_t now) {
       case GameId::MeteorDodge:
         meteorDodge.render(now);
         break;
+      case GameId::MemorySequence:
+        memorySequence.render(now);
+        break;
       default:
         LedManager::clearStrip();
         break;
@@ -400,6 +393,9 @@ void update(uint32_t now) {
           break;
         case GameId::MeteorDodge:
           meteorDodge.update(now);
+          break;
+        case GameId::MemorySequence:
+          memorySequence.update(now);
           break;
         default:
           break;

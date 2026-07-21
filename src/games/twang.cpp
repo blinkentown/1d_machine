@@ -20,7 +20,6 @@ static_assert(CELL_COUNT <= 32, "Twang cell masks require at most 32 cells");
 void TwangGame::start(uint32_t now) {
   lives_ = Config::TWANG_STARTING_LIVES;
   level_ = 1;
-  score_ = 0;
   randomState_ = static_cast<uint16_t>(micros()) ^ static_cast<uint16_t>(now);
   if (randomState_ == 0) {
     randomState_ = 1;
@@ -39,9 +38,6 @@ void TwangGame::startLevel(uint32_t now) {
   generateDungeon();
   phase_ = Phase::Playing;
   phaseChangedAt_ = now;
-
-  Serial.print(F("Twang level "));
-  Serial.println(level_);
 }
 
 uint16_t TwangGame::nextRandom() {
@@ -73,26 +69,17 @@ void TwangGame::generateDungeon() {
   }
 }
 
-void TwangGame::loseLife(uint32_t now,
-                         const __FlashStringHelper* reason) {
+void TwangGame::loseLife(uint32_t now) {
   if (lives_ > 0) {
     --lives_;
   }
   effectCell_ = playerCell_;
-  effectDirection_ = 0;
   effectStartedAt_ = now;
   effectActive_ = true;
-
-  Serial.print(reason);
-  Serial.print(F(". Lives: "));
-  Serial.println(lives_);
 
   if (lives_ == 0) {
     phase_ = Phase::GameOver;
     phaseChangedAt_ = now;
-    Serial.print(F("Twang game over. Score: "));
-    Serial.println(score_);
-    Serial.println(F("Press any color button to restart"));
   }
 }
 
@@ -100,7 +87,6 @@ void TwangGame::move(int8_t direction, bool dash, uint32_t now) {
   facing_ = direction;
   if (dash && static_cast<uint32_t>(now - lastDashAt_) <
                   Config::TWANG_DASH_COOLDOWN_MS) {
-    Serial.println(F("Dash recharging"));
     return;
   }
 
@@ -114,18 +100,16 @@ void TwangGame::move(int8_t direction, bool dash, uint32_t now) {
   const uint8_t targetCell = static_cast<uint8_t>(target);
   const uint32_t targetBit = cellBit(targetCell);
   if ((enemyMask_ & targetBit) != 0U) {
-    Serial.println(F("Enemy blocks the path"));
     return;
   }
 
   if ((lavaMask_ & targetBit) != 0U) {
     lavaMask_ &= ~targetBit;
-    loseLife(now, F("Lava hit"));
+    loseLife(now);
     return;
   }
 
   effectCell_ = playerCell_;
-  effectDirection_ = direction;
   effectStartedAt_ = now;
   effectActive_ = dash;
   playerCell_ = targetCell;
@@ -134,17 +118,13 @@ void TwangGame::move(int8_t direction, bool dash, uint32_t now) {
   }
 
   if (playerCell_ == EXIT_CELL) {
-    score_ += 10U + level_;
     phase_ = Phase::LevelClear;
     phaseChangedAt_ = now;
-    Serial.print(F("Dungeon cleared. Score: "));
-    Serial.println(score_);
   }
 }
 
 void TwangGame::attack(uint32_t now) {
   effectCell_ = playerCell_;
-  effectDirection_ = facing_;
   effectStartedAt_ = now;
   effectActive_ = true;
 
@@ -161,9 +141,6 @@ void TwangGame::attack(uint32_t now) {
     if ((enemyMask_ & targetBit) != 0U) {
       enemyMask_ &= ~targetBit;
       effectCell_ = targetCell;
-      ++score_;
-      Serial.print(F("Enemy twanged. Score: "));
-      Serial.println(score_);
       return;
     }
     if ((lavaMask_ & targetBit) != 0U) {
