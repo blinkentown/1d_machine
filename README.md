@@ -18,9 +18,9 @@ The default image keeps Meteor Dodge, Snake 1D, and Memory Sequence out of the
 selector to stay within the ATmega32U4 flash limit. The alternate
 `sparkfun_promicro16_source_games` is a focused test image containing Catch 1D,
 Colour Gate with a Boss Deflect second stage, Codebreaker, one- and two-player
-Lights Out, and Whack 1D. Minefield and Nim remain as inactive prototype source
-after receiving a medium play-test rating; Hanoi remains inactive after proving
-insufficiently intuitive in play testing.
+Lights Out, Whack 1D, and Firefighter 1D. Minefield and Nim remain as inactive
+prototype source after receiving a medium play-test rating; Hanoi remains
+inactive after proving insufficiently intuitive in play testing.
 
 Detailed controls are in [GAMES.md](GAMES.md). Power wiring and runtime power
 modes are in [POWER_MODES.md](POWER_MODES.md). Firmware structure and memory
@@ -141,7 +141,7 @@ both the module's `3-2-1-6-5-4` grid order and the rotated segment geometry;
 During selection the display shows player count and a three-digit game code.
 The default profile uses `1P tNG`, `1P CSH`, `2P PnG`, `2P tEn`, `2P rAC`, and
 `2P CSn`; the source-games profile uses `1P CtC`, `1P CGt`, `1P COd`, and
-`1P OFF`, `2P OFF`, and `1P HIt`.
+`1P OFF`, `2P OFF`, `1P HIt`, and `1P FIr`.
 During play the display is split into two three-digit score fields.
 Player 1 is on the left and Player 2 is on the right. The right field stays
 blank in a single-player game. Values are right-aligned without leading zeroes
@@ -173,13 +173,13 @@ produces faster movement; simple controls take priority over extra mechanics.
 The enhanced six-game default build with the Tennis 1D hardware test pending
 uses:
 
-- SRAM: 1760 / 2560 bytes (68.8%)
-- Flash: 27536 / 28672 bytes (96.0%)
+- SRAM: 1762 / 2560 bytes (68.8%)
+- Flash: 27540 / 28672 bytes (96.1%)
 
-The six-mode source profile uses:
+The seven-mode source profile uses:
 
-- SRAM: 1611 / 2560 bytes (62.9%)
-- Flash: 25040 / 28672 bytes (87.3%)
+- SRAM: 1657 / 2560 bytes (64.7%)
+- Flash: 27138 / 28672 bytes (94.6%)
 
 The SRAM figure does not include peak stack usage. Future games must use small,
 fixed state and no additional LED framebuffer.

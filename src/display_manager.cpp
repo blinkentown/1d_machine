@@ -31,7 +31,7 @@ const uint8_t DIGIT_GLYPHS[10] PROGMEM = {
     0x6D, 0x7D, 0x07, 0x7F, 0x6F,
 };
 
-const uint8_t MODE_GLYPHS[42] PROGMEM = {
+const uint8_t MODE_GLYPHS[45] PROGMEM = {
     GLYPH_T, GLYPH_N, GLYPH_G,  // Twang: tNG
     GLYPH_C, GLYPH_S, GLYPH_H,  // Colour Shooter: CSH
     GLYPH_P, GLYPH_N, GLYPH_G,  // Pong: PnG
@@ -46,6 +46,7 @@ const uint8_t MODE_GLYPHS[42] PROGMEM = {
     GLYPH_O, GLYPH_F, GLYPH_F,  // Lights Out: OFF
     GLYPH_O, GLYPH_F, GLYPH_F,  // Lights Out Duel: OFF
     GLYPH_H, GLYPH_I, GLYPH_T,  // Whack 1D: HIt
+    GLYPH_F, GLYPH_I, GLYPH_R,  // Firefighter 1D: FIr
 };
 
 uint8_t previousDigits[DIGIT_COUNT] = {};

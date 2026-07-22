@@ -15,7 +15,8 @@ The Player 1 encoder controls Twang and solo Lights Out. Both
 encoders control Tennis 1D and Lights Out Duel. Colour Shooter, Pong, Reaction Race, and Colour
 Snake Duel retain their button controls. Catch 1D uses red; Colour Gate,
 Codebreaker, and Whack 1D use the four color buttons in the source-games
-profile. The Player 2 encoder click remains reserved.
+profile. Firefighter 1D uses Player 1's encoder and the blue button. The Player
+2 encoder click remains reserved.
 
 ## Gameplay UI rule
 
@@ -42,7 +43,7 @@ catalog so unused games are removed by link-time optimization:
 
 ```text
 1P Catch 1D -> 1P Colour Gate -> 1P Codebreaker -> 1P Lights Out ->
-2P Lights Out -> 1P Whack 1D -> repeat
+2P Lights Out -> 1P Whack 1D -> 1P Firefighter 1D -> repeat
 ```
 
 To change power mode without restarting, remain at the game selector and hold
@@ -68,6 +69,7 @@ the blue and yellow game buttons together for two seconds.
 | Lights Out selected/running | Deep blue |
 | Lights Out Duel selected/running | Azure |
 | Whack 1D selected/running | Magenta |
+| Firefighter 1D selected/running | Orange |
 
 After a one-second power confirmation, the selector output returns to the
 selected game's color. Red is the PSU confirmation; green can be the brief
@@ -103,11 +105,13 @@ The selection display identifies player count and game:
 | 1 | Lights Out | `1P OFF` |
 | 2 | Lights Out Duel | `2P OFF` |
 | 1 | Whack 1D | `1P HIt` |
+| 1 | Firefighter 1D | `1P FIr` |
 
 During play, the left three digits show Player 1 and the right three show
 Player 2. Twang, Colour Shooter, Catch 1D, Colour Gate, Codebreaker, solo
-Lights Out, and Whack 1D use the left field and leave the right field blank.
-Pong, Tennis, Reaction Race, Colour Snake Duel, and Lights Out Duel show both scores. Each
+Lights Out, Whack 1D, and Firefighter 1D use the left field and leave the right
+field blank. Pong, Tennis, Reaction Race, Colour Snake Duel, and Lights Out
+Duel show both scores. Each
 field is right-aligned, has no leading
 zeroes, and is limited to 999. Lives remain visible on the LED strip.
 
@@ -363,6 +367,26 @@ Selector output: magenta.
 - The deadline falls from 1100 ms toward 420 ms as the score rises.
 - The left display field shows score. After all three lives are lost, any color
   button starts a new run.
+
+## Firefighter 1D (source-games profile)
+
+Selector output: orange.
+
+- A small cyan marker with a white center is the firefighter. Turn Player 1's
+  encoder to move it along the strip. The firefighter may safely cross a fire;
+  walking on it does not extinguish it.
+- Fires flicker yellow, orange, and red while spreading outward one physical
+  LED at a time. Their width is the visible burn timer.
+- A dim-blue area with bright blue endpoints constantly shows the hose range.
+  Put a fire's center inside that area and tap the blue button once. A visible
+  water jet and cyan splash extinguish the nearest fire in range and add one
+  point; spraying empty space has no penalty and water is unlimited.
+- One fire is active initially, two from score 5, and three from score 15.
+  Burn time falls from 6 seconds toward 3 seconds as score rises.
+- A fire that fully spreads costs one of three lives and clears the field for
+  the next attempt. The left display field shows extinguished-fire score.
+- After all three lives are lost, turn Player 1's encoder or press blue to
+  restart.
 
 ## Hanoi 1D (inactive prototype)
 

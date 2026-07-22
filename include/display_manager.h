@@ -19,6 +19,7 @@ enum class Mode : uint8_t {
   LightsOut,
   LightsOutDuel,
   Whack1D,
+  Firefighter1D,
   Count,
 };
 

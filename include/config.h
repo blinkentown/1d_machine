@@ -86,6 +86,7 @@ constexpr uint32_t MODE_MINEFIELD_COLOR = 0xFF8000UL;
 constexpr uint32_t MODE_NIM_DUEL_COLOR = 0x00FFFFUL;
 constexpr uint32_t MODE_HANOI_COLOR = 0x00FF80UL;
 constexpr uint32_t MODE_WHACK_COLOR = 0xFF00FFUL;
+constexpr uint32_t MODE_FIREFIGHTER_COLOR = 0xFF4000UL;
 
 constexpr uint16_t POWER_STRESS_DURATION_MS = 10000;
 constexpr uint32_t POWER_STRESS_COLOR = 0xFFFFFFUL;
@@ -349,6 +350,33 @@ constexpr uint32_t WHACK_ERROR_COLOR = 0xFF0000UL;
 constexpr uint32_t WHACK_LIFE_COLOR = 0x00FF00UL;
 static_assert(WHACK_INITIAL_DURATION_MS > WHACK_MINIMUM_DURATION_MS,
               "Whack duration must be able to decrease");
+
+constexpr uint8_t FIREFIGHTER_STARTING_LIVES = 3;
+constexpr uint8_t FIREFIGHTER_SPRAY_REACH_CELLS = 2;
+constexpr uint8_t FIREFIGHTER_MAX_FIRE_RADIUS_CELLS = 3;
+constexpr uint16_t FIREFIGHTER_INITIAL_BURN_MS = 6000;
+constexpr uint16_t FIREFIGHTER_MINIMUM_BURN_MS = 3000;
+constexpr uint8_t FIREFIGHTER_SPEEDUP_MS = 100;
+constexpr uint8_t FIREFIGHTER_TWO_FIRE_SCORE = 5;
+constexpr uint8_t FIREFIGHTER_THREE_FIRE_SCORE = 15;
+constexpr uint16_t FIREFIGHTER_SPRAY_MS = 300;
+constexpr uint16_t FIREFIGHTER_ERROR_MS = 300;
+constexpr uint32_t FIREFIGHTER_PLAYER_COLOR = 0x00FFFFUL;
+constexpr uint32_t FIREFIGHTER_PLAYER_CORE_COLOR = 0xFFFFFFUL;
+constexpr uint32_t FIREFIGHTER_WATER_RANGE_COLOR = 0x000008UL;
+constexpr uint32_t FIREFIGHTER_WATER_COLOR = 0x0040FFUL;
+constexpr uint32_t FIREFIGHTER_SPLASH_COLOR = 0x80FFFFUL;
+constexpr uint32_t FIREFIGHTER_FIRE_COLOR = 0xA00000UL;
+constexpr uint32_t FIREFIGHTER_FIRE_INNER_COLOR = 0xFF4000UL;
+constexpr uint32_t FIREFIGHTER_FIRE_CORE_COLOR = 0xFFFF00UL;
+constexpr uint32_t FIREFIGHTER_ERROR_COLOR = 0xFF0000UL;
+constexpr uint32_t FIREFIGHTER_LIFE_COLOR = 0x00FF00UL;
+static_assert(FIREFIGHTER_INITIAL_BURN_MS >
+                  FIREFIGHTER_MINIMUM_BURN_MS,
+              "Firefighter burn time must be able to decrease");
+static_assert(FIREFIGHTER_SPRAY_REACH_CELLS <
+                  FIREFIGHTER_MAX_FIRE_RADIUS_CELLS,
+              "Fire growth must extend beyond spray reach");
 
 constexpr uint8_t COLOUR_SHOOTER_STARTING_LIVES = 3;
 constexpr uint8_t COLOUR_SHOOTER_TARGET_COUNT = 8;

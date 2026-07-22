@@ -8,6 +8,7 @@
 #include "games/catch_1d.h"
 #include "games/codebreaker.h"
 #include "games/colour_quest.h"
+#include "games/firefighter_1d.h"
 #include "games/lights_out.h"
 #include "games/whack_1d.h"
 #else
@@ -42,6 +43,7 @@ const GameId GAME_CATALOG[] PROGMEM = {
     GameId::LightsOut,
     GameId::LightsOutDuel,
     GameId::Whack1D,
+    GameId::Firefighter1D,
 };
 #else
 const GameId GAME_CATALOG[] PROGMEM = {
@@ -71,6 +73,7 @@ CodebreakerGame codebreaker;
 ColourQuestGame colourQuest;
 LightsOutGame lightsOut;
 Whack1DGame whack;
+Firefighter1DGame firefighter;
 #else
 ColourShooterGame colourShooter;
 Tennis1DGame tennis;
@@ -121,6 +124,8 @@ const __FlashStringHelper* gameName(GameId game) {
       return F("Lights Out Duel");
     case GameId::Whack1D:
       return F("Whack 1D");
+    case GameId::Firefighter1D:
+      return F("Firefighter 1D");
     case GameId::Count:
       break;
   }
@@ -159,6 +164,8 @@ uint32_t gameColor(GameId game) {
       return Config::MODE_LIGHTS_OUT_DUEL_COLOR;
     case GameId::Whack1D:
       return Config::MODE_WHACK_COLOR;
+    case GameId::Firefighter1D:
+      return Config::MODE_FIREFIGHTER_COLOR;
     case GameId::Count:
       break;
   }
@@ -216,6 +223,9 @@ void startSelectedGame(uint32_t now) {
       break;
     case GameId::Whack1D:
       whack.start(now);
+      break;
+    case GameId::Firefighter1D:
+      firefighter.start(now);
       break;
 #else
     case GameId::Tennis1D:
@@ -396,6 +406,10 @@ void render(uint32_t now) {
         whack.render(now);
         DisplayManager::showSingleScore(whack.score());
         break;
+      case GameId::Firefighter1D:
+        firefighter.render(now);
+        DisplayManager::showSingleScore(firefighter.score());
+        break;
 #else
       case GameId::Tennis1D:
         tennis.render(now);
@@ -521,6 +535,9 @@ void update(uint32_t now) {
           break;
         case GameId::Whack1D:
           whack.update(now);
+          break;
+        case GameId::Firefighter1D:
+          firefighter.update(now);
           break;
 #else
         case GameId::Tennis1D:
