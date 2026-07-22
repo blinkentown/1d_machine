@@ -7,6 +7,9 @@ namespace Pins {
 constexpr uint8_t LED_CLOCK = 15;
 constexpr uint8_t LED_DATA = 16;
 
+constexpr uint8_t PLAYER_1_ENCODER_A = 0;
+constexpr uint8_t PLAYER_1_ENCODER_B = 1;
+
 constexpr uint8_t ENCODER_A = 2;
 constexpr uint8_t ENCODER_B = 3;
 constexpr uint8_t ENCODER_CLICK = 4;

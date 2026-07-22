@@ -4,7 +4,7 @@
 
 `src/main.cpp` performs one non-blocking update loop:
 
-1. Debounce buttons and decode the rotary encoder.
+1. Debounce buttons and snapshot both interrupt-driven player encoders.
 2. Update the startup/runtime power mode.
 3. Update the selector, power stress test, or active game state machine.
 4. Render at the configured frame interval.
@@ -16,7 +16,7 @@ There are no gameplay delays or dynamic allocations.
 | Module | Responsibility |
 | --- | --- |
 | `input_manager` | Debounced active-low buttons and encoder decoding |
-| `controls.h` | Zero-cost player and one-player aliases for color buttons |
+| `controls.h` | Logical P1/P2 button aliases and reserved encoder adapter |
 | `led_manager` | The only 288-pixel framebuffer, selector pixel, FastLED output |
 | `display_manager` | Six-digit TM1637 mode, score, and life output |
 | `power_mode_manager` | Bench/PSU limits and runtime mode switching |
@@ -24,11 +24,11 @@ There are no gameplay delays or dynamic allocations.
 | `game_manager` | Game selection, confirmation, dispatch, and exit behavior |
 | `games/twang` | Cell-mask dungeon, movement, dash, attack, and level states |
 | `games/meteor_dodge` | Warning, movement, dash, shield, and impact states |
-| `games/memory_sequence` | Seeded sequence playback, input, and round states |
+| `games/memory_sequence` | Inactive retained source: sequence memory game |
 | `games/colour_shooter` | Incoming targets, shots, lives, and impact effects |
 | `games/pong_1d` | Ball, paddles, scoring, point delay, and serve states |
 | `games/reaction_race` | Random start, false starts, alternating inputs, rounds |
-| `games/snake_1d` | Continuous segment queue, rainbow bonus, shots, and combo |
+| `games/snake_1d` | Inactive retained source: continuous color snake |
 
 Pins are centralized in `include/pins.h`. Tunable values are centralized in
 `include/config.h`.
@@ -42,19 +42,17 @@ Pins are centralized in `include/pins.h`. Tunable values are centralized in
 - Render game objects directly into the shared LED buffer.
 - Check both SRAM and flash after every playable step.
 
-Reviewed encoder-and-display build baseline:
+Reviewed five-game, two-encoder, and display build baseline:
 
-- Static SRAM: 1897 / 2560 bytes
-- Flash: 26664 / 28672 bytes
-- Largest game states: Snake 240 bytes, Colour Shooter 124 bytes, Twang 29
-  bytes, Pong 24 bytes, Meteor Dodge 20 bytes, Reaction Race 18 bytes,
-  Memory Sequence 15 bytes
+- Static SRAM: 1604 / 2560 bytes
+- Flash: 22258 / 28672 bytes
+- Active game states: Colour Shooter 124 bytes, Twang 29 bytes, Pong 24 bytes,
+  Meteor Dodge 19 bytes, and Reaction Race 18 bytes
 
-The remaining 663 SRAM bytes also contain the runtime stack. All seven game
-states currently fit as fixed globals. Any substantial future game or feature
-should overlay inactive game states in shared storage and consolidate repeated
-projectile/effect code first. The remaining 2008 flash bytes are maintenance
-reserve, not a target for another large game.
+The remaining 956 SRAM bytes also contain the runtime stack. Snake and Memory
+are not instantiated or dispatched, so link-time optimization removes their
+firmware code while their source remains available. The remaining 6414 flash
+bytes provide headroom for system UI and focused gameplay improvements.
 
 The AVR build enables link-time optimization, shared function prologues,
 reduced small-function inlining, unsplit wide values, and linker relaxation to
@@ -74,22 +72,29 @@ preserve flash for game logic.
   It compares display content every rendered frame but transmits only after a
   visible change. The hardware-validated 100 us half-clock timing follows the
   conservative reference-driver default.
-- Encoder A/B are polled with 2 ms debounce. Normal hand rotation and encoder
-  click are hardware-validated; very fast movement can still skip transitions
-  during LED output. D2/D3 support an interrupt-based decoder later if polling
-  proves insufficient.
-- No large local arrays were found. The 663-byte SRAM reserve still includes
+- Both encoder pairs use CHANGE interrupts, the shared quadrature transition
+  table, four transitions per detent, and saturating pending deltas. Display
+  and LED transfers therefore cannot hide normal player rotation.
+- No large local arrays were found. The 956-byte SRAM reserve still includes
   the unknown runtime stack, so a stack high-water measurement is recommended
   before adding another persistent buffer.
 
-## Rotary encoder status
+## Player and system input boundary
 
-The firmware already initializes D2/D3 with `INPUT_PULLUP`, debounces both
-signals, decodes the quadrature transition table, accumulates four transitions
-per detent, and applies `Config::ENCODER_DIRECTION`. At the selector, rotation
-moves backward or forward through all seven games and the D4 encoder click
-starts the selected game. Normal selection, reverse selection, and click
-behavior are hardware-validated.
+Player 1 owns D0/D1 plus red/green. Player 2 owns D2/D3 plus blue/yellow. Both
+encoder directions are independently configurable. Both directions were
+reversed together after the last hardware check, but encoder deltas are
+currently ignored by all games and the selector. Gameplay remains on the
+proven color-button UI until each encoder use is designed and tested
+separately.
+
+The illuminated selector owns cycle, start, and return behavior. D5 is the
+setup input. The existing D4 encoder click is reserved and ignored during
+normal selection and gameplay to keep the two player interfaces symmetric.
+A2/A3 are the only two currently exposed and completely free direct GPIOs;
+they remain available for future dedicated system-option buttons.
+Power-mode and stress-test chords are the documented temporary exception:
+they use player buttons only while the selector is active.
 
 ## Score and game-mode display
 
@@ -98,11 +103,12 @@ connect to 5 V and common ground. The protocol is bit-banged directly because
 D2/D3 remain dedicated to the encoder. The driver ignores acknowledgements so
 the firmware also runs normally when the display is disconnected.
 
-No display library, heap allocation, text buffer, or framebuffer is used. Each
-game exposes only its small numeric status through constant-time getters. The
-first two digits hold a fixed game abbreviation. The last four show one
-four-digit value or two two-digit player scores. Decimal points serve as the
-life indicators or the divider between player scores.
+No display library, heap allocation, text buffer, or framebuffer is used. At
+selection, the six digits show player count plus a three-digit game
+abbreviation. During a game, the left three digits are reserved for Player 1
+and the right three for Player 2. Single-player games leave the right field
+blank. Each score saturates at 999 and is right-aligned without leading zeroes;
+lives remain represented on the LED strip.
 
 The installed module exposes its physical grids in `3-2-1-6-5-4` order and is
 viewed rotated by 180 degrees. The final output transform therefore remaps the
@@ -115,8 +121,8 @@ F while preserving the center segment and decimal-point bit.
 2. Use `Config::GAME_PIXEL_WIDTH` for logical object width.
 3. Use `Config::EXPLOSION_INTENSITY` as the base effect scale.
 4. Apply `Config::gameplayInterval()` to movement timings.
-5. Use the aliases in `controls.h` when controls are actions rather than
-   colors.
+5. Use the documented logical button aliases in `controls.h` for gameplay;
+   do not enable an encoder without a separate control-design and play test.
 6. Add the game to the explicit implemented-game checks and dispatch in
    `game_manager.cpp`.
 7. Keep power stress available only from the game selector.
@@ -125,9 +131,10 @@ F while preserving the center segment and decimal-point bit.
 
 ## Review notes
 
-- All seven selectable games are implemented.
-- Encoder decoding, selector integration, and installed hardware behavior are
-  validated.
+- Five controller-focused games are selectable. Snake and Memory remain as
+  inactive source code.
+- Both encoder decoders and installed hardware behavior are validated. Encoder
+  gameplay integration is deliberately deferred.
 - The encoder and six-digit TM1637 display are integrated and hardware-tested.
   All six digits and all six decimal points are validated on A0/A1.
 - FastLED current limiting is an estimate. The measured 3000 mA setting draws

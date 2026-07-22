@@ -26,6 +26,11 @@ The power mode can also be changed without restarting:
 The confirmation lasts one second, then the illuminated selector returns to
 the selected game's color. The runtime chord is ignored during a game.
 
+These player-button chords are a temporary selector-only bridge until a
+dedicated system-options control is added on the reserved A2/A3 inputs. Games
+receive player inputs through a separate logical interface and cannot trigger
+power-mode changes.
+
 - FastLED limit: 3000 mA.
 - Global brightness: 85/255. FastLED scales dense frames to the configured
   current ceiling while allowing sparse game effects to use the extra
@@ -55,7 +60,7 @@ Build and upload the single firmware at the desk:
 
 ```powershell
 platformio run -e sparkfun_promicro16
-platformio run -e sparkfun_promicro16 -t upload
+powershell -ExecutionPolicy Bypass -File .\tools\upload_promicro.ps1
 ```
 
 ## Power wiring boundary

@@ -3,24 +3,30 @@
 ## Physical button labels
 
 The four game buttons are mounted left-to-right as red, green, blue, yellow.
-Use these additional labels for games that do not directly match colors:
+The four buttons form two symmetric player interfaces:
 
-| Physical color | Two-player label | One-player label |
+| Player | Primary | Secondary |
 | --- | --- | --- |
-| Red | P1-A | Left |
-| Green | P1-B | Right |
-| Blue | P2-A | Action |
-| Yellow | P2-B | Special |
+| Player 1 | Red / P1-A | Green / P1-B |
+| Player 2 | Blue / P2-A | Yellow / P2-B |
 
-Color-matching games use red, green, blue, and yellow as colors rather than
-these action labels. There is currently no dedicated pause input.
+The two installed player encoders are decoded but currently ignored by every
+game and by the selector. They will be introduced carefully per game after
+separate play tests. The click in the Player 2 encoder is also reserved and
+ignored.
 
 ## Selector and power-mode outputs
 
 At the game selector, short-press the illuminated selector to advance one game.
-Hold it for about 0.8 seconds to confirm the displayed game. Alternatively,
-turn the rotary encoder to select in either direction and press the encoder to
-start. Encoder direction and steps per detent are configurable.
+Hold it for about 0.8 seconds to start the displayed game. The player encoders
+never change menu state.
+
+The selector order is grouped by player count:
+
+```text
+1P Twang -> 1P Colour Shooter -> 1P Meteor Dodge
+-> 2P Pong -> 2P Reaction Race -> repeat
+```
 
 To change power mode without restarting, remain at the game selector and hold
 the blue and yellow game buttons together for two seconds.
@@ -35,11 +41,9 @@ the blue and yellow game buttons together for two seconds.
 | Stress test with bench limits | Green; strip output is solid white |
 | Twang selected/running | Orange |
 | Colour Shooter selected/running | Yellow |
+| Meteor Dodge selected/running | Red |
 | 1D Pong selected/running | Blue |
 | Reaction Race selected/running | Green |
-| Snake 1D selected/running | Cyan |
-| Meteor Dodge selected/running | Red |
-| Memory Sequence selected/running | Purple |
 
 After a one-second power confirmation, the selector output returns to the
 selected game's color. Red can therefore be the brief PSU confirmation or the
@@ -48,11 +52,8 @@ Reaction Race selection.
 
 ## Starting a game
 
-Use either control path:
-
-- Short-press the illuminated selector until it shows the desired game color,
-  then hold it for about 0.8 seconds.
-- Or turn the rotary encoder to the desired color and press the encoder.
+Short-press the illuminated selector until it shows the desired game color,
+then hold it for about 0.8 seconds.
 
 The selected game starts immediately and the selector output remains its game
 color.
@@ -63,40 +64,38 @@ color.
 
 ## Six-digit display
 
-The first two characters identify the selected or running game:
+The selection display identifies player count and game:
 
-| Game | Display prefix |
-| --- | --- |
-| Twang | `tG` |
-| Colour Shooter | `CS` |
-| 1D Pong | `PG` |
-| Reaction Race | `rC` |
-| Snake 1D | `Sn` |
-| Meteor Dodge | `Mt` |
-| Memory Sequence | `ME` |
+| Players | Game | Selection display |
+| ---: | --- | --- |
+| 1 | Twang | `1P tNG` |
+| 1 | Colour Shooter | `1P CSH` |
+| 1 | Meteor Dodge | `1P MEt` |
+| 2 | 1D Pong | `2P PnG` |
+| 2 | Reaction Race | `2P rAC` |
 
-While selecting, the last four digits are blank. Twang shows its level; Colour
-Shooter, Snake, and Meteor Dodge show score; Memory Sequence shows sequence
-length. Their rightmost decimal points show up to three remaining lives. Pong
-and Reaction Race show `P1.P2`, using two score digits per player and the point
-after Player 1 as the separator.
+During play, the left three digits show Player 1 and the right three show
+Player 2. Twang uses its level as the Player 1 value; Colour Shooter and Meteor
+Dodge use score and leave the Player 2 field blank. Pong and Reaction Race show
+both scores. Each field is right-aligned, has no leading zeroes, and is limited
+to 999. Lives remain visible on the LED strip.
 
 ## Twang
 
 Selector output: orange.
 
-- Red / Left and green / Right move the white player by one 12-LED cell.
+- Red moves the white player left by one 12-LED cell; green moves right.
 - The blue direction marker shows which way the player faces.
-- Blue / Action sends a blue-white twang up to three cells in that direction.
+- Blue sends a blue-white twang up to three cells in that direction.
 - A twang destroys the first pulsing red enemy in range but stops at lava.
-- Yellow / Special dashes two cells in the facing direction, with a 600 ms
+- Yellow dashes two cells in the facing direction, with a 600 ms
   recharge. A dash can cross one dangerous cell but must land safely.
 - Orange flickering cells are lava. Landing on lava removes one of three green
   life indicators and clears that lava cell.
 - The green cell at the far end is the dungeon exit. Reaching it produces a
   green strip sweep and generates a denser next level.
 - Three lost lives produce a red-white game-over explosion at strip center.
-- Any color game button restarts after game over.
+- Any color button restarts after game over.
 
 ## Running the power stress test
 
@@ -113,23 +112,27 @@ Selector output: orange.
 
 Selector output: yellow.
 
+- This is currently the 1P Advanced variant with all four colors.
 - Random colored comets move from the far end toward the player.
-- Red, green, blue, or yellow launches a matching projectile.
+- Red, green, blue, and yellow each launch a projectile of the matching color.
 - The nearest comet blocks the projectile.
 - A correct match dissolves the target and increases score and speed.
 - A wrong projectile disappears while the target remains.
 - A comet reaching the player removes one of three green life indicators.
 - Three lost lives produce a flashing red game-over output near the strip
   center.
-- Any color game button restarts after game over.
+- Any color button restarts after game over.
+
+A later two-player Colour Shooter variant will assign only red/green to Player
+1 and blue/yellow to Player 2. That variant is planned, not yet selectable.
 
 ## 1D Pong
 
 Selector output: blue.
 
-- Red / P1-A: left player hit.
-- Blue / P2-A: right player hit.
-- Green / P1-B and yellow / P2-B: unused.
+- Player 1 hits with red / P1-A.
+- Player 2 hits with blue / P2-A.
+- Green / P1-B and yellow / P2-B are reserved for later specials.
 - The 12-LED ball accelerates after successful returns.
 - Each visible 24-LED paddle is also the complete hit zone.
 - The hit zone has three 8-LED accuracy bands. Deeper hits speed up the ball by
@@ -141,31 +144,30 @@ Selector output: blue.
 - First player to five points wins.
 - Game-over output: the winning 24-LED paddle flashes red on the left or blue
   on the right.
-- Any color game button restarts after game over.
+- Any color button restarts after game over.
 
 ## Reaction Race
 
 Selector output: green.
 
 - The center pulses amber during a randomized 1.5- to 4-second start delay.
-- Any early press is a false start and awards the round to the other player.
+- Any early player-button press is a false start and awards the round to the other player.
   If both players false-start together, neither scores.
 - The two center cells turn green when the race begins.
-- Player 1 alternates red / P1-A and green / P1-B. A red trail advances from
-  the left.
-- Player 2 alternates blue / P2-A and yellow / P2-B. A blue trail advances
-  from the right.
-- Each moving tip displays the exact physical button color expected next.
-  Pressing the wrong button does not advance the racer.
+- Player 1 alternates red and green; Player 2 alternates blue and yellow. A red
+  trail advances from the left and a blue trail from the right.
+- The moving tips use each player's primary/secondary colors to indicate the
+  required next button. Pressing the other button does not advance.
 - The first racer to reach the center wins the round. A simultaneous finish is
   a tie and awards no point.
 - First to three rounds wins. The winning color alternates with white across
   the full strip.
 - Any color game button restarts after game over.
 
-## Snake 1D
+## Snake 1D (inactive source)
 
-Selector output: cyan.
+Snake 1D is retained in the repository but is not selectable in the focused
+five-game firmware.
 
 - A continuous row of 12-LED colored segments moves toward the player.
 - Adjacent normal segments always have different colors.
@@ -186,23 +188,24 @@ Selector output: cyan.
 
 Selector output: red.
 
-- The white player begins at strip center. Red / Left and green / Right move
-  one 12-LED cell.
-- Blue / Action dashes three cells in the current direction, clamped inside
+- The white player begins at strip center. Red moves one 12-LED cell left;
+  green moves one cell right.
+- Blue dashes three cells in the current direction, clamped inside
   the play area, with a 700 ms recharge.
 - An orange pulsing cell warns where the next meteor will strike.
 - The impact expands across five cells as a rapid red-white blast. Being
   within two cells of its center costs one of three green lives.
-- Yellow / Special spends one of three cyan shield indicators. The active
+- Yellow spends one of three cyan shield indicators. The active
   shield colors the player cyan and absorbs the next otherwise damaging hit.
 - Each clean dodge increases score. Warning time falls from 1.2 seconds toward
   465 ms as score rises; the 360 ms impact animation remains constant.
 - Three hits produce a flashing red game-over blast at strip center.
-- Any color game button restarts after game over.
+- Any color button restarts after game over.
 
-## Memory Sequence
+## Memory Sequence (inactive source)
 
-Selector output: purple.
+Memory Sequence is retained in the repository but is not selectable in the
+focused five-game firmware.
 
 - Four dim 12-LED stations represent red, green, blue, and yellow at fixed
   positions along the strip.

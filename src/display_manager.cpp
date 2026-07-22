@@ -11,10 +11,11 @@ namespace {
 constexpr uint8_t DIGIT_COUNT = 6;
 constexpr uint8_t SEGMENT_DP = 0x80;
 
-constexpr uint8_t GLYPH_BLANK = 0x00;
+constexpr uint8_t GLYPH_A = 0x77;
 constexpr uint8_t GLYPH_C = 0x39;
 constexpr uint8_t GLYPH_E = 0x79;
 constexpr uint8_t GLYPH_G = 0x3D;
+constexpr uint8_t GLYPH_H = 0x76;
 constexpr uint8_t GLYPH_M = 0x37;
 constexpr uint8_t GLYPH_P = 0x73;
 constexpr uint8_t GLYPH_S = 0x6D;
@@ -27,14 +28,12 @@ const uint8_t DIGIT_GLYPHS[10] PROGMEM = {
     0x6D, 0x7D, 0x07, 0x7F, 0x6F,
 };
 
-const uint8_t MODE_GLYPHS[14] PROGMEM = {
-    GLYPH_T, GLYPH_G,  // Twang
-    GLYPH_C, GLYPH_S,  // Colour Shooter
-    GLYPH_P, GLYPH_G,  // Pong
-    GLYPH_R, GLYPH_C,  // Reaction Race
-    GLYPH_S, GLYPH_N,  // Snake
-    GLYPH_M, GLYPH_T,  // Meteor Dodge
-    GLYPH_M, GLYPH_E,  // Memory Sequence
+const uint8_t MODE_GLYPHS[15] PROGMEM = {
+    GLYPH_T, GLYPH_N, GLYPH_G,  // Twang: tNG
+    GLYPH_C, GLYPH_S, GLYPH_H,  // Colour Shooter: CSH
+    GLYPH_M, GLYPH_E, GLYPH_T,  // Meteor Dodge: MEt
+    GLYPH_P, GLYPH_N, GLYPH_G,  // Pong: PnG
+    GLYPH_R, GLYPH_A, GLYPH_C,  // Reaction Race: rAC
 };
 
 uint8_t previousDigits[DIGIT_COUNT] = {};
@@ -127,10 +126,25 @@ void mapDigitsToModule(const uint8_t* logical, uint8_t* physical) {
   physical[5] = logical[3];
 }
 
-void setModeGlyphs(uint8_t* digits, Mode mode) {
-  const uint8_t offset = static_cast<uint8_t>(mode) * 2U;
-  digits[0] = pgm_read_byte(&MODE_GLYPHS[offset]);
-  digits[1] = pgm_read_byte(&MODE_GLYPHS[offset + 1U]);
+void setModeGlyphs(uint8_t* digits, uint8_t start, Mode mode) {
+  const uint8_t offset = static_cast<uint8_t>(mode) * 3U;
+  for (uint8_t index = 0; index < 3U; ++index) {
+    digits[start + index] = pgm_read_byte(&MODE_GLYPHS[offset + index]);
+  }
+}
+
+void setScoreGlyphs(uint8_t* digits, uint8_t start, uint16_t score) {
+  if (score > 999U) {
+    score = 999U;
+  }
+  if (score >= 100U) {
+    digits[start] = digitGlyph(static_cast<uint8_t>(score / 100U));
+  }
+  if (score >= 10U) {
+    digits[start + 1U] =
+        digitGlyph(static_cast<uint8_t>((score / 10U) % 10U));
+  }
+  digits[start + 2U] = digitGlyph(static_cast<uint8_t>(score % 10U));
 }
 
 void writeDisplay(const uint8_t* digits) {
@@ -180,43 +194,23 @@ void clear() {
 
 void showSelection(Mode mode) {
   uint8_t digits[DIGIT_COUNT] = {};
-  setModeGlyphs(digits, mode);
+  const bool twoPlayers = mode == Mode::Pong1D || mode == Mode::ReactionRace;
+  digits[0] = digitGlyph(twoPlayers ? 2U : 1U);
+  digits[1] = GLYPH_P;
+  setModeGlyphs(digits, 3U, mode);
   writeDisplay(digits);
 }
 
-void showSingleScore(Mode mode, uint16_t score, uint8_t indicators) {
+void showSingleScore(uint16_t player1Score) {
   uint8_t digits[DIGIT_COUNT] = {};
-  setModeGlyphs(digits, mode);
-  if (score > 9999U) {
-    score = 9999U;
-  }
-  digits[2] = digitGlyph(static_cast<uint8_t>((score / 1000U) % 10U));
-  digits[3] = digitGlyph(static_cast<uint8_t>((score / 100U) % 10U));
-  digits[4] = digitGlyph(static_cast<uint8_t>((score / 10U) % 10U));
-  digits[5] = digitGlyph(static_cast<uint8_t>(score % 10U));
-
-  if (indicators > 3U) {
-    indicators = 3U;
-  }
-  for (uint8_t index = 0; index < indicators; ++index) {
-    digits[5U - index] |= SEGMENT_DP;
-  }
+  setScoreGlyphs(digits, 0U, player1Score);
   writeDisplay(digits);
 }
 
-void showVersusScore(Mode mode, uint8_t leftScore, uint8_t rightScore) {
+void showVersusScore(uint16_t player1Score, uint16_t player2Score) {
   uint8_t digits[DIGIT_COUNT] = {};
-  setModeGlyphs(digits, mode);
-  if (leftScore > 99U) {
-    leftScore = 99U;
-  }
-  if (rightScore > 99U) {
-    rightScore = 99U;
-  }
-  digits[2] = leftScore >= 10U ? digitGlyph(leftScore / 10U) : GLYPH_BLANK;
-  digits[3] = digitGlyph(leftScore % 10U) | SEGMENT_DP;
-  digits[4] = rightScore >= 10U ? digitGlyph(rightScore / 10U) : GLYPH_BLANK;
-  digits[5] = digitGlyph(rightScore % 10U);
+  setScoreGlyphs(digits, 0U, player1Score);
+  setScoreGlyphs(digits, 3U, player2Score);
   writeDisplay(digits);
 }
 

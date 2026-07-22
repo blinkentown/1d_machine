@@ -5,6 +5,17 @@
 #include "config.h"
 #include "pins.h"
 
+static_assert(digitalPinToInterrupt(Pins::PLAYER_1_ENCODER_A) !=
+                  NOT_AN_INTERRUPT,
+              "Player 1 encoder A must support interrupts");
+static_assert(digitalPinToInterrupt(Pins::PLAYER_1_ENCODER_B) !=
+                  NOT_AN_INTERRUPT,
+              "Player 1 encoder B must support interrupts");
+static_assert(digitalPinToInterrupt(Pins::ENCODER_A) != NOT_AN_INTERRUPT,
+              "Player 2 encoder A must support interrupts");
+static_assert(digitalPinToInterrupt(Pins::ENCODER_B) != NOT_AN_INTERRUPT,
+              "Player 2 encoder B must support interrupts");
+
 namespace InputManager {
 namespace {
 
@@ -59,12 +70,15 @@ DebouncedInput yellowButton(Pins::BUTTON_4, Config::BUTTON_DEBOUNCE_MS);
 DebouncedInput encoderClick(Pins::ENCODER_CLICK, Config::BUTTON_DEBOUNCE_MS);
 DebouncedInput setup(Pins::SETUP_BUTTON, Config::BUTTON_DEBOUNCE_MS);
 DebouncedInput modeSelect(Pins::MODE_BUTTON, Config::BUTTON_DEBOUNCE_MS);
-DebouncedInput encoderA(Pins::ENCODER_A, Config::ENCODER_DEBOUNCE_MS);
-DebouncedInput encoderB(Pins::ENCODER_B, Config::ENCODER_DEBOUNCE_MS);
 
-uint8_t previousEncoderState = 0;
-int8_t encoderStepAccumulator = 0;
-int8_t pendingEncoderDelta = 0;
+volatile uint8_t previousPlayer1EncoderState = 0;
+volatile int8_t player1EncoderStepAccumulator = 0;
+volatile int8_t pendingPlayer1EncoderDelta = 0;
+volatile uint8_t previousPlayer2EncoderState = 0;
+volatile int8_t player2EncoderStepAccumulator = 0;
+volatile int8_t pendingPlayer2EncoderDelta = 0;
+int8_t player1EncoderDelta = 0;
+int8_t player2EncoderDelta = 0;
 
 const int8_t ENCODER_TRANSITIONS[16] PROGMEM = {
     0, -1, 1, 0,
@@ -94,32 +108,73 @@ DebouncedInput& inputFor(Button button) {
   return redButton;
 }
 
-void updateEncoder() {
+void updatePlayer2EncoderInterrupt() {
   const uint8_t currentState =
-      (static_cast<uint8_t>(encoderA.isHeld()) << 1) |
-      static_cast<uint8_t>(encoderB.isHeld());
+      (static_cast<uint8_t>(digitalRead(Pins::ENCODER_A) == LOW) << 1U) |
+      static_cast<uint8_t>(digitalRead(Pins::ENCODER_B) == LOW);
 
-  if (currentState == previousEncoderState) {
+  if (currentState == previousPlayer2EncoderState) {
     return;
   }
 
-  const uint8_t transition = (previousEncoderState << 2) | currentState;
+  const uint8_t transition =
+      (previousPlayer2EncoderState << 2U) | currentState;
   const int8_t step = static_cast<int8_t>(
       pgm_read_byte(&ENCODER_TRANSITIONS[transition]));
-  previousEncoderState = currentState;
+  previousPlayer2EncoderState = currentState;
 
   if (step == 0) {
-    encoderStepAccumulator = 0;
+    player2EncoderStepAccumulator = 0;
     return;
   }
 
-  encoderStepAccumulator += step * Config::ENCODER_DIRECTION;
-  if (encoderStepAccumulator >= Config::ENCODER_STEPS_PER_DETENT) {
-    pendingEncoderDelta = 1;
-    encoderStepAccumulator = 0;
-  } else if (encoderStepAccumulator <= -Config::ENCODER_STEPS_PER_DETENT) {
-    pendingEncoderDelta = -1;
-    encoderStepAccumulator = 0;
+  player2EncoderStepAccumulator += step * Config::ENCODER_DIRECTION;
+  if (player2EncoderStepAccumulator >= Config::ENCODER_STEPS_PER_DETENT) {
+    if (pendingPlayer2EncoderDelta < 127) {
+      ++pendingPlayer2EncoderDelta;
+    }
+    player2EncoderStepAccumulator = 0;
+  } else if (player2EncoderStepAccumulator <=
+             -Config::ENCODER_STEPS_PER_DETENT) {
+    if (pendingPlayer2EncoderDelta > -127) {
+      --pendingPlayer2EncoderDelta;
+    }
+    player2EncoderStepAccumulator = 0;
+  }
+}
+
+void updatePlayer1EncoderInterrupt() {
+  const uint8_t currentState =
+      (static_cast<uint8_t>(digitalRead(Pins::PLAYER_1_ENCODER_A) == LOW)
+       << 1U) |
+      static_cast<uint8_t>(digitalRead(Pins::PLAYER_1_ENCODER_B) == LOW);
+  if (currentState == previousPlayer1EncoderState) {
+    return;
+  }
+
+  const uint8_t transition =
+      (previousPlayer1EncoderState << 2U) | currentState;
+  const int8_t step = static_cast<int8_t>(
+      pgm_read_byte(&ENCODER_TRANSITIONS[transition]));
+  previousPlayer1EncoderState = currentState;
+  if (step == 0) {
+    player1EncoderStepAccumulator = 0;
+    return;
+  }
+
+  player1EncoderStepAccumulator +=
+      step * Config::PLAYER_1_ENCODER_DIRECTION;
+  if (player1EncoderStepAccumulator >= Config::ENCODER_STEPS_PER_DETENT) {
+    if (pendingPlayer1EncoderDelta < 127) {
+      ++pendingPlayer1EncoderDelta;
+    }
+    player1EncoderStepAccumulator = 0;
+  } else if (player1EncoderStepAccumulator <=
+             -Config::ENCODER_STEPS_PER_DETENT) {
+    if (pendingPlayer1EncoderDelta > -127) {
+      --pendingPlayer1EncoderDelta;
+    }
+    player1EncoderStepAccumulator = 0;
   }
 }
 
@@ -133,15 +188,37 @@ void begin() {
   encoderClick.begin();
   setup.begin();
   modeSelect.begin();
-  encoderA.begin();
-  encoderB.begin();
 
-  previousEncoderState =
-      (static_cast<uint8_t>(encoderA.isHeld()) << 1) |
-      static_cast<uint8_t>(encoderB.isHeld());
+  pinMode(Pins::PLAYER_1_ENCODER_A, INPUT_PULLUP);
+  pinMode(Pins::PLAYER_1_ENCODER_B, INPUT_PULLUP);
+  previousPlayer1EncoderState =
+      (static_cast<uint8_t>(digitalRead(Pins::PLAYER_1_ENCODER_A) == LOW)
+       << 1U) |
+      static_cast<uint8_t>(digitalRead(Pins::PLAYER_1_ENCODER_B) == LOW);
+  attachInterrupt(digitalPinToInterrupt(Pins::PLAYER_1_ENCODER_A),
+                  updatePlayer1EncoderInterrupt, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(Pins::PLAYER_1_ENCODER_B),
+                  updatePlayer1EncoderInterrupt, CHANGE);
+
+  pinMode(Pins::ENCODER_A, INPUT_PULLUP);
+  pinMode(Pins::ENCODER_B, INPUT_PULLUP);
+  previousPlayer2EncoderState =
+      (static_cast<uint8_t>(digitalRead(Pins::ENCODER_A) == LOW) << 1U) |
+      static_cast<uint8_t>(digitalRead(Pins::ENCODER_B) == LOW);
+  attachInterrupt(digitalPinToInterrupt(Pins::ENCODER_A),
+                  updatePlayer2EncoderInterrupt, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(Pins::ENCODER_B),
+                  updatePlayer2EncoderInterrupt, CHANGE);
 }
 
 void update(uint32_t now) {
+  noInterrupts();
+  player1EncoderDelta = pendingPlayer1EncoderDelta;
+  pendingPlayer1EncoderDelta = 0;
+  player2EncoderDelta = pendingPlayer2EncoderDelta;
+  pendingPlayer2EncoderDelta = 0;
+  interrupts();
+
   redButton.update(now);
   greenButton.update(now);
   blueButton.update(now);
@@ -149,9 +226,6 @@ void update(uint32_t now) {
   encoderClick.update(now);
   setup.update(now);
   modeSelect.update(now);
-  encoderA.update(now);
-  encoderB.update(now);
-  updateEncoder();
 }
 
 bool isHeld(Button button) { return inputFor(button).isHeld(); }
@@ -160,10 +234,9 @@ bool wasPressed(Button button) { return inputFor(button).wasPressed(); }
 
 bool wasReleased(Button button) { return inputFor(button).wasReleased(); }
 
-int8_t takeEncoderDelta() {
-  const int8_t result = pendingEncoderDelta;
-  pendingEncoderDelta = 0;
-  return result;
+int8_t encoderDelta(Encoder encoder) {
+  return encoder == Encoder::Player1 ? player1EncoderDelta
+                                     : player2EncoderDelta;
 }
 
 }  // namespace InputManager

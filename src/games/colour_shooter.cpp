@@ -93,22 +93,6 @@ uint32_t ColourShooterGame::scaleColor(uint32_t color, uint8_t scale) {
          (static_cast<uint32_t>(scaledGreen) << 8) | scaledBlue;
 }
 
-int8_t ColourShooterGame::pressedColorIndex() {
-  if (InputManager::wasPressed(InputManager::Button::Red)) {
-    return 0;
-  }
-  if (InputManager::wasPressed(InputManager::Button::Green)) {
-    return 1;
-  }
-  if (InputManager::wasPressed(InputManager::Button::Blue)) {
-    return 2;
-  }
-  if (InputManager::wasPressed(InputManager::Button::Yellow)) {
-    return 3;
-  }
-  return -1;
-}
-
 bool ColourShooterGame::spawnTarget(uint16_t position) {
   if (position >= Config::LED_COUNT) {
     return false;
@@ -165,18 +149,26 @@ void ColourShooterGame::launchShot(uint8_t colorIndex, uint32_t now) {
   }
 }
 
-void ColourShooterGame::handleButtonPress(uint32_t now) {
+int8_t ColourShooterGame::pressedColorIndex() {
   if (InputManager::wasPressed(InputManager::Button::Red)) {
-    launchShot(0, now);
+    return 0;
   }
   if (InputManager::wasPressed(InputManager::Button::Green)) {
-    launchShot(1, now);
+    return 1;
   }
   if (InputManager::wasPressed(InputManager::Button::Blue)) {
-    launchShot(2, now);
+    return 2;
   }
   if (InputManager::wasPressed(InputManager::Button::Yellow)) {
-    launchShot(3, now);
+    return 3;
+  }
+  return -1;
+}
+
+void ColourShooterGame::handleButtonPress(uint32_t now) {
+  const int8_t colorIndex = pressedColorIndex();
+  if (colorIndex >= 0) {
+    launchShot(static_cast<uint8_t>(colorIndex), now);
   }
 }
 

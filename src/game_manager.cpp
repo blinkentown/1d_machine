@@ -4,10 +4,8 @@
 #include "display_manager.h"
 #include "games/colour_shooter.h"
 #include "games/meteor_dodge.h"
-#include "games/memory_sequence.h"
 #include "games/pong_1d.h"
 #include "games/reaction_race.h"
-#include "games/snake_1d.h"
 #include "games/twang.h"
 #include "input_manager.h"
 #include "led_manager.h"
@@ -30,10 +28,8 @@ State state = State::Selecting;
 TwangGame twang;
 ColourShooterGame colourShooter;
 MeteorDodgeGame meteorDodge;
-MemorySequenceGame memorySequence;
 Pong1DGame pong;
 ReactionRaceGame reactionRace;
-Snake1DGame snake;
 PowerStressTest powerStressTest;
 uint32_t lastRenderAt = 0;
 uint32_t modeButtonPressedAt = 0;
@@ -54,16 +50,12 @@ const __FlashStringHelper* gameName(GameId game) {
       return F("Twang");
     case GameId::ColourShooter:
       return F("Colour Shooter");
+    case GameId::MeteorDodge:
+      return F("Meteor Dodge");
     case GameId::Pong1D:
       return F("1D Pong");
     case GameId::ReactionRace:
       return F("Reaction Race");
-    case GameId::Snake1D:
-      return F("Snake 1D");
-    case GameId::MeteorDodge:
-      return F("Meteor Dodge");
-    case GameId::MemorySequence:
-      return F("Memory Sequence");
     case GameId::Count:
       break;
   }
@@ -78,16 +70,12 @@ uint32_t gameColor(GameId game) {
       return Config::MODE_TWANG_COLOR;
     case GameId::ColourShooter:
       return Config::MODE_COLOUR_SHOOTER_COLOR;
+    case GameId::MeteorDodge:
+      return Config::MODE_METEOR_DODGE_COLOR;
     case GameId::Pong1D:
       return Config::MODE_PONG_COLOR;
     case GameId::ReactionRace:
       return Config::MODE_REACTION_RACE_COLOR;
-    case GameId::Snake1D:
-      return Config::MODE_SNAKE_COLOR;
-    case GameId::MeteorDodge:
-      return Config::MODE_METEOR_DODGE_COLOR;
-    case GameId::MemorySequence:
-      return Config::MODE_MEMORY_COLOR;
     case GameId::Count:
       break;
   }
@@ -121,20 +109,14 @@ void startSelectedGame(uint32_t now) {
     case GameId::ColourShooter:
       colourShooter.start(now);
       break;
+    case GameId::MeteorDodge:
+      meteorDodge.start(now);
+      break;
     case GameId::Pong1D:
       pong.start(now);
       break;
     case GameId::ReactionRace:
       reactionRace.start(now);
-      break;
-    case GameId::Snake1D:
-      snake.start(now);
-      break;
-    case GameId::MeteorDodge:
-      meteorDodge.start(now);
-      break;
-    case GameId::MemorySequence:
-      memorySequence.start(now);
       break;
     default:
       break;
@@ -266,38 +248,24 @@ void render(uint32_t now) {
     switch (selectedGame) {
       case GameId::Twang:
         twang.render(now);
-        DisplayManager::showSingleScore(selectedGame, twang.level(),
-                                        twang.lives());
+        DisplayManager::showSingleScore(twang.level());
         break;
       case GameId::ColourShooter:
         colourShooter.render(now);
-        DisplayManager::showSingleScore(selectedGame, colourShooter.score(),
-                                        colourShooter.lives());
-        break;
-      case GameId::Pong1D:
-        pong.render(now);
-        DisplayManager::showVersusScore(selectedGame, pong.leftScore(),
-                                        pong.rightScore());
-        break;
-      case GameId::ReactionRace:
-        reactionRace.render(now);
-        DisplayManager::showVersusScore(selectedGame,
-                                        reactionRace.player1Score(),
-                                        reactionRace.player2Score());
-        break;
-      case GameId::Snake1D:
-        snake.render(now);
-        DisplayManager::showSingleScore(selectedGame, snake.score(),
-                                        snake.lives());
+        DisplayManager::showSingleScore(colourShooter.score());
         break;
       case GameId::MeteorDodge:
         meteorDodge.render(now);
-        DisplayManager::showSingleScore(selectedGame, meteorDodge.score(),
-                                        meteorDodge.lives());
+        DisplayManager::showSingleScore(meteorDodge.score());
         break;
-      case GameId::MemorySequence:
-        memorySequence.render(now);
-        DisplayManager::showSingleScore(selectedGame, memorySequence.length());
+      case GameId::Pong1D:
+        pong.render(now);
+        DisplayManager::showVersusScore(pong.leftScore(), pong.rightScore());
+        break;
+      case GameId::ReactionRace:
+        reactionRace.render(now);
+        DisplayManager::showVersusScore(reactionRace.player1Score(),
+                                        reactionRace.player2Score());
         break;
       default:
         LedManager::clearStrip();
@@ -321,7 +289,6 @@ void begin(uint32_t now) {
 }
 
 void update(uint32_t now) {
-  const int8_t encoderDelta = InputManager::takeEncoderDelta();
   const bool modePressed =
       InputManager::wasPressed(InputManager::Button::ModeSelect);
   const bool modeReleased =
@@ -356,12 +323,6 @@ void update(uint32_t now) {
       startSelectedGame(now);
     } else if (modeShortPress) {
       changeSelection(1);
-    } else if (encoderDelta != 0) {
-      changeSelection(encoderDelta > 0 ? 1 : -1);
-    }
-
-    if (InputManager::wasPressed(InputManager::Button::EncoderClick)) {
-      startSelectedGame(now);
     }
   } else if (state == State::PowerStress) {
     if (anyButtonPressed()) {
@@ -391,20 +352,14 @@ void update(uint32_t now) {
         case GameId::ColourShooter:
           colourShooter.update(now);
           break;
+        case GameId::MeteorDodge:
+          meteorDodge.update(now);
+          break;
         case GameId::Pong1D:
           pong.update(now);
           break;
         case GameId::ReactionRace:
           reactionRace.update(now);
-          break;
-        case GameId::Snake1D:
-          snake.update(now);
-          break;
-        case GameId::MeteorDodge:
-          meteorDodge.update(now);
-          break;
-        case GameId::MemorySequence:
-          memorySequence.update(now);
           break;
         default:
           break;

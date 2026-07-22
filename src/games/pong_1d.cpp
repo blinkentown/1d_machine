@@ -144,8 +144,7 @@ void Pong1DGame::update(uint32_t now) {
     if (InputManager::wasPressed(InputManager::Button::Red) ||
         InputManager::wasPressed(InputManager::Button::Green) ||
         InputManager::wasPressed(InputManager::Button::Blue) ||
-        InputManager::wasPressed(InputManager::Button::Yellow) ||
-        InputManager::wasPressed(InputManager::Button::EncoderClick)) {
+        InputManager::wasPressed(InputManager::Button::Yellow)) {
       start(now);
     }
     return;
