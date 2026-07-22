@@ -28,6 +28,10 @@ There are no gameplay delays or dynamic allocations.
 | `games/colour_quest` | Transition and score wrapper for both Colour Gate stages |
 | `games/codebreaker` | Source-games profile: four-button logic puzzle |
 | `games/lights_out` | Source-games profile: solvable solo and mirrored duel toggle puzzles |
+| `games/whack_1d` | Source-games profile: direct four-color reaction game |
+| `games/hanoi_1d` | Inactive retained prototype: deterministic three-peg disk puzzle |
+| `games/minefield_1d` | Inactive retained prototype: encoder-driven linear mine deduction |
+| `games/nim_duel` | Inactive retained prototype: deterministic two-player take-away strategy |
 | `games/twang` | Encoder dungeon movement, attack, jump, score, and level states |
 | `games/meteor_dodge` | Inactive retained source: encoder-tested dodge prototype |
 | `games/memory_sequence` | Inactive retained source: four-button sequence memory game |
@@ -52,20 +56,21 @@ Pins are centralized in `include/pins.h`. Tunable values are centralized in
 
 Enhanced six-game default build, before the Tennis 1D hardware play test:
 
-- Static SRAM: 1756 / 2560 bytes
-- Flash: 27528 / 28672 bytes
+- Static SRAM: 1760 / 2560 bytes
+- Flash: 27536 / 28672 bytes
 - Active game states: Colour Shooter 124 bytes, Colour Snake Duel 82 bytes,
   Tennis 52 bytes, Twang 34 bytes, Pong 24 bytes, and Reaction Race 24 bytes
 
-The remaining 804 SRAM bytes also contain the runtime stack. Meteor Dodge,
+The remaining 800 SRAM bytes also contain the runtime stack. Meteor Dodge,
 Snake, and Memory are not instantiated or dispatched in the default profile,
 so link-time optimization removes their firmware code. Only 1164 flash bytes
 remain there.
 
 The `sparkfun_promicro16_source_games` profile uses a separate compile-time
-catalog containing Catch 1D, two-stage Colour Gate, Codebreaker, and both
-Lights Out modes. It uses 1583 bytes of SRAM and 24006 bytes of flash. This keeps experimental games isolated
-from the default image and leaves ample room for further prototypes.
+catalog containing Catch 1D, two-stage Colour Gate, Codebreaker, both Lights
+Out modes, and Whack 1D. It uses 1611 bytes of SRAM and 25040 bytes of flash.
+This keeps experimental games isolated
+from the default image, though little flash remains for further prototypes.
 
 The AVR build enables link-time optimization, shared function prologues,
 reduced small-function inlining, unsplit wide values, and linker relaxation to
@@ -94,7 +99,7 @@ preserve flash for game logic.
 - Both encoder pairs use CHANGE interrupts, the shared quadrature transition
   table, four transitions per detent, and saturating pending deltas. Display
   and LED transfers therefore cannot hide normal player rotation.
-- No large local arrays were found. The 804-byte SRAM reserve still includes
+- No large local arrays were found. The 800-byte SRAM reserve still includes
   the unknown runtime stack, so a stack high-water measurement is recommended
   before adding another persistent buffer.
 
@@ -153,9 +158,9 @@ F while preserving the center segment and decimal-point bit.
 ## Review notes
 
 - Six controller-focused games are selectable in the default profile. The
-  source-games profile selects Catch 1D, Colour Gate, Codebreaker, and solo and
-  duel Lights Out; Meteor
-  Dodge, Memory Sequence, and Snake 1D remain inactive source code.
+  source-games profile selects Catch 1D, Colour Gate, Codebreaker, solo and
+  duel Lights Out, and Whack 1D; Hanoi, Minefield, Nim, Meteor Dodge, Memory
+  Sequence, and Snake 1D remain inactive source code.
 - Both encoder decoders and installed hardware behavior are validated. Twang
   is the validated 1P encoder game; Tennis and Lights Out Duel use both.
 - The encoder and six-digit TM1637 display are integrated and hardware-tested.

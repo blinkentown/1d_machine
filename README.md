@@ -17,8 +17,10 @@ APA102/SK9822 strip and a SparkFun Pro Micro 5 V / 16 MHz.
 The default image keeps Meteor Dodge, Snake 1D, and Memory Sequence out of the
 selector to stay within the ATmega32U4 flash limit. The alternate
 `sparkfun_promicro16_source_games` is a focused test image containing Catch 1D,
-Colour Gate with a Boss Deflect second stage, Codebreaker, and one- and
-two-player Lights Out.
+Colour Gate with a Boss Deflect second stage, Codebreaker, one- and two-player
+Lights Out, and Whack 1D. Minefield and Nim remain as inactive prototype source
+after receiving a medium play-test rating; Hanoi remains inactive after proving
+insufficiently intuitive in play testing.
 
 Detailed controls are in [GAMES.md](GAMES.md). Power wiring and runtime power
 modes are in [POWER_MODES.md](POWER_MODES.md). Firmware structure and memory
@@ -76,8 +78,8 @@ All switches use `INPUT_PULLUP`: released is `HIGH`, pressed is `LOW`.
 Player 1 owns red `P1-A` and green `P1-B`; Player 2 owns blue `P2-A` and
 yellow `P2-B`. Both encoders are installed and decoded. Player 1's encoder
 controls Twang and solo Lights Out; both encoders control Tennis 1D and Lights
-Out Duel. The
-illuminated selector and setup button are system controls. A2 and A3 are the
+Out Duel. The illuminated selector and setup button are system
+controls. A2 and A3 are the
 only two currently exposed, completely free direct GPIOs. See
 [GAMES.md](GAMES.md) for per-game assignments.
 
@@ -139,7 +141,7 @@ both the module's `3-2-1-6-5-4` grid order and the rotated segment geometry;
 During selection the display shows player count and a three-digit game code.
 The default profile uses `1P tNG`, `1P CSH`, `2P PnG`, `2P tEn`, `2P rAC`, and
 `2P CSn`; the source-games profile uses `1P CtC`, `1P CGt`, `1P COd`, and
-`1P OFF`, and `2P OFF`.
+`1P OFF`, `2P OFF`, and `1P HIt`.
 During play the display is split into two three-digit score fields.
 Player 1 is on the left and Player 2 is on the right. The right field stays
 blank in a single-player game. Values are right-aligned without leading zeroes
@@ -171,13 +173,13 @@ produces faster movement; simple controls take priority over extra mechanics.
 The enhanced six-game default build with the Tennis 1D hardware test pending
 uses:
 
-- SRAM: 1756 / 2560 bytes (68.6%)
-- Flash: 27528 / 28672 bytes (96.0%)
+- SRAM: 1760 / 2560 bytes (68.8%)
+- Flash: 27536 / 28672 bytes (96.0%)
 
-The five-mode source profile uses:
+The six-mode source profile uses:
 
-- SRAM: 1583 / 2560 bytes (61.8%)
-- Flash: 24006 / 28672 bytes (83.7%)
+- SRAM: 1611 / 2560 bytes (62.9%)
+- Flash: 25040 / 28672 bytes (87.3%)
 
 The SRAM figure does not include peak stack usage. Future games must use small,
 fixed state and no additional LED framebuffer.
@@ -187,8 +189,8 @@ fixed state and no additional LED framebuffer.
 Both player encoders use interrupt-driven quadrature decoding. Their configured
 directions have been reversed together from the last hardware test. Player 1's
 encoder controls movement in Twang. Tennis 1D gives one encoder to each player;
-Lights Out uses Player 1's encoder solo and both encoders in its duel. The
-other active games and the selector ignore encoder deltas.
+Lights Out uses Player 1's encoder solo and both encoders in its duel.
+The other active games and the selector ignore encoder deltas.
 Short-press the illuminated selector to cycle games, hold it for about 0.8
 seconds to start, and press it during a game to return. D5 remains the dedicated
 setup input. A2/A3 are reserved for future system controls; until then,

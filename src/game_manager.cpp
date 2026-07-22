@@ -9,6 +9,7 @@
 #include "games/codebreaker.h"
 #include "games/colour_quest.h"
 #include "games/lights_out.h"
+#include "games/whack_1d.h"
 #else
 #include "games/colour_snake_duel.h"
 #include "games/colour_shooter.h"
@@ -40,6 +41,7 @@ const GameId GAME_CATALOG[] PROGMEM = {
     GameId::Codebreaker,
     GameId::LightsOut,
     GameId::LightsOutDuel,
+    GameId::Whack1D,
 };
 #else
 const GameId GAME_CATALOG[] PROGMEM = {
@@ -68,6 +70,7 @@ Catch1DGame catch1D;
 CodebreakerGame codebreaker;
 ColourQuestGame colourQuest;
 LightsOutGame lightsOut;
+Whack1DGame whack;
 #else
 ColourShooterGame colourShooter;
 Tennis1DGame tennis;
@@ -116,6 +119,8 @@ const __FlashStringHelper* gameName(GameId game) {
       return F("Lights Out");
     case GameId::LightsOutDuel:
       return F("Lights Out Duel");
+    case GameId::Whack1D:
+      return F("Whack 1D");
     case GameId::Count:
       break;
   }
@@ -152,6 +157,8 @@ uint32_t gameColor(GameId game) {
       return Config::MODE_LIGHTS_OUT_COLOR;
     case GameId::LightsOutDuel:
       return Config::MODE_LIGHTS_OUT_DUEL_COLOR;
+    case GameId::Whack1D:
+      return Config::MODE_WHACK_COLOR;
     case GameId::Count:
       break;
   }
@@ -206,6 +213,9 @@ void startSelectedGame(uint32_t now) {
       break;
     case GameId::LightsOutDuel:
       lightsOut.start(now, true);
+      break;
+    case GameId::Whack1D:
+      whack.start(now);
       break;
 #else
     case GameId::Tennis1D:
@@ -382,6 +392,10 @@ void render(uint32_t now) {
         DisplayManager::showVersusScore(lightsOut.player1Score(),
                                         lightsOut.player2Score());
         break;
+      case GameId::Whack1D:
+        whack.render(now);
+        DisplayManager::showSingleScore(whack.score());
+        break;
 #else
       case GameId::Tennis1D:
         tennis.render(now);
@@ -504,6 +518,9 @@ void update(uint32_t now) {
           break;
         case GameId::LightsOutDuel:
           lightsOut.update(now);
+          break;
+        case GameId::Whack1D:
+          whack.update(now);
           break;
 #else
         case GameId::Tennis1D:

@@ -11,11 +11,11 @@ The four buttons form two symmetric player interfaces:
 | Player 2 | Blue / P2-A | Yellow / P2-B |
 
 The two installed player encoders are decoded but never navigate the selector.
-The Player 1 encoder controls Twang and solo Lights Out. Both encoders control
-Tennis 1D and Lights Out Duel. Colour Shooter, Pong, Reaction Race, and Colour
-Snake Duel retain their button controls. Catch 1D uses red; Colour Gate and
-Codebreaker use the four color buttons in the source-games profile. The Player
-2 encoder click remains reserved.
+The Player 1 encoder controls Twang and solo Lights Out. Both
+encoders control Tennis 1D and Lights Out Duel. Colour Shooter, Pong, Reaction Race, and Colour
+Snake Duel retain their button controls. Catch 1D uses red; Colour Gate,
+Codebreaker, and Whack 1D use the four color buttons in the source-games
+profile. The Player 2 encoder click remains reserved.
 
 ## Gameplay UI rule
 
@@ -42,7 +42,7 @@ catalog so unused games are removed by link-time optimization:
 
 ```text
 1P Catch 1D -> 1P Colour Gate -> 1P Codebreaker -> 1P Lights Out ->
-2P Lights Out -> repeat
+2P Lights Out -> 1P Whack 1D -> repeat
 ```
 
 To change power mode without restarting, remain at the game selector and hold
@@ -67,6 +67,7 @@ the blue and yellow game buttons together for two seconds.
 | Codebreaker selected/running | Violet |
 | Lights Out selected/running | Deep blue |
 | Lights Out Duel selected/running | Azure |
+| Whack 1D selected/running | Magenta |
 
 After a one-second power confirmation, the selector output returns to the
 selected game's color. Red is the PSU confirmation; green can be the brief
@@ -101,11 +102,12 @@ The selection display identifies player count and game:
 | 1 | Codebreaker | `1P COd` |
 | 1 | Lights Out | `1P OFF` |
 | 2 | Lights Out Duel | `2P OFF` |
+| 1 | Whack 1D | `1P HIt` |
 
 During play, the left three digits show Player 1 and the right three show
-Player 2. Twang, Colour Shooter, Catch 1D, Colour Gate, Codebreaker, and solo
-Lights Out use the left field and leave the right field blank. Pong, Tennis,
-Reaction Race, Colour Snake Duel, and Lights Out Duel show both scores. Each
+Player 2. Twang, Colour Shooter, Catch 1D, Colour Gate, Codebreaker, solo
+Lights Out, and Whack 1D use the left field and leave the right field blank.
+Pong, Tennis, Reaction Race, Colour Snake Duel, and Lights Out Duel show both scores. Each
 field is right-aligned, has no leading
 zeroes, and is limited to 999. Lives remain visible on the LED strip.
 
@@ -345,6 +347,71 @@ The following selector entry, `2P OFF`, is the competitive version:
   both finish in the same update, the orange tie round awards no point.
 - Both display fields show match score. First to three wins; any color button
   starts a new match after the winner animation.
+
+## Whack 1D (source-games profile)
+
+Selector output: magenta.
+
+- The strip is divided into four large dim red, green, blue, and yellow zones.
+- A target becomes bright and gets a white center. Its bright colored width
+  contracts continuously toward the center to show the remaining response
+  time. Press that zone's matching color button before it closes.
+- A correct press clears the target and adds one point. A wrong button or a
+  timeout costs one of three lives and flashes the strip red.
+- Waves begin with one target. Two targets appear from score 8, and three from
+  score 24; clear every lit target to complete the wave.
+- The deadline falls from 1100 ms toward 420 ms as the score rises.
+- The left display field shows score. After all three lives are lost, any color
+  button starts a new run.
+
+## Hanoi 1D (inactive prototype)
+
+Retained in source after proving insufficiently intuitive in play testing; not
+selectable.
+
+- The strip is divided into red/left, green/middle, and blue/right peg zones.
+- Red, green, and blue select a source peg and then a destination peg. Yellow
+  resets the tower.
+- Only the top disk can move, and a larger disk cannot be placed on a smaller
+  one. The goal is to move the complete tower from red to blue.
+
+## Minefield 1D (inactive prototype)
+
+Retained in source after a medium play-test rating; not selectable.
+
+- The strip is divided into 24 initially dim-white hidden cells. Player 1's
+  encoder moves the white cursor.
+- Red reveals the selected cell. The first reveal is always made safe.
+- Green places or removes a yellow flag on an unrevealed cell.
+- A dim-green revealed cell has no mine next to it; a blue cell has exactly one
+  neighboring mine; an orange cell has mines on both immediate sides.
+- Pressing red again on a revealed clue opens its other neighboring cells when
+  the clue's required number of adjacent flags has been placed.
+- Revealing a cell with no adjacent mine automatically opens the connected
+  safe run and its numbered boundary cells.
+- Reveal every safe cell to clear the board. Flags are aids and do not need to
+  be placed to finish.
+- Revealing a mine exposes all mines in red. Move the encoder or press red or
+  green to restart.
+- Cleared-board count appears on the display. Mine count starts at four and
+  increases every two cleared boards, up to eight.
+
+## Nim Duel (inactive prototype)
+
+Retained in source after a medium play-test rating; not selectable.
+
+- Twenty-one visible white stones form a shared pile. There is no random or
+  hidden state.
+- The colored stone group shows how many stones the active player is preparing
+  to take. A red pixel at the left end indicates Player 1's turn; a blue pixel
+  at the right end indicates Player 2's turn.
+- On Player 1's turn, their encoder selects one, two, or three stones and red
+  confirms the move. On Player 2's turn, their encoder selects and blue
+  confirms.
+- The player taking the final stone wins the round. The winning half flashes
+  in that player's color and their display score increases.
+- The starting player alternates every round; play continues until the players
+  leave through the selector.
 
 ## Snake 1D (inactive source)
 
