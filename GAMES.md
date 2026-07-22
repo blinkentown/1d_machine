@@ -11,11 +11,11 @@ The four buttons form two symmetric player interfaces:
 | Player 2 | Blue / P2-A | Yellow / P2-B |
 
 The two installed player encoders are decoded but never navigate the selector.
-The Player 1 encoder controls Twang. Both encoders control Tennis 1D. Colour
-Shooter, Pong, Reaction Race, and Colour Snake Duel retain their button
-controls. Catch 1D uses red; Colour Gate, Codebreaker, and Lights Out use the
-four color buttons in the source-games profile. The Player 2 encoder click
-remains reserved.
+The Player 1 encoder controls Twang and solo Lights Out. Both encoders control
+Tennis 1D and Lights Out Duel. Colour Shooter, Pong, Reaction Race, and Colour
+Snake Duel retain their button controls. Catch 1D uses red; Colour Gate and
+Codebreaker use the four color buttons in the source-games profile. The Player
+2 encoder click remains reserved.
 
 ## Gameplay UI rule
 
@@ -41,7 +41,8 @@ The `sparkfun_promicro16_source_games` profile has its own compile-time
 catalog so unused games are removed by link-time optimization:
 
 ```text
-1P Catch 1D -> 1P Colour Gate -> 1P Codebreaker -> 1P Lights Out -> repeat
+1P Catch 1D -> 1P Colour Gate -> 1P Codebreaker -> 1P Lights Out ->
+2P Lights Out -> repeat
 ```
 
 To change power mode without restarting, remain at the game selector and hold
@@ -65,6 +66,7 @@ the blue and yellow game buttons together for two seconds.
 | Colour Gate selected/running | Azure |
 | Codebreaker selected/running | Violet |
 | Lights Out selected/running | Deep blue |
+| Lights Out Duel selected/running | Azure |
 
 After a one-second power confirmation, the selector output returns to the
 selected game's color. Red is the PSU confirmation; green can be the brief
@@ -98,11 +100,13 @@ The selection display identifies player count and game:
 | 1 | Colour Gate | `1P CGt` |
 | 1 | Codebreaker | `1P COd` |
 | 1 | Lights Out | `1P OFF` |
+| 2 | Lights Out Duel | `2P OFF` |
 
 During play, the left three digits show Player 1 and the right three show
-Player 2. Twang, Colour Shooter, Catch 1D, Colour Gate, Codebreaker, and Lights
-Out use the left field and leave the right field blank. Pong, Tennis, Reaction Race, and Colour
-Snake Duel show both scores. Each field is right-aligned, has no leading
+Player 2. Twang, Colour Shooter, Catch 1D, Colour Gate, Codebreaker, and solo
+Lights Out use the left field and leave the right field blank. Pong, Tennis,
+Reaction Race, Colour Snake Duel, and Lights Out Duel show both scores. Each
+field is right-aligned, has no leading
 zeroes, and is limited to 999. Lives remain visible on the LED strip.
 
 ## Colour Snake Duel
@@ -322,14 +326,25 @@ Selector output: violet.
 Selector output: deep blue.
 
 - The strip is divided into 24 cells. Blue cells are on; dark cells are off.
-- Two white edge pixels mark the selected cell.
-- Red moves the selection one cell left and green moves it one cell right. The
-  selection wraps at either end.
-- Blue toggles the selected cell and its immediate neighbors between on and off.
-- Yellow restores the current puzzle's original pattern.
+- Player 1's encoder moves the white cursor, red toggles the selected cell and
+  its immediate neighbors, and green restores the puzzle's original pattern.
+- The cursor wraps at either end.
 - Turn every cell off to solve the puzzle. A green sweep confirms success and
   starts a more heavily scrambled, guaranteed-solvable puzzle.
 - The display counts solved puzzles.
+
+The following selector entry, `2P OFF`, is the competitive version:
+
+- The strip is split into two identical, independently playable 12-cell
+  puzzles. Player 1 owns the left half and Player 2 owns the right half.
+- Player 1 uses their encoder, red to toggle, and green to reset. Their cursor
+  is red.
+- Player 2 uses their encoder, blue to toggle, and yellow to reset. Their cursor
+  is yellow.
+- The first player to turn off every cell on their half scores the round. If
+  both finish in the same update, the orange tie round awards no point.
+- Both display fields show match score. First to three wins; any color button
+  starts a new match after the winner animation.
 
 ## Snake 1D (inactive source)
 

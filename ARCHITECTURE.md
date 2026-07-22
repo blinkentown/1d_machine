@@ -27,7 +27,7 @@ There are no gameplay delays or dynamic allocations.
 | `games/boss_deflect` | Colour Gate stage two: multi-level four-color boss fight |
 | `games/colour_quest` | Transition and score wrapper for both Colour Gate stages |
 | `games/codebreaker` | Source-games profile: four-button logic puzzle |
-| `games/lights_out` | Source-games profile: solvable linear toggle puzzle |
+| `games/lights_out` | Source-games profile: solvable solo and mirrored duel toggle puzzles |
 | `games/twang` | Encoder dungeon movement, attack, jump, score, and level states |
 | `games/meteor_dodge` | Inactive retained source: encoder-tested dodge prototype |
 | `games/memory_sequence` | Inactive retained source: four-button sequence memory game |
@@ -52,19 +52,19 @@ Pins are centralized in `include/pins.h`. Tunable values are centralized in
 
 Enhanced six-game default build, before the Tennis 1D hardware play test:
 
-- Static SRAM: 1748 / 2560 bytes
-- Flash: 27508 / 28672 bytes
+- Static SRAM: 1756 / 2560 bytes
+- Flash: 27528 / 28672 bytes
 - Active game states: Colour Shooter 124 bytes, Colour Snake Duel 82 bytes,
   Tennis 52 bytes, Twang 34 bytes, Pong 24 bytes, and Reaction Race 24 bytes
 
-The remaining 812 SRAM bytes also contain the runtime stack. Meteor Dodge,
+The remaining 804 SRAM bytes also contain the runtime stack. Meteor Dodge,
 Snake, and Memory are not instantiated or dispatched in the default profile,
 so link-time optimization removes their firmware code. Only 1164 flash bytes
 remain there.
 
 The `sparkfun_promicro16_source_games` profile uses a separate compile-time
-catalog containing Catch 1D, two-stage Colour Gate, Codebreaker, and Lights
-Out. It uses 1567 bytes of SRAM and 23076 bytes of flash. This keeps experimental games isolated
+catalog containing Catch 1D, two-stage Colour Gate, Codebreaker, and both
+Lights Out modes. It uses 1583 bytes of SRAM and 24006 bytes of flash. This keeps experimental games isolated
 from the default image and leaves ample room for further prototypes.
 
 The AVR build enables link-time optimization, shared function prologues,
@@ -94,7 +94,7 @@ preserve flash for game logic.
 - Both encoder pairs use CHANGE interrupts, the shared quadrature transition
   table, four transitions per detent, and saturating pending deltas. Display
   and LED transfers therefore cannot hide normal player rotation.
-- No large local arrays were found. The 812-byte SRAM reserve still includes
+- No large local arrays were found. The 804-byte SRAM reserve still includes
   the unknown runtime stack, so a stack high-water measurement is recommended
   before adding another persistent buffer.
 
@@ -104,8 +104,8 @@ Player 1 owns D0/D1 plus red/green. Player 2 owns D2/D3 plus blue/yellow. Both
 encoder directions are independently configurable and were reversed together
 after the last hardware check. Twang consumes Player 1 encoder movement, uses
 red for attack, and green for a contextual one-obstacle jump. Tennis consumes
-both encoder deltas and no gameplay button. No other active game or selector
-consumes encoder deltas.
+both encoder deltas and no gameplay button. Solo Lights Out consumes Player 1
+movement; its duel mode consumes both encoders. The selector ignores them.
 
 The illuminated selector owns cycle, start, and return behavior. D5 is the
 setup input. The existing D4 encoder click is reserved and ignored during
@@ -153,11 +153,11 @@ F while preserving the center segment and decimal-point bit.
 ## Review notes
 
 - Six controller-focused games are selectable in the default profile. The
-  source-games profile selects Catch 1D, Colour Gate, Codebreaker, and Lights Out; Meteor
+  source-games profile selects Catch 1D, Colour Gate, Codebreaker, and solo and
+  duel Lights Out; Meteor
   Dodge, Memory Sequence, and Snake 1D remain inactive source code.
-- Both encoder decoders and installed hardware behavior are validated. Twang is
-  the validated 1P encoder game; Tennis is the first 2P dual-encoder game and
-  still needs its gameplay hardware test.
+- Both encoder decoders and installed hardware behavior are validated. Twang
+  is the validated 1P encoder game; Tennis and Lights Out Duel use both.
 - The encoder and six-digit TM1637 display are integrated and hardware-tested.
   All six digits and all six decimal points are validated on A0/A1.
 - FastLED current limiting is an estimate. The measured 3000 mA setting draws

@@ -39,6 +39,7 @@ const GameId GAME_CATALOG[] PROGMEM = {
     GameId::ColourGate,
     GameId::Codebreaker,
     GameId::LightsOut,
+    GameId::LightsOutDuel,
 };
 #else
 const GameId GAME_CATALOG[] PROGMEM = {
@@ -113,6 +114,8 @@ const __FlashStringHelper* gameName(GameId game) {
       return F("Codebreaker");
     case GameId::LightsOut:
       return F("Lights Out");
+    case GameId::LightsOutDuel:
+      return F("Lights Out Duel");
     case GameId::Count:
       break;
   }
@@ -147,6 +150,8 @@ uint32_t gameColor(GameId game) {
       return Config::MODE_CODEBREAKER_COLOR;
     case GameId::LightsOut:
       return Config::MODE_LIGHTS_OUT_COLOR;
+    case GameId::LightsOutDuel:
+      return Config::MODE_LIGHTS_OUT_DUEL_COLOR;
     case GameId::Count:
       break;
   }
@@ -197,7 +202,10 @@ void startSelectedGame(uint32_t now) {
       codebreaker.start(now);
       break;
     case GameId::LightsOut:
-      lightsOut.start(now);
+      lightsOut.start(now, false);
+      break;
+    case GameId::LightsOutDuel:
+      lightsOut.start(now, true);
       break;
 #else
     case GameId::Tennis1D:
@@ -369,6 +377,11 @@ void render(uint32_t now) {
         lightsOut.render(now);
         DisplayManager::showSingleScore(lightsOut.score());
         break;
+      case GameId::LightsOutDuel:
+        lightsOut.render(now);
+        DisplayManager::showVersusScore(lightsOut.player1Score(),
+                                        lightsOut.player2Score());
+        break;
 #else
       case GameId::Tennis1D:
         tennis.render(now);
@@ -487,6 +500,9 @@ void update(uint32_t now) {
           codebreaker.update(now);
           break;
         case GameId::LightsOut:
+          lightsOut.update(now);
+          break;
+        case GameId::LightsOutDuel:
           lightsOut.update(now);
           break;
 #else
