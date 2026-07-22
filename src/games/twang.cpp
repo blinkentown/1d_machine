@@ -2,7 +2,6 @@
 
 #include "config.h"
 #include "controls.h"
-#include "input_manager.h"
 #include "led_manager.h"
 
 namespace {
@@ -20,13 +19,14 @@ static_assert(CELL_COUNT <= 32, "Twang cell masks require at most 32 cells");
 void TwangGame::start(uint32_t now) {
   lives_ = Config::TWANG_STARTING_LIVES;
   level_ = 1;
+  score_ = 0;
   randomState_ = static_cast<uint16_t>(micros()) ^ static_cast<uint16_t>(now);
   if (randomState_ == 0) {
     randomState_ = 1;
   }
 
   DEBUG_PRINTLN(F("Twang started"));
-  DEBUG_PRINTLN(F("Red/Green move, Blue attacks, Yellow dashes"));
+  DEBUG_PRINTLN(F("P1 encoder moves, Red attacks, Green jumps"));
   startLevel(now);
 }
 
@@ -34,7 +34,6 @@ void TwangGame::startLevel(uint32_t now) {
   playerCell_ = Config::TWANG_START_CELL;
   facing_ = 1;
   effectActive_ = false;
-  lastDashAt_ = now - Config::TWANG_DASH_COOLDOWN_MS;
   generateDungeon();
   phase_ = Phase::Playing;
   phaseChangedAt_ = now;
@@ -54,18 +53,32 @@ void TwangGame::generateDungeon() {
   lavaMask_ = 0;
 
   const uint8_t density = level_ > 8U ? 8U : level_;
+  bool reserveLandingCell = false;
   for (uint8_t cell = Config::TWANG_START_CELL + 2U; cell < EXIT_CELL;
        ++cell) {
+    if (reserveLandingCell) {
+      reserveLandingCell = false;
+      continue;
+    }
     const uint8_t roll = static_cast<uint8_t>(nextRandom() & 0x1FU);
     if (roll < 5U + density / 2U) {
       enemyMask_ |= cellBit(cell);
     } else if (roll < 8U + density / 2U) {
       lavaMask_ |= cellBit(cell);
+      reserveLandingCell = true;
     }
   }
 
   if (enemyMask_ == 0) {
-    enemyMask_ |= cellBit(CELL_COUNT / 2U);
+    for (uint8_t cell = Config::TWANG_START_CELL + 2U; cell < EXIT_CELL;
+         ++cell) {
+      const uint32_t bit = cellBit(cell);
+      const uint32_t previousBit = cellBit(cell - 1U);
+      if ((lavaMask_ & (bit | previousBit)) == 0U) {
+        enemyMask_ |= bit;
+        break;
+      }
+    }
   }
 }
 
@@ -83,40 +96,58 @@ void TwangGame::loseLife(uint32_t now) {
   }
 }
 
-void TwangGame::move(int8_t direction, bool dash, uint32_t now) {
+bool TwangGame::move(int8_t direction, uint32_t now) {
   facing_ = direction;
-  if (dash && static_cast<uint32_t>(now - lastDashAt_) <
-                  Config::TWANG_DASH_COOLDOWN_MS) {
-    return;
-  }
-
-  const int8_t distance = dash ? Config::TWANG_DASH_CELLS : 1;
   const int16_t target = static_cast<int16_t>(playerCell_) +
-                         static_cast<int16_t>(direction) * distance;
+                         static_cast<int16_t>(direction);
   if (target < Config::TWANG_START_CELL || target > EXIT_CELL) {
-    return;
+    return false;
   }
 
   const uint8_t targetCell = static_cast<uint8_t>(target);
   const uint32_t targetBit = cellBit(targetCell);
   if ((enemyMask_ & targetBit) != 0U) {
-    return;
+    return false;
   }
 
   if ((lavaMask_ & targetBit) != 0U) {
-    lavaMask_ &= ~targetBit;
     loseLife(now);
+    return false;
+  }
+
+  playerCell_ = targetCell;
+
+  if (playerCell_ == EXIT_CELL) {
+    phase_ = Phase::LevelClear;
+    phaseChangedAt_ = now;
+  }
+  return true;
+}
+
+void TwangGame::jump(uint32_t now) {
+  const int16_t obstacle = static_cast<int16_t>(playerCell_) + facing_;
+  const int16_t landing = static_cast<int16_t>(playerCell_) +
+                          static_cast<int16_t>(facing_) *
+                              Config::TWANG_JUMP_CELLS;
+  if (obstacle < Config::TWANG_START_CELL || obstacle >= EXIT_CELL ||
+      landing < Config::TWANG_START_CELL || landing > EXIT_CELL) {
     return;
   }
 
-  effectCell_ = playerCell_;
-  effectStartedAt_ = now;
-  effectActive_ = dash;
-  playerCell_ = targetCell;
-  if (dash) {
-    lastDashAt_ = now;
+  const uint32_t obstacleBit = cellBit(static_cast<uint8_t>(obstacle));
+  const uint32_t landingBit = cellBit(static_cast<uint8_t>(landing));
+  const bool obstaclePresent =
+      ((enemyMask_ | lavaMask_) & obstacleBit) != 0U;
+  const bool landingBlocked =
+      ((enemyMask_ | lavaMask_) & landingBit) != 0U;
+  if (!obstaclePresent || landingBlocked) {
+    return;
   }
 
+  playerCell_ = static_cast<uint8_t>(landing);
+  effectCell_ = static_cast<uint8_t>(obstacle);
+  effectStartedAt_ = now;
+  effectActive_ = true;
   if (playerCell_ == EXIT_CELL) {
     phase_ = Phase::LevelClear;
     phaseChangedAt_ = now;
@@ -140,6 +171,9 @@ void TwangGame::attack(uint32_t now) {
     const uint32_t targetBit = cellBit(targetCell);
     if ((enemyMask_ & targetBit) != 0U) {
       enemyMask_ &= ~targetBit;
+      if (score_ < 999U) {
+        ++score_;
+      }
       effectCell_ = targetCell;
       return;
     }
@@ -150,6 +184,7 @@ void TwangGame::attack(uint32_t now) {
 }
 
 void TwangGame::update(uint32_t now) {
+  int8_t movement = Controls::rotation(Controls::Player::One);
   if (effectActive_ &&
       static_cast<uint32_t>(now - effectStartedAt_) >=
           Config::TWANG_EFFECT_MS) {
@@ -157,10 +192,9 @@ void TwangGame::update(uint32_t now) {
   }
 
   if (phase_ == Phase::GameOver) {
-    if (InputManager::wasPressed(InputManager::Button::Red) ||
-        InputManager::wasPressed(InputManager::Button::Green) ||
-        InputManager::wasPressed(InputManager::Button::Blue) ||
-        InputManager::wasPressed(InputManager::Button::Yellow)) {
+    if (movement != 0 ||
+        Controls::primaryPressed(Controls::Player::One) ||
+        Controls::secondaryPressed(Controls::Player::One)) {
       start(now);
     }
     return;
@@ -177,17 +211,26 @@ void TwangGame::update(uint32_t now) {
     return;
   }
 
-  if (InputManager::wasPressed(Controls::ONE_PLAYER_LEFT)) {
-    move(-1, false, now);
+  while (movement < 0) {
+    if (!move(-1, now)) {
+      break;
+    }
+    ++movement;
   }
-  if (InputManager::wasPressed(Controls::ONE_PLAYER_RIGHT)) {
-    move(1, false, now);
+  while (movement > 0) {
+    if (!move(1, now)) {
+      break;
+    }
+    --movement;
   }
-  if (InputManager::wasPressed(Controls::ONE_PLAYER_ACTION)) {
+  if (phase_ != Phase::Playing) {
+    return;
+  }
+  if (Controls::primaryPressed(Controls::Player::One)) {
     attack(now);
   }
-  if (InputManager::wasPressed(Controls::ONE_PLAYER_SPECIAL)) {
-    move(facing_, true, now);
+  if (Controls::secondaryPressed(Controls::Player::One)) {
+    jump(now);
   }
 }
 

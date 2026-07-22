@@ -22,7 +22,7 @@ There are no gameplay delays or dynamic allocations.
 | `power_mode_manager` | Bench/PSU limits and runtime mode switching |
 | `power_stress_test` | Abortable 10-second full-strip load test |
 | `game_manager` | Game selection, confirmation, dispatch, and exit behavior |
-| `games/twang` | Cell-mask dungeon, movement, dash, attack, and level states |
+| `games/twang` | Encoder dungeon movement, attack, jump, score, and level states |
 | `games/meteor_dodge` | Inactive retained source: encoder-tested dodge prototype |
 | `games/memory_sequence` | Inactive retained source: sequence memory game |
 | `games/colour_shooter` | Incoming targets, shots, lives, and impact effects |
@@ -45,14 +45,14 @@ Pins are centralized in `include/pins.h`. Tunable values are centralized in
 Reviewed four-game, two-encoder, and display build baseline:
 
 - Static SRAM: 1582 / 2560 bytes
-- Flash: 21026 / 28672 bytes
-- Active game states: Colour Shooter 124 bytes, Twang 29 bytes, Pong 24 bytes,
+- Flash: 21380 / 28672 bytes
+- Active game states: Colour Shooter 124 bytes, Twang 27 bytes, Pong 24 bytes,
   and Reaction Race 18 bytes
 
 The remaining 978 SRAM bytes also contain the runtime stack. Meteor Dodge,
 Snake, and Memory are not instantiated or dispatched, so link-time optimization
 removes their firmware code while their source remains available. The remaining
-7646 flash bytes provide headroom for system UI and focused gameplay improvements.
+7292 flash bytes provide headroom for system UI and focused gameplay improvements.
 
 The AVR build enables link-time optimization, shared function prologues,
 reduced small-function inlining, unsplit wide values, and linker relaxation to
@@ -83,10 +83,9 @@ preserve flash for game logic.
 
 Player 1 owns D0/D1 plus red/green. Player 2 owns D2/D3 plus blue/yellow. Both
 encoder directions are independently configurable and were reversed together
-after the last hardware check. The archived Meteor Dodge prototype validated
-Player 1 encoder movement, but no active game or selector currently consumes
-encoder deltas. Twang is the next planned integration and will be designed and
-tested separately.
+after the last hardware check. Twang consumes Player 1 encoder movement, uses
+red for attack, and green for a contextual one-obstacle jump. No other active
+game or selector consumes encoder deltas; Player 2 remains reserved.
 
 The illuminated selector owns cycle, start, and return behavior. D5 is the
 setup input. The existing D4 encoder click is reserved and ignored during
@@ -135,8 +134,9 @@ F while preserving the center segment and decimal-point bit.
 
 - Four controller-focused games are selectable. Meteor Dodge, Snake, and Memory
   remain as inactive source code.
-- Both encoder decoders and installed hardware behavior are validated. The
-  archived Meteor prototype preserves the isolated test; Twang is planned next.
+- Both encoder decoders and installed hardware behavior are validated. Twang is
+  the first active encoder game; the archived Meteor prototype preserves the
+  earlier isolated test.
 - The encoder and six-digit TM1637 display are integrated and hardware-tested.
   All six digits and all six decimal points are validated on A0/A1.
 - FastLED current limiting is an estimate. The measured 3000 mA setting draws

@@ -52,9 +52,8 @@ rails must not be tied together without proper power-source isolation.
 All switches use `INPUT_PULLUP`: released is `HIGH`, pressed is `LOW`.
 
 Player 1 owns red `P1-A` and green `P1-B`; Player 2 owns blue `P2-A` and
-yellow `P2-B`. Both encoders are installed and decoded but currently reserved
-while gameplay behavior is introduced one game at a time. Twang is the next
-planned encoder integration. The
+yellow `P2-B`. Both encoders are installed and decoded. The Player 1 encoder
+controls Twang; the Player 2 encoder remains reserved. The
 illuminated selector and setup button are system controls. A2 and A3 are the
 only two currently exposed, completely free direct GPIOs. See
 [GAMES.md](GAMES.md) for per-game assignments.
@@ -137,7 +136,7 @@ produces faster movement; simple controls take priority over extra mechanics.
 The reviewed four-game build with two encoders and TM1637 display uses:
 
 - SRAM: 1582 / 2560 bytes (61.8%)
-- Flash: 21026 / 28672 bytes (73.3%)
+- Flash: 21380 / 28672 bytes (74.6%)
 
 The SRAM figure does not include peak stack usage. Future games must use small,
 fixed state and no additional LED framebuffer.
@@ -146,9 +145,9 @@ fixed state and no additional LED framebuffer.
 
 Both player encoders use interrupt-driven quadrature decoding. Their configured
 directions have been reversed together from the last hardware test. The Player
-encoder deltas are currently ignored by all four active games and the selector
-while integration proceeds gradually. Twang is planned as the first active
-encoder-controlled game.
+Player 1 encoder controls movement only in Twang. Colour Shooter, Pong,
+Reaction Race, and the selector ignore encoder deltas; the Player 2 encoder
+remains reserved.
 Short-press the illuminated selector to cycle games, hold it for about 0.8
 seconds to start, and press it during a game to return. D5 remains the dedicated
 setup input. A2/A3 are reserved for future system controls; until then,

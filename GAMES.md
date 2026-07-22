@@ -11,9 +11,9 @@ The four buttons form two symmetric player interfaces:
 | Player 2 | Blue / P2-A | Yellow / P2-B |
 
 The two installed player encoders are decoded but never navigate the selector.
-No active game currently consumes encoder movement. Twang is the next planned
-encoder integration; Colour Shooter, Pong, and Reaction Race retain their
-button controls. Both encoders and the Player 2 encoder click remain reserved.
+The Player 1 encoder controls Twang. Colour Shooter, Pong, and Reaction Race
+retain their button controls. The Player 2 encoder and its click remain
+reserved.
 
 ## Gameplay UI rule
 
@@ -78,8 +78,8 @@ The selection display identifies player count and game:
 | 2 | Reaction Race | `2P rAC` |
 
 During play, the left three digits show Player 1 and the right three show
-Player 2. Twang uses its level as the Player 1 value; Colour Shooter uses score
-and leaves the Player 2 field blank. Pong and Reaction Race show
+Player 2. Twang and Colour Shooter use Player 1 score and leave the Player 2
+field blank. Pong and Reaction Race show
 both scores. Each field is right-aligned, has no leading zeroes, and is limited
 to 999. Lives remain visible on the LED strip.
 
@@ -87,18 +87,23 @@ to 999. Lives remain visible on the LED strip.
 
 Selector output: orange.
 
-- Red moves the white player left by one 12-LED cell; green moves right.
+- The goal is to move the white player from the left start to the green exit.
+- Each Player 1 encoder detent moves one 12-LED cell left or right. Turning the
+  encoder faster moves through multiple clear cells faster.
 - The blue direction marker shows which way the player faces.
-- Blue sends a blue-white twang up to three cells in that direction.
-- A twang destroys the first pulsing red enemy in range but stops at lava.
-- Yellow dashes two cells in the facing direction, with a 600 ms
-  recharge. A dash can cross one dangerous cell but must land safely.
-- Orange flickering cells are lava. Landing on lava removes one of three green
-  life indicators and clears that lava cell.
+- Red / P1-A sends a blue-white twang up to three cells in that direction.
+- A twang destroys the first pulsing red enemy in range, adds one point, and
+  stops at lava.
+- Green / P1-B jumps over exactly one adjacent red enemy or orange lava cell,
+  but only when the landing cell is free. It cannot be used for faster travel.
+- Red enemies block normal movement. They can be attacked or jumped.
+- Orange flickering cells are lava and every generated lava cell has a safe
+  landing cell behind it. Trying to walk into lava removes one of three lives;
+  the lava remains and must be jumped.
 - The green cell at the far end is the dungeon exit. Reaching it produces a
-  green strip sweep and generates a denser next level.
+  green strip sweep and generates a denser next level while preserving score.
 - Three lost lives produce a red-white game-over explosion at strip center.
-- Any color button restarts after game over.
+- Either Player 1 button or Player 1 encoder movement restarts after game over.
 
 ## Running the power stress test
 

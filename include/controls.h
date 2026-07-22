@@ -16,12 +16,6 @@ constexpr InputManager::Button PLAYER_2_PRIMARY = InputManager::Button::Blue;
 constexpr InputManager::Button PLAYER_2_SECONDARY =
     InputManager::Button::Yellow;
 
-constexpr InputManager::Button ONE_PLAYER_LEFT = InputManager::Button::Red;
-constexpr InputManager::Button ONE_PLAYER_RIGHT = InputManager::Button::Green;
-constexpr InputManager::Button ONE_PLAYER_ACTION = InputManager::Button::Blue;
-constexpr InputManager::Button ONE_PLAYER_SPECIAL =
-    InputManager::Button::Yellow;
-
 inline int8_t rotation(Player player) {
   return InputManager::encoderDelta(
       player == Player::One ? InputManager::Encoder::Player1

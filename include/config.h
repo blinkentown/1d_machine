@@ -102,8 +102,7 @@ static_assert((PONG_HIT_ZONE_LENGTH * GAME_PIXEL_WIDTH) %
 constexpr uint8_t TWANG_STARTING_LIVES = 3;
 constexpr uint8_t TWANG_START_CELL = 1;
 constexpr uint8_t TWANG_ATTACK_RANGE_CELLS = 3;
-constexpr uint8_t TWANG_DASH_CELLS = 2;
-constexpr uint16_t TWANG_DASH_COOLDOWN_MS = 600;
+constexpr uint8_t TWANG_JUMP_CELLS = 2;
 constexpr uint16_t TWANG_EFFECT_MS = 300;
 constexpr uint16_t TWANG_LEVEL_CLEAR_MS = 900;
 constexpr uint32_t TWANG_PLAYER_COLOR = 0xFFFFFFUL;

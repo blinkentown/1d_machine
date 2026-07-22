@@ -239,7 +239,7 @@ void render(uint32_t now) {
     switch (selectedGame) {
       case GameId::Twang:
         twang.render(now);
-        DisplayManager::showSingleScore(twang.level());
+        DisplayManager::showSingleScore(twang.score());
         break;
       case GameId::ColourShooter:
         colourShooter.render(now);
