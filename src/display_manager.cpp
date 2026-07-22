@@ -13,10 +13,8 @@ constexpr uint8_t SEGMENT_DP = 0x80;
 
 constexpr uint8_t GLYPH_A = 0x77;
 constexpr uint8_t GLYPH_C = 0x39;
-constexpr uint8_t GLYPH_E = 0x79;
 constexpr uint8_t GLYPH_G = 0x3D;
 constexpr uint8_t GLYPH_H = 0x76;
-constexpr uint8_t GLYPH_M = 0x37;
 constexpr uint8_t GLYPH_P = 0x73;
 constexpr uint8_t GLYPH_S = 0x6D;
 constexpr uint8_t GLYPH_N = 0x54;
@@ -28,10 +26,9 @@ const uint8_t DIGIT_GLYPHS[10] PROGMEM = {
     0x6D, 0x7D, 0x07, 0x7F, 0x6F,
 };
 
-const uint8_t MODE_GLYPHS[15] PROGMEM = {
+const uint8_t MODE_GLYPHS[12] PROGMEM = {
     GLYPH_T, GLYPH_N, GLYPH_G,  // Twang: tNG
     GLYPH_C, GLYPH_S, GLYPH_H,  // Colour Shooter: CSH
-    GLYPH_M, GLYPH_E, GLYPH_T,  // Meteor Dodge: MEt
     GLYPH_P, GLYPH_N, GLYPH_G,  // Pong: PnG
     GLYPH_R, GLYPH_A, GLYPH_C,  // Reaction Race: rAC
 };

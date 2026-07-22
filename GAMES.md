@@ -11,9 +11,16 @@ The four buttons form two symmetric player interfaces:
 | Player 2 | Blue / P2-A | Yellow / P2-B |
 
 The two installed player encoders are decoded but never navigate the selector.
-The Player 1 encoder is active only in Meteor Dodge. Twang is the next planned
+No active game currently consumes encoder movement. Twang is the next planned
 encoder integration; Colour Shooter, Pong, and Reaction Race retain their
-button controls. The Player 2 encoder and its click remain reserved.
+button controls. Both encoders and the Player 2 encoder click remain reserved.
+
+## Gameplay UI rule
+
+Use an encoder for active directional control. Turning it faster must produce
+faster movement without a separate speed button. A game should ideally require
+only one action button and may use at most two. Prefer a simple, immediately
+readable control scheme over additional mechanics.
 
 ## Selector and power-mode outputs
 
@@ -24,8 +31,7 @@ never change menu state.
 The selector order is grouped by player count:
 
 ```text
-1P Twang -> 1P Colour Shooter -> 1P Meteor Dodge
--> 2P Pong -> 2P Reaction Race -> repeat
+1P Twang -> 1P Colour Shooter -> 2P Pong -> 2P Reaction Race -> repeat
 ```
 
 To change power mode without restarting, remain at the game selector and hold
@@ -41,14 +47,12 @@ the blue and yellow game buttons together for two seconds.
 | Stress test with bench limits | Green; strip output is solid white |
 | Twang selected/running | Orange |
 | Colour Shooter selected/running | Yellow |
-| Meteor Dodge selected/running | Red |
 | 1D Pong selected/running | Blue |
 | Reaction Race selected/running | Green |
 
 After a one-second power confirmation, the selector output returns to the
-selected game's color. Red can therefore be the brief PSU confirmation or the
-Meteor Dodge selection; green can be the brief bench confirmation or the
-Reaction Race selection.
+selected game's color. Red is the PSU confirmation; green can be the brief
+bench confirmation or the Reaction Race selection.
 
 ## Starting a game
 
@@ -70,13 +74,12 @@ The selection display identifies player count and game:
 | ---: | --- | --- |
 | 1 | Twang | `1P tNG` |
 | 1 | Colour Shooter | `1P CSH` |
-| 1 | Meteor Dodge | `1P MEt` |
 | 2 | 1D Pong | `2P PnG` |
 | 2 | Reaction Race | `2P rAC` |
 
 During play, the left three digits show Player 1 and the right three show
-Player 2. Twang uses its level as the Player 1 value; Colour Shooter and Meteor
-Dodge use score and leave the Player 2 field blank. Pong and Reaction Race show
+Player 2. Twang uses its level as the Player 1 value; Colour Shooter uses score
+and leaves the Player 2 field blank. Pong and Reaction Race show
 both scores. Each field is right-aligned, has no leading zeroes, and is limited
 to 999. Lives remain visible on the LED strip.
 
@@ -167,7 +170,7 @@ Selector output: green.
 ## Snake 1D (inactive source)
 
 Snake 1D is retained in the repository but is not selectable in the focused
-five-game firmware.
+four-game firmware.
 
 - A continuous row of 12-LED colored segments moves toward the player.
 - Adjacent normal segments always have different colors.
@@ -184,28 +187,29 @@ five-game firmware.
   center.
 - Any color game button restarts after game over.
 
-## Meteor Dodge
+## Meteor Dodge (inactive source)
 
-Selector output: red.
+Meteor Dodge is retained as an encoder-tested prototype but is not selectable
+in the focused four-game firmware.
 
 - The white player begins at strip center. Each Player 1 encoder detent moves
   one 12-LED cell left or right.
-- Red / P1-A dashes three cells in the current direction, clamped inside
-  the play area, with a 700 ms recharge.
+- Turning the encoder faster moves the player faster; there is no dash.
 - An orange pulsing cell warns where the next meteor will strike.
 - The impact expands across five cells as a rapid red-white blast. Being
   within two cells of its center costs one of three green lives.
-- Green / P1-B spends one of three cyan shield indicators. The active
+- Red / P1-A spends one of three cyan shield indicators. The active
   shield colors the player cyan and absorbs the next otherwise damaging hit.
 - Each clean dodge increases score. Warning time falls from 1.2 seconds toward
   465 ms as score rises; the 360 ms impact animation remains constant.
 - Three hits produce a flashing red game-over blast at strip center.
-- Either Player 1 button or Player 1 encoder movement restarts after game over.
+- Red / P1-A or Player 1 encoder movement restarts after game over. Green is
+  currently unused.
 
 ## Memory Sequence (inactive source)
 
 Memory Sequence is retained in the repository but is not selectable in the
-focused five-game firmware.
+focused four-game firmware.
 
 - Four dim 12-LED stations represent red, green, blue, and yellow at fixed
   positions along the strip.

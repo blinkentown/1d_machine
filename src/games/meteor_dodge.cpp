@@ -15,18 +15,16 @@ constexpr uint8_t LAST_PLAY_CELL = CELL_COUNT - 2U;
 
 void MeteorDodgeGame::start(uint32_t now) {
   playerCell_ = CELL_COUNT / 2U;
-  facing_ = 1;
   lives_ = Config::METEOR_STARTING_LIVES;
   shields_ = Config::METEOR_STARTING_SHIELDS;
   shieldActive_ = false;
   score_ = 0;
-  lastDashAt_ = now - Config::METEOR_DASH_COOLDOWN_MS;
   randomState_ = static_cast<uint16_t>(micros()) ^ static_cast<uint16_t>(now);
   if (randomState_ == 0) {
     randomState_ = 1;
   }
   DEBUG_PRINTLN(F("Meteor Dodge started"));
-  DEBUG_PRINTLN(F("P1 encoder moves, Red dashes, Green shields"));
+  DEBUG_PRINTLN(F("P1 encoder moves, Red activates a shield"));
   startMeteor(now);
 }
 
@@ -44,25 +42,15 @@ void MeteorDodgeGame::startMeteor(uint32_t now) {
   phase_ = Phase::Warning;
 }
 
-void MeteorDodgeGame::move(int8_t direction, bool dash, uint32_t now) {
-  facing_ = direction;
-  if (dash && static_cast<uint32_t>(now - lastDashAt_) <
-                  Config::METEOR_DASH_COOLDOWN_MS) {
-    return;
-  }
-
-  const int8_t distance = dash ? Config::METEOR_DASH_CELLS : 1;
+void MeteorDodgeGame::move(int8_t direction) {
   int16_t target = static_cast<int16_t>(playerCell_) +
-                   static_cast<int16_t>(direction) * distance;
+                   static_cast<int16_t>(direction);
   if (target < FIRST_PLAY_CELL) {
     target = FIRST_PLAY_CELL;
   } else if (target > LAST_PLAY_CELL) {
     target = LAST_PLAY_CELL;
   }
   playerCell_ = static_cast<uint8_t>(target);
-  if (dash) {
-    lastDashAt_ = now;
-  }
 }
 
 void MeteorDodgeGame::resolveImpact(uint32_t now) {
@@ -87,25 +75,21 @@ void MeteorDodgeGame::update(uint32_t now) {
   int8_t movement = Controls::rotation(Controls::Player::One);
   if (phase_ == Phase::GameOver) {
     if (movement != 0 ||
-        Controls::primaryPressed(Controls::Player::One) ||
-        Controls::secondaryPressed(Controls::Player::One)) {
+        Controls::primaryPressed(Controls::Player::One)) {
       start(now);
     }
     return;
   }
 
   while (movement < 0) {
-    move(-1, false, now);
+    move(-1);
     ++movement;
   }
   while (movement > 0) {
-    move(1, false, now);
+    move(1);
     --movement;
   }
-  if (Controls::primaryPressed(Controls::Player::One)) {
-    move(facing_, true, now);
-  }
-  if (Controls::secondaryPressed(Controls::Player::One) &&
+  if (Controls::primaryPressed(Controls::Player::One) &&
       !shieldActive_ && shields_ > 0) {
     --shields_;
     shieldActive_ = true;

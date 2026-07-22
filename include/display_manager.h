@@ -7,7 +7,6 @@ namespace DisplayManager {
 enum class Mode : uint8_t {
   Twang,
   ColourShooter,
-  MeteorDodge,
   Pong1D,
   ReactionRace,
   Count,

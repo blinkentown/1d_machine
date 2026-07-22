@@ -3,7 +3,6 @@
 #include "config.h"
 #include "display_manager.h"
 #include "games/colour_shooter.h"
-#include "games/meteor_dodge.h"
 #include "games/pong_1d.h"
 #include "games/reaction_race.h"
 #include "games/twang.h"
@@ -27,7 +26,6 @@ GameId selectedGame = GameId::ColourShooter;
 State state = State::Selecting;
 TwangGame twang;
 ColourShooterGame colourShooter;
-MeteorDodgeGame meteorDodge;
 Pong1DGame pong;
 ReactionRaceGame reactionRace;
 PowerStressTest powerStressTest;
@@ -50,8 +48,6 @@ const __FlashStringHelper* gameName(GameId game) {
       return F("Twang");
     case GameId::ColourShooter:
       return F("Colour Shooter");
-    case GameId::MeteorDodge:
-      return F("Meteor Dodge");
     case GameId::Pong1D:
       return F("1D Pong");
     case GameId::ReactionRace:
@@ -70,8 +66,6 @@ uint32_t gameColor(GameId game) {
       return Config::MODE_TWANG_COLOR;
     case GameId::ColourShooter:
       return Config::MODE_COLOUR_SHOOTER_COLOR;
-    case GameId::MeteorDodge:
-      return Config::MODE_METEOR_DODGE_COLOR;
     case GameId::Pong1D:
       return Config::MODE_PONG_COLOR;
     case GameId::ReactionRace:
@@ -108,9 +102,6 @@ void startSelectedGame(uint32_t now) {
       break;
     case GameId::ColourShooter:
       colourShooter.start(now);
-      break;
-    case GameId::MeteorDodge:
-      meteorDodge.start(now);
       break;
     case GameId::Pong1D:
       pong.start(now);
@@ -254,10 +245,6 @@ void render(uint32_t now) {
         colourShooter.render(now);
         DisplayManager::showSingleScore(colourShooter.score());
         break;
-      case GameId::MeteorDodge:
-        meteorDodge.render(now);
-        DisplayManager::showSingleScore(meteorDodge.score());
-        break;
       case GameId::Pong1D:
         pong.render(now);
         DisplayManager::showVersusScore(pong.leftScore(), pong.rightScore());
@@ -351,9 +338,6 @@ void update(uint32_t now) {
           break;
         case GameId::ColourShooter:
           colourShooter.update(now);
-          break;
-        case GameId::MeteorDodge:
-          meteorDodge.update(now);
           break;
         case GameId::Pong1D:
           pong.update(now);

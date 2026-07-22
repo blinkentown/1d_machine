@@ -9,12 +9,11 @@ APA102/SK9822 strip and a SparkFun Pro Micro 5 V / 16 MHz.
 | ---: | --- | --- | --- |
 | 1 | Orange | Twang | Playable |
 | 1 | Yellow | Colour Shooter | Playable |
-| 1 | Red | Meteor Dodge | Playable |
 | 2 | Blue | 1D Pong | Playable |
 | 2 | Green | Reaction Race | Playable |
 
-Snake 1D and Memory Sequence remain in the source tree but are intentionally
-not linked into the selectable firmware.
+Meteor Dodge, Snake 1D, and Memory Sequence remain in the source tree but are
+intentionally not linked into the selectable firmware.
 
 Detailed controls are in [GAMES.md](GAMES.md). Power wiring and runtime power
 modes are in [POWER_MODES.md](POWER_MODES.md). Firmware structure and memory
@@ -53,9 +52,9 @@ rails must not be tied together without proper power-source isolation.
 All switches use `INPUT_PULLUP`: released is `HIGH`, pressed is `LOW`.
 
 Player 1 owns red `P1-A` and green `P1-B`; Player 2 owns blue `P2-A` and
-yellow `P2-B`. Both encoders are installed and decoded. The Player 1 encoder is
-active only in Meteor Dodge while gameplay behavior is introduced one game at
-a time; the Player 2 encoder remains reserved. The
+yellow `P2-B`. Both encoders are installed and decoded but currently reserved
+while gameplay behavior is introduced one game at a time. Twang is the next
+planned encoder integration. The
 illuminated selector and setup button are system controls. A2 and A3 are the
 only two currently exposed, completely free direct GPIOs. See
 [GAMES.md](GAMES.md) for per-game assignments.
@@ -109,7 +108,7 @@ both the module's `3-2-1-6-5-4` grid order and the rotated segment geometry;
 `TM1637_ROTATE_180` in `include/config.h` records that mounting orientation.
 
 During selection the display shows player count and a three-digit game code:
-`1P tNG`, `1P CSH`, `1P MEt`, `2P PnG`, or `2P rAC`. During play the display
+`1P tNG`, `1P CSH`, `2P PnG`, or `2P rAC`. During play the display
 is split into two three-digit score fields. Player 1 is on the left and Player
 2 is on the right. The right field stays blank in a single-player game. Values
 are right-aligned without leading zeroes and saturate at 999. Lives remain
@@ -118,6 +117,10 @@ visible on the LED strip rather than as display decimal points.
 ## Main configuration
 
 All tunable constants live in `include/config.h`.
+
+Gameplay uses encoders for directional movement and should need one action
+button where possible, never more than two. Faster encoder rotation directly
+produces faster movement; simple controls take priority over extra mechanics.
 
 - Tape pixel width: 3 LEDs
 - Game segment multiplier: 4
@@ -131,10 +134,10 @@ All tunable constants live in `include/config.h`.
 
 ## Memory baseline
 
-The reviewed five-game build with two encoders and TM1637 display uses:
+The reviewed four-game build with two encoders and TM1637 display uses:
 
-- SRAM: 1606 / 2560 bytes (62.7%)
-- Flash: 22240 / 28672 bytes (77.6%)
+- SRAM: 1582 / 2560 bytes (61.8%)
+- Flash: 21026 / 28672 bytes (73.3%)
 
 The SRAM figure does not include peak stack usage. Future games must use small,
 fixed state and no additional LED framebuffer.
@@ -143,8 +146,9 @@ fixed state and no additional LED framebuffer.
 
 Both player encoders use interrupt-driven quadrature decoding. Their configured
 directions have been reversed together from the last hardware test. The Player
-1 encoder controls movement only in Meteor Dodge; all other games and the
-selector ignore encoder deltas while integration proceeds gradually.
+encoder deltas are currently ignored by all four active games and the selector
+while integration proceeds gradually. Twang is planned as the first active
+encoder-controlled game.
 Short-press the illuminated selector to cycle games, hold it for about 0.8
 seconds to start, and press it during a game to return. D5 remains the dedicated
 setup input. A2/A3 are reserved for future system controls; until then,

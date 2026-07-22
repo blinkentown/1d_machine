@@ -70,7 +70,6 @@ constexpr uint32_t MODE_COLOUR_SHOOTER_COLOR = 0xFFFF00UL;
 constexpr uint32_t MODE_PONG_COLOR = 0x0000FFUL;
 constexpr uint32_t MODE_REACTION_RACE_COLOR = 0x00FF00UL;
 constexpr uint32_t MODE_SNAKE_COLOR = 0x00FFFFUL;
-constexpr uint32_t MODE_METEOR_DODGE_COLOR = 0xFF0000UL;
 constexpr uint32_t MODE_MEMORY_COLOR = 0x8000FFUL;
 
 constexpr uint16_t POWER_STRESS_DURATION_MS = 10000;
@@ -126,9 +125,7 @@ constexpr uint32_t REACTION_FALSE_START_COLOR = 0xFFFF00UL;
 
 constexpr uint8_t METEOR_STARTING_LIVES = 3;
 constexpr uint8_t METEOR_STARTING_SHIELDS = 3;
-constexpr uint8_t METEOR_DASH_CELLS = 3;
 constexpr uint8_t METEOR_BLAST_RADIUS_CELLS = 2;
-constexpr uint16_t METEOR_DASH_COOLDOWN_MS = 700;
 constexpr uint16_t METEOR_INITIAL_WARNING_MS = 1200;
 constexpr uint16_t METEOR_MINIMUM_WARNING_MS = 450;
 constexpr uint8_t METEOR_WARNING_SPEEDUP_MS = 35;
