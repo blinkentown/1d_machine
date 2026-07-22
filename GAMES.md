@@ -11,9 +11,9 @@ The four buttons form two symmetric player interfaces:
 | Player 2 | Blue / P2-A | Yellow / P2-B |
 
 The two installed player encoders are decoded but never navigate the selector.
-The Player 1 encoder controls Twang. Colour Shooter, Pong, and Reaction Race
-retain their button controls. The Player 2 encoder and its click remain
-reserved.
+The Player 1 encoder controls Twang. Colour Shooter, Pong, Reaction Race, and
+Colour Snake Duel retain their button controls. The Player 2 encoder and its
+click remain reserved.
 
 ## Gameplay UI rule
 
@@ -31,7 +31,8 @@ never change menu state.
 The selector order is grouped by player count:
 
 ```text
-1P Twang -> 1P Colour Shooter -> 2P Pong -> 2P Reaction Race -> repeat
+1P Twang -> 1P Colour Shooter -> 2P Pong -> 2P Reaction Race
+-> 2P Colour Snake Duel -> repeat
 ```
 
 To change power mode without restarting, remain at the game selector and hold
@@ -49,6 +50,7 @@ the blue and yellow game buttons together for two seconds.
 | Colour Shooter selected/running | Yellow |
 | 1D Pong selected/running | Blue |
 | Reaction Race selected/running | Green |
+| Colour Snake Duel selected/running | Violet |
 
 After a one-second power confirmation, the selector output returns to the
 selected game's color. Red is the PSU confirmation; green can be the brief
@@ -76,12 +78,37 @@ The selection display identifies player count and game:
 | 1 | Colour Shooter | `1P CSH` |
 | 2 | 1D Pong | `2P PnG` |
 | 2 | Reaction Race | `2P rAC` |
+| 2 | Colour Snake Duel | `2P CSn` |
 
 During play, the left three digits show Player 1 and the right three show
 Player 2. Twang and Colour Shooter use Player 1 score and leave the Player 2
 field blank. Pong and Reaction Race show
 both scores. Each field is right-aligned, has no leading zeroes, and is limited
 to 999. Lives remain visible on the LED strip.
+
+## Colour Snake Duel
+
+Selector output: violet.
+
+- Player 1 is at LED 0 and uses red / P1-A plus green / P1-B.
+- Player 2 is at LED 287 and uses blue / P2-A plus yellow / P2-B.
+- Two continuous snakes begin at the center and grow outward simultaneously.
+- Every colored segment is one 12-LED logical cell. Player 1 sees only red and
+  green segments; Player 2 sees only blue and yellow segments.
+- A button launches a three-LED matching-color projectile from that player's
+  endpoint. Projectiles travel through physical LEDs rather than game cells.
+- A correct projectile dissolves the nearest segment and retracts that half of
+  the snake toward the center.
+- A wrong projectile queues one 12-LED penalty segment. That penalty slides in
+  one physical LED every 25 ms instead of appearing as a block.
+- Natural growth also moves exactly one physical LED per step. It starts at
+  90 ms per LED and accelerates every four seconds toward 38 ms per LED; the
+  colored sections remain 12 LEDs wide and move continuously.
+- If a snake reaches a player's endpoint, the opponent wins the round. A
+  simultaneous breakthrough is a tie and awards no point.
+- Both halves reset after each round. First to five round points wins.
+- The display shows Player 1 rounds on the left and Player 2 rounds on the
+  right. Neither encoder is used.
 
 ## Twang
 
@@ -90,6 +117,8 @@ Selector output: orange.
 - The goal is to move the white player from the left start to the green exit.
 - Each Player 1 encoder detent moves one 12-LED cell left or right. Turning the
   encoder faster moves through multiple clear cells faster.
+- The 12-LED player glides to each logical target one physical LED at a time;
+  obstacle collision remains aligned to the safe 12-LED cell grid.
 - The blue direction marker shows which way the player faces.
 - Red / P1-A sends a blue-white twang up to three cells in that direction.
 - A twang destroys the first pulsing red enemy in range, adds one point, and
@@ -122,6 +151,8 @@ Selector output: yellow.
 
 - This is currently the 1P Advanced variant with all four colors.
 - Random colored comets move from the far end toward the player.
+- Comets and projectiles advance by physical LEDs; 12 LEDs define their width,
+  not their movement step.
 - Red, green, blue, and yellow each launch a projectile of the matching color.
 - The nearest comet blocks the projectile.
 - A correct match dissolves the target and increases score and speed.
@@ -142,6 +173,7 @@ Selector output: blue.
 - Player 2 hits with blue / P2-A.
 - Green / P1-B and yellow / P2-B are reserved for later specials.
 - The 12-LED ball accelerates after successful returns.
+- Ball position advances one physical LED per movement step.
 - Each visible 24-LED paddle is also the complete hit zone.
 - The hit zone has three 8-LED accuracy bands. Deeper hits speed up the ball by
   2, 4, or 6 ms for the current rally.
@@ -164,6 +196,9 @@ Selector output: green.
 - The two center cells turn green when the race begins.
 - Player 1 alternates red and green; Player 2 alternates blue and yellow. A red
   trail advances from the left and a blue trail from the right.
+- Every correct button adds a 12-pixel movement impulse, but the visible trail
+  and colored tip advance one physical LED at a time. The result animation
+  waits until the winning tip has visibly reached the center.
 - The moving tips use each player's primary/secondary colors to indicate the
   required next button. Pressing the other button does not advance.
 - The first racer to reach the center wins the round. A simultaneous finish is
@@ -175,7 +210,7 @@ Selector output: green.
 ## Snake 1D (inactive source)
 
 Snake 1D is retained in the repository but is not selectable in the focused
-four-game firmware.
+five-game firmware.
 
 - A continuous row of 12-LED colored segments moves toward the player.
 - Adjacent normal segments always have different colors.
@@ -195,7 +230,7 @@ four-game firmware.
 ## Meteor Dodge (inactive source)
 
 Meteor Dodge is retained as an encoder-tested prototype but is not selectable
-in the focused four-game firmware.
+in the focused five-game firmware.
 
 - The white player begins at strip center. Each Player 1 encoder detent moves
   one 12-LED cell left or right.
@@ -214,7 +249,7 @@ in the focused four-game firmware.
 ## Memory Sequence (inactive source)
 
 Memory Sequence is retained in the repository but is not selectable in the
-focused four-game firmware.
+focused five-game firmware.
 
 - Four dim 12-LED stations represent red, green, blue, and yellow at fixed
   positions along the strip.

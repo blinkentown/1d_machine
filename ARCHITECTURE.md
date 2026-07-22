@@ -26,6 +26,7 @@ There are no gameplay delays or dynamic allocations.
 | `games/meteor_dodge` | Inactive retained source: encoder-tested dodge prototype |
 | `games/memory_sequence` | Inactive retained source: sequence memory game |
 | `games/colour_shooter` | Incoming targets, shots, lives, and impact effects |
+| `games/colour_snake_duel` | Pixel-moving snake halves, shots, rounds, and scores |
 | `games/pong_1d` | Ball, paddles, scoring, point delay, and serve states |
 | `games/reaction_race` | Random start, false starts, alternating inputs, rounds |
 | `games/snake_1d` | Inactive retained source: continuous color snake |
@@ -42,17 +43,17 @@ Pins are centralized in `include/pins.h`. Tunable values are centralized in
 - Render game objects directly into the shared LED buffer.
 - Check both SRAM and flash after every playable step.
 
-Reviewed four-game, two-encoder, and display build baseline:
+Reviewed five-game, two-encoder, and display build baseline:
 
-- Static SRAM: 1582 / 2560 bytes
-- Flash: 21380 / 28672 bytes
-- Active game states: Colour Shooter 124 bytes, Twang 27 bytes, Pong 24 bytes,
-  and Reaction Race 18 bytes
+- Static SRAM: 1680 / 2560 bytes
+- Flash: 25060 / 28672 bytes
+- Active game states: Colour Shooter 124 bytes, Colour Snake Duel 82 bytes,
+  Twang 34 bytes, Pong 24 bytes, and Reaction Race 24 bytes
 
-The remaining 978 SRAM bytes also contain the runtime stack. Meteor Dodge,
+The remaining 880 SRAM bytes also contain the runtime stack. Meteor Dodge,
 Snake, and Memory are not instantiated or dispatched, so link-time optimization
 removes their firmware code while their source remains available. The remaining
-7292 flash bytes provide headroom for system UI and focused gameplay improvements.
+3612 flash bytes provide headroom for system UI and focused gameplay improvements.
 
 The AVR build enables link-time optimization, shared function prologues,
 reduced small-function inlining, unsplit wide values, and linker relaxation to
@@ -68,6 +69,10 @@ preserve flash for game logic.
   the 20 ms frame budget.
 - Input and game updates remain non-blocking. Detailed serial event diagnostics
   are compiled out by default; the USB startup message remains.
+- `GAME_PIXEL_WIDTH` defines object width only. Colour Shooter targets and
+  shots, the Pong ball, Colour Snake growth, Twang player interpolation, and
+  Reaction Race trails all advance through physical LED coordinates rather
+  than jumping by a full 12-LED game segment.
 - The TM1637 driver retains only six previous segment bytes and one state byte.
   It compares display content every rendered frame but transmits only after a
   visible change. The hardware-validated 100 us half-clock timing follows the
@@ -75,7 +80,7 @@ preserve flash for game logic.
 - Both encoder pairs use CHANGE interrupts, the shared quadrature transition
   table, four transitions per detent, and saturating pending deltas. Display
   and LED transfers therefore cannot hide normal player rotation.
-- No large local arrays were found. The 978-byte SRAM reserve still includes
+- No large local arrays were found. The 880-byte SRAM reserve still includes
   the unknown runtime stack, so a stack high-water measurement is recommended
   before adding another persistent buffer.
 
@@ -132,7 +137,7 @@ F while preserving the center segment and decimal-point bit.
 
 ## Review notes
 
-- Four controller-focused games are selectable. Meteor Dodge, Snake, and Memory
+- Five controller-focused games are selectable. Meteor Dodge, Snake, and Memory
   remain as inactive source code.
 - Both encoder decoders and installed hardware behavior are validated. Twang is
   the first active encoder game; the archived Meteor prototype preserves the

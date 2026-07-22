@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "display_manager.h"
+#include "games/colour_snake_duel.h"
 #include "games/colour_shooter.h"
 #include "games/pong_1d.h"
 #include "games/reaction_race.h"
@@ -28,6 +29,7 @@ TwangGame twang;
 ColourShooterGame colourShooter;
 Pong1DGame pong;
 ReactionRaceGame reactionRace;
+ColourSnakeDuelGame colourSnakeDuel;
 PowerStressTest powerStressTest;
 uint32_t lastRenderAt = 0;
 uint32_t modeButtonPressedAt = 0;
@@ -52,6 +54,8 @@ const __FlashStringHelper* gameName(GameId game) {
       return F("1D Pong");
     case GameId::ReactionRace:
       return F("Reaction Race");
+    case GameId::ColourSnakeDuel:
+      return F("Colour Snake Duel");
     case GameId::Count:
       break;
   }
@@ -70,6 +74,8 @@ uint32_t gameColor(GameId game) {
       return Config::MODE_PONG_COLOR;
     case GameId::ReactionRace:
       return Config::MODE_REACTION_RACE_COLOR;
+    case GameId::ColourSnakeDuel:
+      return Config::MODE_COLOUR_SNAKE_COLOR;
     case GameId::Count:
       break;
   }
@@ -108,6 +114,9 @@ void startSelectedGame(uint32_t now) {
       break;
     case GameId::ReactionRace:
       reactionRace.start(now);
+      break;
+    case GameId::ColourSnakeDuel:
+      colourSnakeDuel.start(now);
       break;
     default:
       break;
@@ -254,6 +263,11 @@ void render(uint32_t now) {
         DisplayManager::showVersusScore(reactionRace.player1Score(),
                                         reactionRace.player2Score());
         break;
+      case GameId::ColourSnakeDuel:
+        colourSnakeDuel.render(now);
+        DisplayManager::showVersusScore(colourSnakeDuel.player1Score(),
+                                        colourSnakeDuel.player2Score());
+        break;
       default:
         LedManager::clearStrip();
         break;
@@ -344,6 +358,9 @@ void update(uint32_t now) {
           break;
         case GameId::ReactionRace:
           reactionRace.update(now);
+          break;
+        case GameId::ColourSnakeDuel:
+          colourSnakeDuel.update(now);
           break;
         default:
           break;

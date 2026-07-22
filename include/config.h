@@ -69,6 +69,7 @@ constexpr uint32_t MODE_TWANG_COLOR = 0xFF4000UL;
 constexpr uint32_t MODE_COLOUR_SHOOTER_COLOR = 0xFFFF00UL;
 constexpr uint32_t MODE_PONG_COLOR = 0x0000FFUL;
 constexpr uint32_t MODE_REACTION_RACE_COLOR = 0x00FF00UL;
+constexpr uint32_t MODE_COLOUR_SNAKE_COLOR = 0x8000FFUL;
 constexpr uint32_t MODE_SNAKE_COLOR = 0x00FFFFUL;
 constexpr uint32_t MODE_MEMORY_COLOR = 0x8000FFUL;
 
@@ -103,6 +104,7 @@ constexpr uint8_t TWANG_STARTING_LIVES = 3;
 constexpr uint8_t TWANG_START_CELL = 1;
 constexpr uint8_t TWANG_ATTACK_RANGE_CELLS = 3;
 constexpr uint8_t TWANG_JUMP_CELLS = 2;
+constexpr uint8_t TWANG_PIXEL_STEP_MS = 12;
 constexpr uint16_t TWANG_EFFECT_MS = 300;
 constexpr uint16_t TWANG_LEVEL_CLEAR_MS = 900;
 constexpr uint32_t TWANG_PLAYER_COLOR = 0xFFFFFFUL;
@@ -116,6 +118,7 @@ constexpr uint8_t REACTION_ROUNDS_TO_WIN = 3;
 constexpr uint16_t REACTION_WAIT_MIN_MS = 1500;
 constexpr uint16_t REACTION_WAIT_MAX_MS = 4000;
 constexpr uint16_t REACTION_ROUND_RESULT_MS = 1000;
+constexpr uint8_t REACTION_PIXEL_STEP_MS = 12;
 constexpr uint32_t REACTION_PLAYER_1_COLOR = 0xFF0000UL;
 constexpr uint32_t REACTION_PLAYER_2_COLOR = 0x0000FFUL;
 constexpr uint32_t REACTION_WAIT_COLOR = 0xFF8000UL;
@@ -171,6 +174,30 @@ constexpr uint8_t COLOUR_SHOOTER_STROBE_PERIOD_MS = 25;
 constexpr uint8_t COLOUR_SHOOTER_BLAST_RADIUS =
     EXPLOSION_INTENSITY * 7U + 1U;
 constexpr uint32_t COLOUR_SHOOTER_ERROR_COLOR = 0xFF0000UL;
+
+constexpr uint8_t COLOUR_SNAKE_INITIAL_LENGTH = 3;
+constexpr uint8_t COLOUR_SNAKE_ROUNDS_TO_WIN = 5;
+constexpr uint8_t COLOUR_SNAKE_INITIAL_PIXEL_STEP_MS = 90;
+constexpr uint8_t COLOUR_SNAKE_MINIMUM_PIXEL_STEP_MS = 38;
+constexpr uint16_t COLOUR_SNAKE_SPEEDUP_EVERY_MS = 4000;
+constexpr uint8_t COLOUR_SNAKE_SPEEDUP_MS = 4;
+constexpr uint8_t COLOUR_SNAKE_MAX_SPEED_STEPS =
+    (COLOUR_SNAKE_INITIAL_PIXEL_STEP_MS -
+     COLOUR_SNAKE_MINIMUM_PIXEL_STEP_MS) /
+    COLOUR_SNAKE_SPEEDUP_MS;
+constexpr uint8_t COLOUR_SNAKE_SHOT_STEP_MS = 6;
+constexpr uint8_t COLOUR_SNAKE_PENALTY_STEP_MS = 25;
+constexpr uint16_t COLOUR_SNAKE_HIT_EFFECT_MS = 260;
+constexpr uint16_t COLOUR_SNAKE_ROUND_RESULT_MS = 900;
+constexpr uint32_t COLOUR_SNAKE_ERROR_COLOR = 0xFF0000UL;
+static_assert(COLOUR_SNAKE_INITIAL_LENGTH <
+                  LED_COUNT / GAME_PIXEL_WIDTH / 2U,
+              "Colour Snake must start before either player endpoint");
+static_assert(COLOUR_SNAKE_INITIAL_PIXEL_STEP_MS -
+                      COLOUR_SNAKE_MAX_SPEED_STEPS *
+                          COLOUR_SNAKE_SPEEDUP_MS >=
+                  COLOUR_SNAKE_MINIMUM_PIXEL_STEP_MS,
+              "Colour Snake growth speed must respect its minimum");
 
 constexpr uint8_t SNAKE_STARTING_LIVES = 3;
 constexpr uint8_t SNAKE_MAX_SEGMENTS = 48;

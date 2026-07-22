@@ -11,6 +11,7 @@ APA102/SK9822 strip and a SparkFun Pro Micro 5 V / 16 MHz.
 | 1 | Yellow | Colour Shooter | Playable |
 | 2 | Blue | 1D Pong | Playable |
 | 2 | Green | Reaction Race | Playable |
+| 2 | Violet | Colour Snake Duel | Playable |
 
 Meteor Dodge, Snake 1D, and Memory Sequence remain in the source tree but are
 intentionally not linked into the selectable firmware.
@@ -107,7 +108,7 @@ both the module's `3-2-1-6-5-4` grid order and the rotated segment geometry;
 `TM1637_ROTATE_180` in `include/config.h` records that mounting orientation.
 
 During selection the display shows player count and a three-digit game code:
-`1P tNG`, `1P CSH`, `2P PnG`, or `2P rAC`. During play the display
+`1P tNG`, `1P CSH`, `2P PnG`, `2P rAC`, or `2P CSn`. During play the display
 is split into two three-digit score fields. Player 1 is on the left and Player
 2 is on the right. The right field stays blank in a single-player game. Values
 are right-aligned without leading zeroes and saturate at 999. Lives remain
@@ -124,6 +125,8 @@ produces faster movement; simple controls take priority over extra mechanics.
 - Tape pixel width: 3 LEDs
 - Game segment multiplier: 4
 - Logical game segment: 12 LEDs
+- Object width and movement are separate: moving state advances in physical
+  LED steps even when the object itself is 12 LEDs wide
 - Global gameplay speed: 100%
 - Bench limit: 100 mA at brightness 32/255
 - PSU limit: FastLED estimate of 3000 mA at brightness 85/255
@@ -133,10 +136,10 @@ produces faster movement; simple controls take priority over extra mechanics.
 
 ## Memory baseline
 
-The reviewed four-game build with two encoders and TM1637 display uses:
+The reviewed five-game build with two encoders and TM1637 display uses:
 
-- SRAM: 1582 / 2560 bytes (61.8%)
-- Flash: 21380 / 28672 bytes (74.6%)
+- SRAM: 1680 / 2560 bytes (65.6%)
+- Flash: 25060 / 28672 bytes (87.4%)
 
 The SRAM figure does not include peak stack usage. Future games must use small,
 fixed state and no additional LED framebuffer.
@@ -146,8 +149,8 @@ fixed state and no additional LED framebuffer.
 Both player encoders use interrupt-driven quadrature decoding. Their configured
 directions have been reversed together from the last hardware test. The Player
 Player 1 encoder controls movement only in Twang. Colour Shooter, Pong,
-Reaction Race, and the selector ignore encoder deltas; the Player 2 encoder
-remains reserved.
+Reaction Race, Colour Snake Duel, and the selector ignore encoder deltas; the
+Player 2 encoder remains reserved.
 Short-press the illuminated selector to cycle games, hold it for about 0.8
 seconds to start, and press it during a game to return. D5 remains the dedicated
 setup input. A2/A3 are reserved for future system controls; until then,

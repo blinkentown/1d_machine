@@ -35,6 +35,9 @@ uint16_t ReactionRaceGame::nextRandom() {
 void ReactionRaceGame::prepareRound(uint32_t now) {
   player1Progress_ = 0;
   player2Progress_ = 0;
+  player1RenderProgressPixels_ = 0;
+  player2RenderProgressPixels_ = 0;
+  lastProgressPixelStepAt_ = now;
   player1SecondaryNext_ = false;
   player2SecondaryNext_ = false;
   roundWinner_ = 0;
@@ -83,14 +86,43 @@ void ReactionRaceGame::handleRaceInputs(uint32_t now) {
   const bool player1Finished = player1Progress_ >= RACE_STEPS;
   const bool player2Finished = player2Progress_ >= RACE_STEPS;
   if (player1Finished || player2Finished) {
-    finishRound(player1Finished == player2Finished
-                    ? 0
-                    : (player1Finished ? -1 : 1),
-                now);
+    roundWinner_ = player1Finished == player2Finished
+                       ? 0
+                       : (player1Finished ? -1 : 1);
+    phase_ = Phase::Finishing;
+    phaseChangedAt_ = now;
   }
 }
 
+void ReactionRaceGame::updateProgressAnimation(uint32_t now) {
+  uint32_t dueSteps =
+      (now - lastProgressPixelStepAt_) / Config::REACTION_PIXEL_STEP_MS;
+  if (dueSteps > Config::GAME_PIXEL_WIDTH * 2U) {
+    dueSteps = Config::GAME_PIXEL_WIDTH * 2U;
+  }
+  const uint8_t steps = static_cast<uint8_t>(dueSteps);
+  if (steps == 0U) {
+    return;
+  }
+  lastProgressPixelStepAt_ +=
+      static_cast<uint32_t>(steps) * Config::REACTION_PIXEL_STEP_MS;
+
+  const uint8_t player1Target =
+      player1Progress_ * Config::GAME_PIXEL_WIDTH;
+  const uint8_t player2Target =
+      player2Progress_ * Config::GAME_PIXEL_WIDTH;
+  const uint8_t player1Remaining =
+      player1Target - player1RenderProgressPixels_;
+  const uint8_t player2Remaining =
+      player2Target - player2RenderProgressPixels_;
+  player1RenderProgressPixels_ +=
+      steps < player1Remaining ? steps : player1Remaining;
+  player2RenderProgressPixels_ +=
+      steps < player2Remaining ? steps : player2Remaining;
+}
+
 void ReactionRaceGame::update(uint32_t now) {
+  updateProgressAnimation(now);
   const bool player1Pressed =
       InputManager::wasPressed(Controls::PLAYER_1_PRIMARY) ||
       InputManager::wasPressed(Controls::PLAYER_1_SECONDARY);
@@ -113,6 +145,18 @@ void ReactionRaceGame::update(uint32_t now) {
     return;
   }
 
+  if (phase_ == Phase::Finishing) {
+    const uint8_t player1Target =
+        player1Progress_ * Config::GAME_PIXEL_WIDTH;
+    const uint8_t player2Target =
+        player2Progress_ * Config::GAME_PIXEL_WIDTH;
+    if (player1RenderProgressPixels_ >= player1Target &&
+        player2RenderProgressPixels_ >= player2Target) {
+      finishRound(roundWinner_, now);
+    }
+    return;
+  }
+
   if (phase_ == Phase::Waiting) {
     if (static_cast<int32_t>(now - goAt_) < 0) {
       if (player1Pressed || player2Pressed) {
@@ -125,6 +169,7 @@ void ReactionRaceGame::update(uint32_t now) {
     }
     phase_ = Phase::Racing;
     phaseChangedAt_ = now;
+    lastProgressPixelStepAt_ = now;
   }
 
   handleRaceInputs(now);
@@ -177,17 +222,20 @@ void ReactionRaceGame::render(uint32_t now) const {
 
   LedManager::setGameCell(CELL_COUNT / 2U - 1U, Config::REACTION_GO_COLOR);
   LedManager::setGameCell(CELL_COUNT / 2U, Config::REACTION_GO_COLOR);
-  for (uint8_t cell = 0; cell <= player1Progress_; ++cell) {
-    LedManager::setGameCell(cell, 0x300000UL);
-  }
-  for (uint8_t cell = 0; cell <= player2Progress_; ++cell) {
-    LedManager::setGameCell(CELL_COUNT - 1U - cell, 0x000030UL);
-  }
+  const uint16_t player1TrailLength =
+      Config::GAME_PIXEL_WIDTH + player1RenderProgressPixels_;
+  const uint16_t player2TrailLength =
+      Config::GAME_PIXEL_WIDTH + player2RenderProgressPixels_;
+  LedManager::setStripRange(0U, player1TrailLength, 0x300000UL);
+  LedManager::setStripRange(Config::LED_COUNT - player2TrailLength,
+                            player2TrailLength, 0x000030UL);
 
-  LedManager::setGameCell(
-      player1Progress_,
+  LedManager::setStripRange(
+      player1RenderProgressPixels_, Config::GAME_PIXEL_WIDTH,
       player1SecondaryNext_ ? Config::BUTTON_2_COLOR : Config::BUTTON_1_COLOR);
-  LedManager::setGameCell(
-      CELL_COUNT - 1U - player2Progress_,
+  LedManager::setStripRange(
+      Config::LED_COUNT - Config::GAME_PIXEL_WIDTH -
+          player2RenderProgressPixels_,
+      Config::GAME_PIXEL_WIDTH,
       player2SecondaryNext_ ? Config::BUTTON_4_COLOR : Config::BUTTON_3_COLOR);
 }

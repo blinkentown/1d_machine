@@ -32,8 +32,12 @@ void TwangGame::start(uint32_t now) {
 
 void TwangGame::startLevel(uint32_t now) {
   playerCell_ = Config::TWANG_START_CELL;
+  playerRenderPosition_ =
+      static_cast<uint16_t>(playerCell_) * Config::GAME_PIXEL_WIDTH;
+  lastPlayerPixelStepAt_ = now;
   facing_ = 1;
   effectActive_ = false;
+  exitPending_ = false;
   generateDungeon();
   phase_ = Phase::Playing;
   phaseChangedAt_ = now;
@@ -118,8 +122,7 @@ bool TwangGame::move(int8_t direction, uint32_t now) {
   playerCell_ = targetCell;
 
   if (playerCell_ == EXIT_CELL) {
-    phase_ = Phase::LevelClear;
-    phaseChangedAt_ = now;
+    exitPending_ = true;
   }
   return true;
 }
@@ -149,6 +152,30 @@ void TwangGame::jump(uint32_t now) {
   effectStartedAt_ = now;
   effectActive_ = true;
   if (playerCell_ == EXIT_CELL) {
+    exitPending_ = true;
+  }
+}
+
+void TwangGame::updatePlayerAnimation(uint32_t now) {
+  const uint16_t targetPosition =
+      static_cast<uint16_t>(playerCell_) * Config::GAME_PIXEL_WIDTH;
+  uint32_t dueSteps =
+      (now - lastPlayerPixelStepAt_) / Config::TWANG_PIXEL_STEP_MS;
+  if (dueSteps > Config::GAME_PIXEL_WIDTH * 2U) {
+    dueSteps = Config::GAME_PIXEL_WIDTH * 2U;
+  }
+  uint8_t steps = static_cast<uint8_t>(dueSteps);
+  if (steps > 0U) {
+    lastPlayerPixelStepAt_ +=
+        static_cast<uint32_t>(steps) * Config::TWANG_PIXEL_STEP_MS;
+  }
+  while (steps-- > 0U && playerRenderPosition_ != targetPosition) {
+    playerRenderPosition_ +=
+        playerRenderPosition_ < targetPosition ? 1 : -1;
+  }
+
+  if (exitPending_ && playerRenderPosition_ == targetPosition) {
+    exitPending_ = false;
     phase_ = Phase::LevelClear;
     phaseChangedAt_ = now;
   }
@@ -184,6 +211,7 @@ void TwangGame::attack(uint32_t now) {
 }
 
 void TwangGame::update(uint32_t now) {
+  updatePlayerAnimation(now);
   int8_t movement = Controls::rotation(Controls::Player::One);
   if (effectActive_ &&
       static_cast<uint32_t>(now - effectStartedAt_) >=
@@ -224,6 +252,10 @@ void TwangGame::update(uint32_t now) {
     --movement;
   }
   if (phase_ != Phase::Playing) {
+    return;
+  }
+
+  if (exitPending_) {
     return;
   }
   if (Controls::primaryPressed(Controls::Player::One)) {
@@ -274,9 +306,10 @@ void TwangGame::render(uint32_t now) const {
     }
   }
 
-  LedManager::setGameCell(playerCell_, Config::TWANG_PLAYER_COLOR);
+  LedManager::setStripRange(playerRenderPosition_, Config::GAME_PIXEL_WIDTH,
+                            Config::TWANG_PLAYER_COLOR);
   const uint16_t directionPixel =
-      static_cast<uint16_t>(playerCell_) * Config::GAME_PIXEL_WIDTH +
+      playerRenderPosition_ +
       (facing_ > 0 ? Config::GAME_PIXEL_WIDTH - 1U : 0U);
   LedManager::setStripPixel(directionPixel, Config::TWANG_ATTACK_COLOR);
 
