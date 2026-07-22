@@ -79,6 +79,7 @@ constexpr uint32_t MODE_SNAKE_COLOR = 0x00FFFFUL;
 constexpr uint32_t MODE_MEMORY_COLOR = 0x8000FFUL;
 constexpr uint32_t MODE_CATCH_COLOR = 0xFF00FFUL;
 constexpr uint32_t MODE_COLOUR_GATE_COLOR = 0x0080FFUL;
+constexpr uint32_t MODE_CODEBREAKER_COLOR = 0x8000FFUL;
 
 constexpr uint16_t POWER_STRESS_DURATION_MS = 10000;
 constexpr uint32_t POWER_STRESS_COLOR = 0xFFFFFFUL;
@@ -227,16 +228,53 @@ constexpr uint8_t COLOUR_GATE_INITIAL_STEP_MS = 10;
 constexpr uint8_t COLOUR_GATE_MINIMUM_STEP_MS = 5;
 constexpr uint8_t COLOUR_GATE_SPEEDUP_MS = 1;
 constexpr uint8_t COLOUR_GATE_SPEEDUP_EVERY = 3;
+constexpr uint8_t COLOUR_GATE_STAGE_SCORE = 8;
 constexpr uint8_t COLOUR_GATE_MAX_CATCHUP_STEPS = 12;
 constexpr uint16_t COLOUR_GATE_FEEDBACK_MS = 320;
 constexpr uint32_t COLOUR_GATE_COLOR = 0x202020UL;
 constexpr uint32_t COLOUR_GATE_SUCCESS_COLOR = 0x00FF00UL;
 constexpr uint32_t COLOUR_GATE_ERROR_COLOR = 0xFF0000UL;
 constexpr uint32_t COLOUR_GATE_LIFE_COLOR = 0x004000UL;
+constexpr uint16_t COLOUR_QUEST_TRANSITION_MS = 800;
 static_assert(COLOUR_GATE_WIDTH > 0 &&
                   COLOUR_GATE_CENTER >= COLOUR_GATE_WIDTH / 2U &&
                   COLOUR_GATE_CENTER + COLOUR_GATE_WIDTH / 2U < LED_COUNT,
               "Colour Gate target must fit on the strip");
+
+constexpr uint8_t BOSS_DEFLECT_STARTING_LIVES = 3;
+constexpr uint16_t BOSS_DEFLECT_GATE_CENTER = LED_COUNT / 4U;
+constexpr uint8_t BOSS_DEFLECT_GATE_WIDTH = GAME_PIXEL_WIDTH * 2U;
+constexpr uint8_t BOSS_DEFLECT_BOSS_WIDTH = GAME_PIXEL_WIDTH * 2U;
+constexpr uint8_t BOSS_DEFLECT_ATTACK_WIDTH = TAPE_PIXEL_WIDTH;
+constexpr uint8_t BOSS_DEFLECT_BASE_HEALTH = 4;
+constexpr uint8_t BOSS_DEFLECT_MAX_HEALTH = 12;
+constexpr uint8_t BOSS_DEFLECT_INITIAL_STEP_MS = 12;
+constexpr uint8_t BOSS_DEFLECT_MAX_LEVEL_SPEEDUP = 6;
+constexpr uint8_t BOSS_DEFLECT_REFLECTED_STEP_MS = 4;
+constexpr uint8_t BOSS_DEFLECT_MAX_CATCHUP_STEPS = 12;
+constexpr uint16_t BOSS_DEFLECT_FEEDBACK_MS = 280;
+constexpr uint16_t BOSS_DEFLECT_LEVEL_CLEAR_MS = 800;
+constexpr uint32_t BOSS_DEFLECT_GATE_COLOR = 0x202020UL;
+constexpr uint32_t BOSS_DEFLECT_BOSS_COLOR = 0xFF2000UL;
+constexpr uint32_t BOSS_DEFLECT_SUCCESS_COLOR = 0x00FF00UL;
+constexpr uint32_t BOSS_DEFLECT_ERROR_COLOR = 0xFF0000UL;
+constexpr uint32_t BOSS_DEFLECT_LIFE_COLOR = 0x004000UL;
+static_assert(BOSS_DEFLECT_INITIAL_STEP_MS >
+                  BOSS_DEFLECT_MAX_LEVEL_SPEEDUP,
+              "Boss incoming step interval must stay positive");
+static_assert(BOSS_DEFLECT_BOSS_WIDTH < LED_COUNT / 2U,
+              "Boss must leave room for the playfield");
+
+constexpr uint8_t CODEBREAKER_CODE_LENGTH = 4;
+constexpr uint8_t CODEBREAKER_ATTEMPTS = 8;
+constexpr uint16_t CODEBREAKER_SUCCESS_MS = 800;
+constexpr uint32_t CODEBREAKER_SLOT_COLOR = 0x101010UL;
+constexpr uint32_t CODEBREAKER_EXACT_COLOR = 0x00FF00UL;
+constexpr uint32_t CODEBREAKER_MISPLACED_COLOR = 0xFF8000UL;
+constexpr uint32_t CODEBREAKER_MISS_COLOR = 0x300000UL;
+constexpr uint32_t CODEBREAKER_ATTEMPT_COLOR = 0x004000UL;
+static_assert(CODEBREAKER_CODE_LENGTH <= 8,
+              "Codebreaker secret must fit in its packed state");
 
 constexpr uint8_t COLOUR_SHOOTER_STARTING_LIVES = 3;
 constexpr uint8_t COLOUR_SHOOTER_TARGET_COUNT = 8;

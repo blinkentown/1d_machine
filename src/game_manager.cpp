@@ -6,7 +6,8 @@
 #include "display_manager.h"
 #if GAME_SET_SOURCE_GAMES
 #include "games/catch_1d.h"
-#include "games/colour_gate.h"
+#include "games/codebreaker.h"
+#include "games/colour_quest.h"
 #else
 #include "games/colour_snake_duel.h"
 #include "games/colour_shooter.h"
@@ -35,6 +36,7 @@ enum class State : uint8_t {
 const GameId GAME_CATALOG[] PROGMEM = {
     GameId::Catch1D,
     GameId::ColourGate,
+    GameId::Codebreaker,
 };
 #else
 const GameId GAME_CATALOG[] PROGMEM = {
@@ -60,7 +62,8 @@ TwangGame twang;
 Pong1DGame pong;
 #if GAME_SET_SOURCE_GAMES
 Catch1DGame catch1D;
-ColourGateGame colourGate;
+CodebreakerGame codebreaker;
+ColourQuestGame colourQuest;
 #else
 ColourShooterGame colourShooter;
 Tennis1DGame tennis;
@@ -103,6 +106,8 @@ const __FlashStringHelper* gameName(GameId game) {
       return F("Catch 1D");
     case GameId::ColourGate:
       return F("Colour Gate");
+    case GameId::Codebreaker:
+      return F("Codebreaker");
     case GameId::Count:
       break;
   }
@@ -133,6 +138,8 @@ uint32_t gameColor(GameId game) {
       return Config::MODE_CATCH_COLOR;
     case GameId::ColourGate:
       return Config::MODE_COLOUR_GATE_COLOR;
+    case GameId::Codebreaker:
+      return Config::MODE_CODEBREAKER_COLOR;
     case GameId::Count:
       break;
   }
@@ -177,7 +184,10 @@ void startSelectedGame(uint32_t now) {
       catch1D.start(now);
       break;
     case GameId::ColourGate:
-      colourGate.start(now);
+      colourQuest.start(now);
+      break;
+    case GameId::Codebreaker:
+      codebreaker.start(now);
       break;
 #else
     case GameId::Tennis1D:
@@ -338,8 +348,12 @@ void render(uint32_t now) {
         DisplayManager::showSingleScore(catch1D.score());
         break;
       case GameId::ColourGate:
-        colourGate.render(now);
-        DisplayManager::showSingleScore(colourGate.score());
+        colourQuest.render(now);
+        DisplayManager::showSingleScore(colourQuest.score());
+        break;
+      case GameId::Codebreaker:
+        codebreaker.render(now);
+        DisplayManager::showSingleScore(codebreaker.score());
         break;
 #else
       case GameId::Tennis1D:
@@ -453,7 +467,10 @@ void update(uint32_t now) {
           catch1D.update(now);
           break;
         case GameId::ColourGate:
-          colourGate.update(now);
+          colourQuest.update(now);
+          break;
+        case GameId::Codebreaker:
+          codebreaker.update(now);
           break;
 #else
         case GameId::Tennis1D:

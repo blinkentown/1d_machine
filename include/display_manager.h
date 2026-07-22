@@ -15,6 +15,7 @@ enum class Mode : uint8_t {
   Snake1D,
   Catch1D,
   ColourGate,
+  Codebreaker,
   Count,
 };
 

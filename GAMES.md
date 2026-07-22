@@ -13,8 +13,8 @@ The four buttons form two symmetric player interfaces:
 The two installed player encoders are decoded but never navigate the selector.
 The Player 1 encoder controls Twang. Both encoders control Tennis 1D. Colour
 Shooter, Pong, Reaction Race, and Colour Snake Duel retain their button
-controls. Catch 1D uses red and Colour Gate uses all four color buttons in the
-source-games profile. The Player 2 encoder click remains reserved.
+controls. Catch 1D uses red; Colour Gate and Codebreaker use all four color
+buttons in the source-games profile. The Player 2 encoder click remains reserved.
 
 ## Gameplay UI rule
 
@@ -40,7 +40,7 @@ The `sparkfun_promicro16_source_games` profile has its own compile-time
 catalog so unused games are removed by link-time optimization:
 
 ```text
-1P Catch 1D -> 1P Colour Gate -> repeat
+1P Catch 1D -> 1P Colour Gate -> 1P Codebreaker -> repeat
 ```
 
 To change power mode without restarting, remain at the game selector and hold
@@ -62,6 +62,7 @@ the blue and yellow game buttons together for two seconds.
 | Colour Snake Duel selected/running | Violet |
 | Catch 1D selected/running | Magenta |
 | Colour Gate selected/running | Azure |
+| Codebreaker selected/running | Violet |
 
 After a one-second power confirmation, the selector output returns to the
 selected game's color. Red is the PSU confirmation; green can be the brief
@@ -93,10 +94,11 @@ The selection display identifies player count and game:
 | 2 | Colour Snake Duel | `2P CSn` |
 | 1 | Catch 1D | `1P CtC` |
 | 1 | Colour Gate | `1P CGt` |
+| 1 | Codebreaker | `1P COd` |
 
 During play, the left three digits show Player 1 and the right three show
-Player 2. Twang, Colour Shooter, Catch 1D, and Colour Gate use the left
-field and leave the right field blank. Pong, Tennis, Reaction Race, and Colour
+Player 2. Twang, Colour Shooter, Catch 1D, Colour Gate, and Codebreaker use the
+left field and leave the right field blank. Pong, Tennis, Reaction Race, and Colour
 Snake Duel show both scores. Each field is right-aligned, has no leading
 zeroes, and is limited to 999. Lives remain visible on the LED strip.
 
@@ -279,6 +281,38 @@ Selector output: azure.
   one millisecond, from 10 ms down to 5 ms.
 - After three mistakes the gate flashes red; any color button restarts.
 - The display shows the score in the left field.
+
+After eight correct gates, a green sweep starts the Boss Deflect second stage:
+
+- A colored three-LED boss attack travels from the red boss toward the dim
+  white defense gate.
+- Press the matching red, green, blue, or yellow button while the attack is
+  inside the gate.
+- A correct defense turns the attack white and reflects it into the boss.
+- Wrong timing, wrong color, or a missed attack costs one of three green lives.
+- The first boss needs four reflected hits. Each cleared level adds one boss
+  hit point, accelerates incoming attacks, and restores one lost life.
+- The boss health is represented by the bright portion of its 24-LED body.
+- Defeating a boss produces a green strip sweep. Three mistakes produce a
+  flashing red game-over gate; any color button restarts.
+- The display continues the stage-one score and adds total reflected hits.
+
+## Codebreaker (source-games profile)
+
+Selector output: violet.
+
+- The center of the strip shows four empty white slots. Enter a four-color code
+  with the red, green, blue, and yellow buttons; repeated colors are allowed.
+- After four presses, four feedback blocks appear to the left: green means the
+  right color in the right position, orange means a right color in a different
+  position, and dim red means that color did not contribute to a match.
+- The completed guess colors and feedback remain visible until the next color
+  press. That press also becomes the first color of the next guess.
+- The eight small green LEDs at the strip start show remaining attempts.
+- Solve the secret within eight attempts to earn one point and receive a new
+  code. A green sweep confirms the solution.
+- If all attempts are used, the center slots reveal the secret. Press any color
+  button to restart. The display counts solved codes.
 
 ## Snake 1D (inactive source)
 

@@ -16,8 +16,8 @@ APA102/SK9822 strip and a SparkFun Pro Micro 5 V / 16 MHz.
 
 The default image keeps Meteor Dodge, Snake 1D, and Memory Sequence out of the
 selector to stay within the ATmega32U4 flash limit. The alternate
-`sparkfun_promicro16_source_games` is now a focused test image containing only
-the genuinely new Catch 1D and Colour Gate games.
+`sparkfun_promicro16_source_games` is a focused test image containing Catch 1D,
+Colour Gate with a Boss Deflect second stage, and Codebreaker.
 
 Detailed controls are in [GAMES.md](GAMES.md). Power wiring and runtime power
 modes are in [POWER_MODES.md](POWER_MODES.md). Firmware structure and memory
@@ -37,7 +37,8 @@ non-blocking managers; it does not copy the board-specific sketches wholesale.
   timing challenge.
 - [TWANG](https://github.com/MacLemon/TWANG) informed the dungeon, enemies,
   hazards, levels, attack, and effects; the local encoder and two-button
-  control scheme replaces its spring/accelerometer controller.
+  control scheme replaces its spring/accelerometer controller. Its boss and
+  projectile ideas also inform Colour Gate's second stage.
 
 ## Hardware
 
@@ -135,8 +136,8 @@ both the module's `3-2-1-6-5-4` grid order and the rotated segment geometry;
 
 During selection the display shows player count and a three-digit game code.
 The default profile uses `1P tNG`, `1P CSH`, `2P PnG`, `2P tEn`, `2P rAC`, and
-`2P CSn`; the source-games profile uses `1P CtC` and `1P CGt`. During play the
-display is split into two three-digit score fields.
+`2P CSn`; the source-games profile uses `1P CtC`, `1P CGt`, and `1P COd`.
+During play the display is split into two three-digit score fields.
 Player 1 is on the left and Player 2 is on the right. The right field stays
 blank in a single-player game. Values are right-aligned without leading zeroes
 and saturate at 999. Lives remain visible on the LED strip rather than as
@@ -167,13 +168,13 @@ produces faster movement; simple controls take priority over extra mechanics.
 The enhanced six-game default build with the Tennis 1D hardware test pending
 uses:
 
-- SRAM: 1748 / 2560 bytes (68.3%)
-- Flash: 27508 / 28672 bytes (95.9%)
+- SRAM: 1750 / 2560 bytes (68.4%)
+- Flash: 27512 / 28672 bytes (96.0%)
 
-The two-game source profile uses:
+The three-game source profile uses:
 
-- SRAM: 1499 / 2560 bytes (58.6%)
-- Flash: 19250 / 28672 bytes (67.1%)
+- SRAM: 1545 / 2560 bytes (60.4%)
+- Flash: 21878 / 28672 bytes (76.3%)
 
 The SRAM figure does not include peak stack usage. Future games must use small,
 fixed state and no additional LED framebuffer.
