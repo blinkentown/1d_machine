@@ -6,6 +6,7 @@
 #include "games/colour_shooter.h"
 #include "games/pong_1d.h"
 #include "games/reaction_race.h"
+#include "games/tennis_1d.h"
 #include "games/twang.h"
 #include "input_manager.h"
 #include "led_manager.h"
@@ -28,6 +29,7 @@ State state = State::Selecting;
 TwangGame twang;
 ColourShooterGame colourShooter;
 Pong1DGame pong;
+Tennis1DGame tennis;
 ReactionRaceGame reactionRace;
 ColourSnakeDuelGame colourSnakeDuel;
 PowerStressTest powerStressTest;
@@ -52,6 +54,8 @@ const __FlashStringHelper* gameName(GameId game) {
       return F("Colour Shooter");
     case GameId::Pong1D:
       return F("1D Pong");
+    case GameId::Tennis1D:
+      return F("Tennis 1D");
     case GameId::ReactionRace:
       return F("Reaction Race");
     case GameId::ColourSnakeDuel:
@@ -72,6 +76,8 @@ uint32_t gameColor(GameId game) {
       return Config::MODE_COLOUR_SHOOTER_COLOR;
     case GameId::Pong1D:
       return Config::MODE_PONG_COLOR;
+    case GameId::Tennis1D:
+      return Config::MODE_TENNIS_COLOR;
     case GameId::ReactionRace:
       return Config::MODE_REACTION_RACE_COLOR;
     case GameId::ColourSnakeDuel:
@@ -111,6 +117,9 @@ void startSelectedGame(uint32_t now) {
       break;
     case GameId::Pong1D:
       pong.start(now);
+      break;
+    case GameId::Tennis1D:
+      tennis.start(now);
       break;
     case GameId::ReactionRace:
       reactionRace.start(now);
@@ -258,6 +267,11 @@ void render(uint32_t now) {
         pong.render(now);
         DisplayManager::showVersusScore(pong.leftScore(), pong.rightScore());
         break;
+      case GameId::Tennis1D:
+        tennis.render(now);
+        DisplayManager::showVersusScore(tennis.player1Score(),
+                                        tennis.player2Score());
+        break;
       case GameId::ReactionRace:
         reactionRace.render(now);
         DisplayManager::showVersusScore(reactionRace.player1Score(),
@@ -355,6 +369,9 @@ void update(uint32_t now) {
           break;
         case GameId::Pong1D:
           pong.update(now);
+          break;
+        case GameId::Tennis1D:
+          tennis.update(now);
           break;
         case GameId::ReactionRace:
           reactionRace.update(now);

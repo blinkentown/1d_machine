@@ -11,9 +11,9 @@ The four buttons form two symmetric player interfaces:
 | Player 2 | Blue / P2-A | Yellow / P2-B |
 
 The two installed player encoders are decoded but never navigate the selector.
-The Player 1 encoder controls Twang. Colour Shooter, Pong, Reaction Race, and
-Colour Snake Duel retain their button controls. The Player 2 encoder and its
-click remain reserved.
+The Player 1 encoder controls Twang. Both encoders control Tennis 1D. Colour
+Shooter, Pong, Reaction Race, and Colour Snake Duel retain their button
+controls. The Player 2 encoder click remains reserved.
 
 ## Gameplay UI rule
 
@@ -31,7 +31,7 @@ never change menu state.
 The selector order is grouped by player count:
 
 ```text
-1P Twang -> 1P Colour Shooter -> 2P Pong -> 2P Reaction Race
+1P Twang -> 1P Colour Shooter -> 2P Pong -> 2P Tennis -> 2P Reaction Race
 -> 2P Colour Snake Duel -> repeat
 ```
 
@@ -49,6 +49,7 @@ the blue and yellow game buttons together for two seconds.
 | Twang selected/running | Orange |
 | Colour Shooter selected/running | Yellow |
 | 1D Pong selected/running | Blue |
+| Tennis 1D selected/running | Cyan |
 | Reaction Race selected/running | Green |
 | Colour Snake Duel selected/running | Violet |
 
@@ -77,12 +78,13 @@ The selection display identifies player count and game:
 | 1 | Twang | `1P tNG` |
 | 1 | Colour Shooter | `1P CSH` |
 | 2 | 1D Pong | `2P PnG` |
+| 2 | Tennis 1D | `2P tEn` |
 | 2 | Reaction Race | `2P rAC` |
 | 2 | Colour Snake Duel | `2P CSn` |
 
 During play, the left three digits show Player 1 and the right three show
 Player 2. Twang and Colour Shooter use Player 1 score and leave the Player 2
-field blank. Pong and Reaction Race show
+field blank. Pong, Tennis, and Reaction Race show
 both scores. Each field is right-aligned, has no leading zeroes, and is limited
 to 999. Lives remain visible on the LED strip.
 
@@ -185,6 +187,33 @@ Selector output: blue.
 - Game-over output: the winning 24-LED paddle flashes red on the left or blue
   on the right.
 - Any color button restarts after game over.
+
+## Tennis 1D
+
+Selector output: cyan.
+
+- Player 1's encoder moves the red racket inside the left 72-LED court;
+  Player 2's encoder moves the blue racket inside the right 72-LED court.
+- Each racket is 12 LEDs wide. Its bright three-LED edge faces the center and
+  is the only part that returns the ball; the dim remainder shows its body.
+- Encoder movement is physical-pixel based. Faster detents produce a faster
+  swing without an action button.
+- During flight, a dim marker shows the landing position. The cyan halo grows
+  toward the trajectory apex and contracts toward the landing point.
+- The opponent cannot touch the ball while it is airborne. After landing, the
+  ball continues toward that player's outside edge and becomes returnable.
+- Swinging the racket edge toward the center at contact determines return
+  power. Stationary or wrong-direction contact produces only a soft return.
+- Power levels move the next landing point progressively deeper and shorten
+  both flight and post-bounce time. A maximum-power ball lands only 14 LEDs
+  from the outside edge.
+- A player waiting near the center can therefore be overflown: the ball lands
+  behind the racket and keeps moving outward. Returning a deep shot strongly
+  requires early positioning plus a fast inward swing at the hit edge.
+- A missed ball reaching LED 0 or LED 287 awards the opponent one point.
+  Serves alternate automatically; first to five points wins.
+- During play the display shows Player 1 on the left and Player 2 on the right.
+  Encoder movement or either primary button restarts after game over.
 
 ## Reaction Race
 

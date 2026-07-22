@@ -8,6 +8,7 @@ enum class Mode : uint8_t {
   Twang,
   ColourShooter,
   Pong1D,
+  Tennis1D,
   ReactionRace,
   ColourSnakeDuel,
   Count,

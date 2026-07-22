@@ -28,6 +28,7 @@ There are no gameplay delays or dynamic allocations.
 | `games/colour_shooter` | Incoming targets, shots, lives, and impact effects |
 | `games/colour_snake_duel` | Pixel-moving snake halves, shots, rounds, and scores |
 | `games/pong_1d` | Ball, paddles, scoring, point delay, and serve states |
+| `games/tennis_1d` | Dual-encoder rackets, flight, bounce, returns, and score |
 | `games/reaction_race` | Random start, false starts, alternating inputs, rounds |
 | `games/snake_1d` | Inactive retained source: continuous color snake |
 
@@ -43,17 +44,18 @@ Pins are centralized in `include/pins.h`. Tunable values are centralized in
 - Render game objects directly into the shared LED buffer.
 - Check both SRAM and flash after every playable step.
 
-Reviewed five-game, two-encoder, and display build baseline:
+Six-game build after adding Tennis 1D, before its hardware play test:
 
-- Static SRAM: 1680 / 2560 bytes
-- Flash: 25060 / 28672 bytes
+- Static SRAM: 1734 / 2560 bytes
+- Flash: 27422 / 28672 bytes
 - Active game states: Colour Shooter 124 bytes, Colour Snake Duel 82 bytes,
-  Twang 34 bytes, Pong 24 bytes, and Reaction Race 24 bytes
+  Tennis 52 bytes, Twang 34 bytes, Pong 24 bytes, and Reaction Race 24 bytes
 
-The remaining 880 SRAM bytes also contain the runtime stack. Meteor Dodge,
+The remaining 826 SRAM bytes also contain the runtime stack. Meteor Dodge,
 Snake, and Memory are not instantiated or dispatched, so link-time optimization
-removes their firmware code while their source remains available. The remaining
-3612 flash bytes provide headroom for system UI and focused gameplay improvements.
+removes their firmware code while their source remains available. Only 1250
+flash bytes remain. If Tennis is accepted, retiring the older Pong implementation
+is the preferred way to recover development headroom.
 
 The AVR build enables link-time optimization, shared function prologues,
 reduced small-function inlining, unsplit wide values, and linker relaxation to
@@ -73,6 +75,8 @@ preserve flash for game logic.
   shots, the Pong ball, Colour Snake growth, Twang player interpolation, and
   Reaction Race trails all advance through physical LED coordinates rather
   than jumping by a full 12-LED game segment.
+- Tennis rackets move in physical pixels. Its airborne ball uses time-based
+  interpolation, and its post-bounce ball advances one physical pixel per step.
 - The TM1637 driver retains only six previous segment bytes and one state byte.
   It compares display content every rendered frame but transmits only after a
   visible change. The hardware-validated 100 us half-clock timing follows the
@@ -89,8 +93,9 @@ preserve flash for game logic.
 Player 1 owns D0/D1 plus red/green. Player 2 owns D2/D3 plus blue/yellow. Both
 encoder directions are independently configurable and were reversed together
 after the last hardware check. Twang consumes Player 1 encoder movement, uses
-red for attack, and green for a contextual one-obstacle jump. No other active
-game or selector consumes encoder deltas; Player 2 remains reserved.
+red for attack, and green for a contextual one-obstacle jump. Tennis consumes
+both encoder deltas and no gameplay button. No other active game or selector
+consumes encoder deltas.
 
 The illuminated selector owns cycle, start, and return behavior. D5 is the
 setup input. The existing D4 encoder click is reserved and ignored during
@@ -137,11 +142,11 @@ F while preserving the center segment and decimal-point bit.
 
 ## Review notes
 
-- Five controller-focused games are selectable. Meteor Dodge, Snake, and Memory
+- Six controller-focused games are selectable. Meteor Dodge, Snake, and Memory
   remain as inactive source code.
 - Both encoder decoders and installed hardware behavior are validated. Twang is
-  the first active encoder game; the archived Meteor prototype preserves the
-  earlier isolated test.
+  the validated 1P encoder game; Tennis is the first 2P dual-encoder game and
+  still needs its gameplay hardware test.
 - The encoder and six-digit TM1637 display are integrated and hardware-tested.
   All six digits and all six decimal points are validated on A0/A1.
 - FastLED current limiting is an estimate. The measured 3000 mA setting draws

@@ -68,6 +68,7 @@ constexpr uint32_t ENCODER_CLICK_COLOR = 0x8000FFUL;
 constexpr uint32_t MODE_TWANG_COLOR = 0xFF4000UL;
 constexpr uint32_t MODE_COLOUR_SHOOTER_COLOR = 0xFFFF00UL;
 constexpr uint32_t MODE_PONG_COLOR = 0x0000FFUL;
+constexpr uint32_t MODE_TENNIS_COLOR = 0x00FFFFUL;
 constexpr uint32_t MODE_REACTION_RACE_COLOR = 0x00FF00UL;
 constexpr uint32_t MODE_COLOUR_SNAKE_COLOR = 0x8000FFUL;
 constexpr uint32_t MODE_SNAKE_COLOR = 0x00FFFFUL;
@@ -99,6 +100,40 @@ static_assert((PONG_HIT_ZONE_LENGTH * GAME_PIXEL_WIDTH) %
                       PONG_HIT_QUALITY_BANDS ==
                   0,
               "Pong hit zone must divide into equal quality bands");
+
+constexpr uint8_t TENNIS_COURT_LENGTH = LED_COUNT / 4U;
+constexpr uint8_t TENNIS_PADDLE_WIDTH = GAME_PIXEL_WIDTH;
+constexpr uint8_t TENNIS_HIT_EDGE_WIDTH = TAPE_PIXEL_WIDTH;
+constexpr uint8_t TENNIS_ENCODER_PIXELS_PER_DETENT = 1;
+constexpr uint8_t TENNIS_LANDING_FRONT_MARGIN = GAME_PIXEL_WIDTH;
+constexpr uint8_t TENNIS_LANDING_DEPTH_STEP = 15;
+constexpr uint16_t TENNIS_FLIGHT_BASE_MS = 1050;
+constexpr uint8_t TENNIS_FLIGHT_SPEEDUP_MS = 130;
+constexpr uint8_t TENNIS_BOUNCE_BASE_STEP_MS = 22;
+constexpr uint8_t TENNIS_BOUNCE_SPEEDUP_MS = 4;
+constexpr uint16_t TENNIS_FAST_DETENT_MS = 35;
+constexpr uint16_t TENNIS_MEDIUM_DETENT_MS = 75;
+constexpr uint16_t TENNIS_SWING_MEMORY_MS = 140;
+constexpr uint16_t TENNIS_SERVE_DELAY_MS = 900;
+constexpr uint16_t TENNIS_POINT_DELAY_MS = 900;
+constexpr uint16_t TENNIS_HIT_EFFECT_MS = 180;
+constexpr uint8_t TENNIS_WINNING_SCORE = 5;
+constexpr uint32_t TENNIS_PLAYER_1_COLOR = 0xFF0000UL;
+constexpr uint32_t TENNIS_PLAYER_2_COLOR = 0x0000FFUL;
+constexpr uint32_t TENNIS_BALL_COLOR = 0xFFFFFFUL;
+constexpr uint32_t TENNIS_ARC_COLOR = 0x004040UL;
+constexpr uint32_t TENNIS_LANDING_MARKER_COLOR = 0x002020UL;
+static_assert(LED_COUNT % 4U == 0U,
+              "Tennis requires four equal court quarters");
+static_assert(TENNIS_PADDLE_WIDTH <= TENNIS_COURT_LENGTH,
+              "Tennis paddle must fit inside one player court");
+static_assert(TENNIS_LANDING_FRONT_MARGIN +
+                      3U * TENNIS_LANDING_DEPTH_STEP <
+                  TENNIS_COURT_LENGTH,
+              "Tennis deepest landing must remain inside the court");
+static_assert(TENNIS_BOUNCE_BASE_STEP_MS >
+                  4U * TENNIS_BOUNCE_SPEEDUP_MS,
+              "Tennis bounce interval must remain positive");
 
 constexpr uint8_t TWANG_STARTING_LIVES = 3;
 constexpr uint8_t TWANG_START_CELL = 1;

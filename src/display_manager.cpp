@@ -13,6 +13,7 @@ constexpr uint8_t SEGMENT_DP = 0x80;
 
 constexpr uint8_t GLYPH_A = 0x77;
 constexpr uint8_t GLYPH_C = 0x39;
+constexpr uint8_t GLYPH_E = 0x79;
 constexpr uint8_t GLYPH_G = 0x3D;
 constexpr uint8_t GLYPH_H = 0x76;
 constexpr uint8_t GLYPH_P = 0x73;
@@ -26,10 +27,11 @@ const uint8_t DIGIT_GLYPHS[10] PROGMEM = {
     0x6D, 0x7D, 0x07, 0x7F, 0x6F,
 };
 
-const uint8_t MODE_GLYPHS[15] PROGMEM = {
+const uint8_t MODE_GLYPHS[18] PROGMEM = {
     GLYPH_T, GLYPH_N, GLYPH_G,  // Twang: tNG
     GLYPH_C, GLYPH_S, GLYPH_H,  // Colour Shooter: CSH
     GLYPH_P, GLYPH_N, GLYPH_G,  // Pong: PnG
+    GLYPH_T, GLYPH_E, GLYPH_N,  // Tennis: tEn
     GLYPH_R, GLYPH_A, GLYPH_C,  // Reaction Race: rAC
     GLYPH_C, GLYPH_S, GLYPH_N,  // Colour Snake Duel: CSn
 };
@@ -193,6 +195,7 @@ void clear() {
 void showSelection(Mode mode) {
   uint8_t digits[DIGIT_COUNT] = {};
   const bool twoPlayers = mode == Mode::Pong1D ||
+                          mode == Mode::Tennis1D ||
                           mode == Mode::ReactionRace ||
                           mode == Mode::ColourSnakeDuel;
   digits[0] = digitGlyph(twoPlayers ? 2U : 1U);
