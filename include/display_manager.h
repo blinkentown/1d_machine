@@ -16,6 +16,7 @@ enum class Mode : uint8_t {
   Catch1D,
   ColourGate,
   Codebreaker,
+  LightsOut,
   Count,
 };
 

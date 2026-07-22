@@ -15,6 +15,7 @@ constexpr uint8_t GLYPH_A = 0x77;
 constexpr uint8_t GLYPH_C = 0x39;
 constexpr uint8_t GLYPH_D = 0x5E;
 constexpr uint8_t GLYPH_E = 0x79;
+constexpr uint8_t GLYPH_F = 0x71;
 constexpr uint8_t GLYPH_G = 0x3D;
 constexpr uint8_t GLYPH_H = 0x76;
 constexpr uint8_t GLYPH_P = 0x73;
@@ -29,7 +30,7 @@ const uint8_t DIGIT_GLYPHS[10] PROGMEM = {
     0x6D, 0x7D, 0x07, 0x7F, 0x6F,
 };
 
-const uint8_t MODE_GLYPHS[33] PROGMEM = {
+const uint8_t MODE_GLYPHS[36] PROGMEM = {
     GLYPH_T, GLYPH_N, GLYPH_G,  // Twang: tNG
     GLYPH_C, GLYPH_S, GLYPH_H,  // Colour Shooter: CSH
     GLYPH_P, GLYPH_N, GLYPH_G,  // Pong: PnG
@@ -41,6 +42,7 @@ const uint8_t MODE_GLYPHS[33] PROGMEM = {
     GLYPH_C, GLYPH_T, GLYPH_C,  // Catch 1D: CtC
     GLYPH_C, GLYPH_G, GLYPH_T,  // Colour Gate: CGt
     GLYPH_C, GLYPH_O, GLYPH_D,  // Codebreaker: COd
+    GLYPH_O, GLYPH_F, GLYPH_F,  // Lights Out: OFF
 };
 
 uint8_t previousDigits[DIGIT_COUNT] = {};

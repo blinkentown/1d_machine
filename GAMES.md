@@ -13,8 +13,9 @@ The four buttons form two symmetric player interfaces:
 The two installed player encoders are decoded but never navigate the selector.
 The Player 1 encoder controls Twang. Both encoders control Tennis 1D. Colour
 Shooter, Pong, Reaction Race, and Colour Snake Duel retain their button
-controls. Catch 1D uses red; Colour Gate and Codebreaker use all four color
-buttons in the source-games profile. The Player 2 encoder click remains reserved.
+controls. Catch 1D uses red; Colour Gate, Codebreaker, and Lights Out use the
+four color buttons in the source-games profile. The Player 2 encoder click
+remains reserved.
 
 ## Gameplay UI rule
 
@@ -40,7 +41,7 @@ The `sparkfun_promicro16_source_games` profile has its own compile-time
 catalog so unused games are removed by link-time optimization:
 
 ```text
-1P Catch 1D -> 1P Colour Gate -> 1P Codebreaker -> repeat
+1P Catch 1D -> 1P Colour Gate -> 1P Codebreaker -> 1P Lights Out -> repeat
 ```
 
 To change power mode without restarting, remain at the game selector and hold
@@ -63,6 +64,7 @@ the blue and yellow game buttons together for two seconds.
 | Catch 1D selected/running | Magenta |
 | Colour Gate selected/running | Azure |
 | Codebreaker selected/running | Violet |
+| Lights Out selected/running | Deep blue |
 
 After a one-second power confirmation, the selector output returns to the
 selected game's color. Red is the PSU confirmation; green can be the brief
@@ -95,10 +97,11 @@ The selection display identifies player count and game:
 | 1 | Catch 1D | `1P CtC` |
 | 1 | Colour Gate | `1P CGt` |
 | 1 | Codebreaker | `1P COd` |
+| 1 | Lights Out | `1P OFF` |
 
 During play, the left three digits show Player 1 and the right three show
-Player 2. Twang, Colour Shooter, Catch 1D, Colour Gate, and Codebreaker use the
-left field and leave the right field blank. Pong, Tennis, Reaction Race, and Colour
+Player 2. Twang, Colour Shooter, Catch 1D, Colour Gate, Codebreaker, and Lights
+Out use the left field and leave the right field blank. Pong, Tennis, Reaction Race, and Colour
 Snake Duel show both scores. Each field is right-aligned, has no leading
 zeroes, and is limited to 999. Lives remain visible on the LED strip.
 
@@ -313,6 +316,20 @@ Selector output: violet.
   code. A green sweep confirms the solution.
 - If all attempts are used, the center slots reveal the secret. Press any color
   button to restart. The display counts solved codes.
+
+## Lights Out (source-games profile)
+
+Selector output: deep blue.
+
+- The strip is divided into 24 cells. Blue cells are on; dark cells are off.
+- Two white edge pixels mark the selected cell.
+- Red moves the selection one cell left and green moves it one cell right. The
+  selection wraps at either end.
+- Blue toggles the selected cell and its immediate neighbors between on and off.
+- Yellow restores the current puzzle's original pattern.
+- Turn every cell off to solve the puzzle. A green sweep confirms success and
+  starts a more heavily scrambled, guaranteed-solvable puzzle.
+- The display counts solved puzzles.
 
 ## Snake 1D (inactive source)
 

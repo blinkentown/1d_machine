@@ -27,6 +27,7 @@ There are no gameplay delays or dynamic allocations.
 | `games/boss_deflect` | Colour Gate stage two: multi-level four-color boss fight |
 | `games/colour_quest` | Transition and score wrapper for both Colour Gate stages |
 | `games/codebreaker` | Source-games profile: four-button logic puzzle |
+| `games/lights_out` | Source-games profile: solvable linear toggle puzzle |
 | `games/twang` | Encoder dungeon movement, attack, jump, score, and level states |
 | `games/meteor_dodge` | Inactive retained source: encoder-tested dodge prototype |
 | `games/memory_sequence` | Inactive retained source: four-button sequence memory game |
@@ -62,8 +63,8 @@ so link-time optimization removes their firmware code. Only 1164 flash bytes
 remain there.
 
 The `sparkfun_promicro16_source_games` profile uses a separate compile-time
-catalog containing Catch 1D, two-stage Colour Gate, and Codebreaker. It uses
-1545 bytes of SRAM and 21878 bytes of flash. This keeps experimental games isolated
+catalog containing Catch 1D, two-stage Colour Gate, Codebreaker, and Lights
+Out. It uses 1567 bytes of SRAM and 23076 bytes of flash. This keeps experimental games isolated
 from the default image and leaves ample room for further prototypes.
 
 The AVR build enables link-time optimization, shared function prologues,
@@ -152,7 +153,7 @@ F while preserving the center segment and decimal-point bit.
 ## Review notes
 
 - Six controller-focused games are selectable in the default profile. The
-  source-games profile selects Catch 1D, Colour Gate, and Codebreaker; Meteor
+  source-games profile selects Catch 1D, Colour Gate, Codebreaker, and Lights Out; Meteor
   Dodge, Memory Sequence, and Snake 1D remain inactive source code.
 - Both encoder decoders and installed hardware behavior are validated. Twang is
   the validated 1P encoder game; Tennis is the first 2P dual-encoder game and
