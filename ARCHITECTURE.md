@@ -22,15 +22,17 @@ There are no gameplay delays or dynamic allocations.
 | `power_mode_manager` | Bench/PSU limits and runtime mode switching |
 | `power_stress_test` | Abortable 10-second full-strip load test |
 | `game_manager` | Game selection, confirmation, dispatch, and exit behavior |
+| `games/catch_1d` | Source-games profile: accelerating one-button timing game |
+| `games/colour_gate` | Source-games profile: four-color timing gate |
 | `games/twang` | Encoder dungeon movement, attack, jump, score, and level states |
 | `games/meteor_dodge` | Inactive retained source: encoder-tested dodge prototype |
-| `games/memory_sequence` | Inactive retained source: sequence memory game |
+| `games/memory_sequence` | Inactive retained source: four-button sequence memory game |
 | `games/colour_shooter` | Incoming targets, shots, lives, and impact effects |
 | `games/colour_snake_duel` | Pixel-moving snake halves, shots, rounds, and scores |
 | `games/pong_1d` | Ball, paddles, scoring, point delay, and serve states |
 | `games/tennis_1d` | Dual-encoder rackets, flight, bounce, returns, and score |
 | `games/reaction_race` | Random start, false starts, alternating inputs, rounds |
-| `games/snake_1d` | Inactive retained source: continuous color snake |
+| `games/snake_1d` | Inactive retained source: continuous four-button color snake |
 
 Pins are centralized in `include/pins.h`. Tunable values are centralized in
 `include/config.h`.
@@ -44,18 +46,22 @@ Pins are centralized in `include/pins.h`. Tunable values are centralized in
 - Render game objects directly into the shared LED buffer.
 - Check both SRAM and flash after every playable step.
 
-Six-game build after adding Tennis 1D, before its hardware play test:
+Enhanced six-game default build, before the Tennis 1D hardware play test:
 
-- Static SRAM: 1734 / 2560 bytes
-- Flash: 27422 / 28672 bytes
+- Static SRAM: 1748 / 2560 bytes
+- Flash: 27508 / 28672 bytes
 - Active game states: Colour Shooter 124 bytes, Colour Snake Duel 82 bytes,
   Tennis 52 bytes, Twang 34 bytes, Pong 24 bytes, and Reaction Race 24 bytes
 
-The remaining 826 SRAM bytes also contain the runtime stack. Meteor Dodge,
-Snake, and Memory are not instantiated or dispatched, so link-time optimization
-removes their firmware code while their source remains available. Only 1250
-flash bytes remain. If Tennis is accepted, retiring the older Pong implementation
-is the preferred way to recover development headroom.
+The remaining 812 SRAM bytes also contain the runtime stack. Meteor Dodge,
+Snake, and Memory are not instantiated or dispatched in the default profile,
+so link-time optimization removes their firmware code. Only 1164 flash bytes
+remain there.
+
+The `sparkfun_promicro16_source_games` profile uses a separate compile-time
+catalog containing only the new Catch 1D and Colour Gate games. It uses 1499
+bytes of SRAM and 19250 bytes of flash. This keeps experimental games isolated
+from the default image and leaves ample room for further prototypes.
 
 The AVR build enables link-time optimization, shared function prologues,
 reduced small-function inlining, unsplit wide values, and linker relaxation to
@@ -84,7 +90,7 @@ preserve flash for game logic.
 - Both encoder pairs use CHANGE interrupts, the shared quadrature transition
   table, four transitions per detent, and saturating pending deltas. Display
   and LED transfers therefore cannot hide normal player rotation.
-- No large local arrays were found. The 880-byte SRAM reserve still includes
+- No large local arrays were found. The 812-byte SRAM reserve still includes
   the unknown runtime stack, so a stack high-water measurement is recommended
   before adding another persistent buffer.
 
@@ -134,16 +140,17 @@ F while preserving the center segment and decimal-point bit.
    do not enable an encoder without a separate control-design and play test.
 6. Encoder speed should directly control movement speed. Prefer one action
    button and never exceed two; do not add mechanics without a clear purpose.
-7. Add the game to the explicit implemented-game checks and dispatch in
-   `game_manager.cpp`.
+7. Add the mode glyph to `display_manager` and place the game in the appropriate
+   compile-time `GAME_CATALOG` and dispatch blocks in `game_manager.cpp`.
 8. Keep power stress available only from the game selector.
 9. Document input controls and every visible selector/strip output.
 10. Build without warnings, inspect SRAM/flash, test on hardware, then commit.
 
 ## Review notes
 
-- Six controller-focused games are selectable. Meteor Dodge, Snake, and Memory
-  remain as inactive source code.
+- Six controller-focused games are selectable in the default profile. The
+  source-games profile selects Catch 1D and Colour Gate; Meteor Dodge, Memory
+  Sequence, and Snake 1D remain inactive source code.
 - Both encoder decoders and installed hardware behavior are validated. Twang is
   the validated 1P encoder game; Tennis is the first 2P dual-encoder game and
   still needs its gameplay hardware test.

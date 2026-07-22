@@ -1,12 +1,19 @@
 #include "game_manager.h"
 
+#include <avr/pgmspace.h>
+
 #include "config.h"
 #include "display_manager.h"
+#if GAME_SET_SOURCE_GAMES
+#include "games/catch_1d.h"
+#include "games/colour_gate.h"
+#else
 #include "games/colour_snake_duel.h"
 #include "games/colour_shooter.h"
-#include "games/pong_1d.h"
 #include "games/reaction_race.h"
 #include "games/tennis_1d.h"
+#endif
+#include "games/pong_1d.h"
 #include "games/twang.h"
 #include "input_manager.h"
 #include "led_manager.h"
@@ -24,14 +31,42 @@ enum class State : uint8_t {
   Running,
 };
 
+#if GAME_SET_SOURCE_GAMES
+const GameId GAME_CATALOG[] PROGMEM = {
+    GameId::Catch1D,
+    GameId::ColourGate,
+};
+#else
+const GameId GAME_CATALOG[] PROGMEM = {
+    GameId::Twang,
+    GameId::ColourShooter,
+    GameId::Pong1D,
+    GameId::Tennis1D,
+    GameId::ReactionRace,
+    GameId::ColourSnakeDuel,
+};
+#endif
+constexpr uint8_t GAME_COUNT = sizeof(GAME_CATALOG) / sizeof(GAME_CATALOG[0]);
+
+#if GAME_SET_SOURCE_GAMES
+uint8_t selectedGameIndex = 0;
+GameId selectedGame = GameId::Catch1D;
+#else
+uint8_t selectedGameIndex = 1;
 GameId selectedGame = GameId::ColourShooter;
+#endif
 State state = State::Selecting;
 TwangGame twang;
-ColourShooterGame colourShooter;
 Pong1DGame pong;
+#if GAME_SET_SOURCE_GAMES
+Catch1DGame catch1D;
+ColourGateGame colourGate;
+#else
+ColourShooterGame colourShooter;
 Tennis1DGame tennis;
 ReactionRaceGame reactionRace;
 ColourSnakeDuelGame colourSnakeDuel;
+#endif
 PowerStressTest powerStressTest;
 uint32_t lastRenderAt = 0;
 uint32_t modeButtonPressedAt = 0;
@@ -60,6 +95,14 @@ const __FlashStringHelper* gameName(GameId game) {
       return F("Reaction Race");
     case GameId::ColourSnakeDuel:
       return F("Colour Snake Duel");
+    case GameId::MemorySequence:
+      return F("Memory Sequence");
+    case GameId::Snake1D:
+      return F("Snake 1D");
+    case GameId::Catch1D:
+      return F("Catch 1D");
+    case GameId::ColourGate:
+      return F("Colour Gate");
     case GameId::Count:
       break;
   }
@@ -82,6 +125,14 @@ uint32_t gameColor(GameId game) {
       return Config::MODE_REACTION_RACE_COLOR;
     case GameId::ColourSnakeDuel:
       return Config::MODE_COLOUR_SNAKE_COLOR;
+    case GameId::MemorySequence:
+      return Config::MODE_MEMORY_COLOR;
+    case GameId::Snake1D:
+      return Config::MODE_SNAKE_COLOR;
+    case GameId::Catch1D:
+      return Config::MODE_CATCH_COLOR;
+    case GameId::ColourGate:
+      return Config::MODE_COLOUR_GATE_COLOR;
     case GameId::Count:
       break;
   }
@@ -95,14 +146,15 @@ void printSelection() {
 }
 
 void changeSelection(int8_t direction) {
-  const int8_t gameCount = static_cast<int8_t>(GameId::Count);
-  int8_t next = static_cast<int8_t>(selectedGame) + direction;
+  int8_t next = static_cast<int8_t>(selectedGameIndex) + direction;
   if (next < 0) {
-    next = gameCount - 1;
-  } else if (next >= gameCount) {
+    next = GAME_COUNT - 1;
+  } else if (next >= GAME_COUNT) {
     next = 0;
   }
-  selectedGame = static_cast<GameId>(next);
+  selectedGameIndex = static_cast<uint8_t>(next);
+  selectedGame = static_cast<GameId>(
+      pgm_read_byte(&GAME_CATALOG[selectedGameIndex]));
   printSelection();
 }
 
@@ -112,12 +164,22 @@ void startSelectedGame(uint32_t now) {
     case GameId::Twang:
       twang.start(now);
       break;
+#if !GAME_SET_SOURCE_GAMES
     case GameId::ColourShooter:
       colourShooter.start(now);
       break;
+#endif
     case GameId::Pong1D:
       pong.start(now);
       break;
+#if GAME_SET_SOURCE_GAMES
+    case GameId::Catch1D:
+      catch1D.start(now);
+      break;
+    case GameId::ColourGate:
+      colourGate.start(now);
+      break;
+#else
     case GameId::Tennis1D:
       tennis.start(now);
       break;
@@ -127,6 +189,7 @@ void startSelectedGame(uint32_t now) {
     case GameId::ColourSnakeDuel:
       colourSnakeDuel.start(now);
       break;
+#endif
     default:
       break;
   }
@@ -259,14 +322,26 @@ void render(uint32_t now) {
         twang.render(now);
         DisplayManager::showSingleScore(twang.score());
         break;
+#if !GAME_SET_SOURCE_GAMES
       case GameId::ColourShooter:
         colourShooter.render(now);
         DisplayManager::showSingleScore(colourShooter.score());
         break;
+#endif
       case GameId::Pong1D:
         pong.render(now);
         DisplayManager::showVersusScore(pong.leftScore(), pong.rightScore());
         break;
+#if GAME_SET_SOURCE_GAMES
+      case GameId::Catch1D:
+        catch1D.render(now);
+        DisplayManager::showSingleScore(catch1D.score());
+        break;
+      case GameId::ColourGate:
+        colourGate.render(now);
+        DisplayManager::showSingleScore(colourGate.score());
+        break;
+#else
       case GameId::Tennis1D:
         tennis.render(now);
         DisplayManager::showVersusScore(tennis.player1Score(),
@@ -282,6 +357,7 @@ void render(uint32_t now) {
         DisplayManager::showVersusScore(colourSnakeDuel.player1Score(),
                                         colourSnakeDuel.player2Score());
         break;
+#endif
       default:
         LedManager::clearStrip();
         break;
@@ -364,12 +440,22 @@ void update(uint32_t now) {
         case GameId::Twang:
           twang.update(now);
           break;
+#if !GAME_SET_SOURCE_GAMES
         case GameId::ColourShooter:
           colourShooter.update(now);
           break;
+#endif
         case GameId::Pong1D:
           pong.update(now);
           break;
+#if GAME_SET_SOURCE_GAMES
+        case GameId::Catch1D:
+          catch1D.update(now);
+          break;
+        case GameId::ColourGate:
+          colourGate.update(now);
+          break;
+#else
         case GameId::Tennis1D:
           tennis.update(now);
           break;
@@ -379,6 +465,7 @@ void update(uint32_t now) {
         case GameId::ColourSnakeDuel:
           colourSnakeDuel.update(now);
           break;
+#endif
         default:
           break;
       }

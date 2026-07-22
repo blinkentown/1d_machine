@@ -18,8 +18,9 @@ class Pong1DGame {
   };
 
   void serve(uint32_t now);
-  void handleHits(uint32_t now);
+  bool handleHits(uint32_t now);
   void applyHit(uint8_t depth, int8_t playerSide, uint32_t now);
+  uint8_t hitZoneWidth() const;
   void moveBall(uint32_t now);
   void awardPoint(bool leftPlayerScored, uint32_t now);
   void printScore() const;

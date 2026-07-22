@@ -27,32 +27,63 @@ void Pong1DGame::serve(uint32_t now) {
   phase_ = Phase::Playing;
 }
 
-void Pong1DGame::handleHits(uint32_t now) {
-  constexpr uint8_t hitZoneWidth =
+uint8_t Pong1DGame::hitZoneWidth() const {
+  constexpr uint8_t startingWidth =
       Config::PONG_HIT_ZONE_LENGTH * Config::GAME_PIXEL_WIDTH;
-
-  if (InputManager::wasPressed(Controls::PLAYER_1_PRIMARY) &&
-      ballDirection_ < 0 && ballPosition_ < hitZoneWidth) {
-    const uint8_t depth = hitZoneWidth - 1U - ballPosition_;
-    ballDirection_ = 1;
-    applyHit(depth, -1, now);
+  const uint8_t points = leftScore_ + rightScore_;
+  const uint8_t shrink =
+      points * Config::PONG_ZONE_SHRINK_PIXELS_PER_POINT;
+  if (shrink >= startingWidth - Config::PONG_MINIMUM_HIT_ZONE_PIXELS) {
+    return Config::PONG_MINIMUM_HIT_ZONE_PIXELS;
   }
+  return startingWidth - shrink;
+}
 
-  const uint16_t rightHitZoneStart =
-      Config::LED_COUNT - hitZoneWidth;
-  if (InputManager::wasPressed(Controls::PLAYER_2_PRIMARY) &&
-      ballDirection_ > 0 && ballPosition_ >= rightHitZoneStart) {
-    const uint8_t depth = ballPosition_ - rightHitZoneStart;
-    ballDirection_ = -1;
-    applyHit(depth, 1, now);
+bool Pong1DGame::handleHits(uint32_t now) {
+  const bool leftPressed =
+      InputManager::wasPressed(Controls::PLAYER_1_PRIMARY);
+  const bool rightPressed =
+      InputManager::wasPressed(Controls::PLAYER_2_PRIMARY);
+  const uint8_t zoneWidth = hitZoneWidth();
+
+  if (ballDirection_ < 0) {
+    if (leftPressed) {
+      if (ballPosition_ < zoneWidth) {
+        const uint8_t depth = zoneWidth - 1U - ballPosition_;
+        ballDirection_ = 1;
+        applyHit(depth, -1, now);
+      } else {
+        awardPoint(false, now);
+        return true;
+      }
+    } else if (rightPressed) {
+      awardPoint(true, now);
+      return true;
+    }
+  } else {
+    const uint16_t rightHitZoneStart = Config::LED_COUNT - zoneWidth;
+    if (rightPressed) {
+      if (ballPosition_ >= rightHitZoneStart) {
+        const uint8_t depth = ballPosition_ - rightHitZoneStart;
+        ballDirection_ = -1;
+        applyHit(depth, 1, now);
+      } else {
+        awardPoint(true, now);
+        return true;
+      }
+    } else if (leftPressed) {
+      awardPoint(false, now);
+      return true;
+    }
   }
+  return false;
 }
 
 void Pong1DGame::applyHit(uint8_t depth, int8_t playerSide, uint32_t now) {
-  constexpr uint8_t hitZoneWidth =
-      Config::PONG_HIT_ZONE_LENGTH * Config::GAME_PIXEL_WIDTH;
-  constexpr uint8_t bandWidth =
-      hitZoneWidth / Config::PONG_HIT_QUALITY_BANDS;
+  const uint8_t zoneWidth = hitZoneWidth();
+  const uint8_t bandWidth =
+      (zoneWidth + Config::PONG_HIT_QUALITY_BANDS - 1U) /
+      Config::PONG_HIT_QUALITY_BANDS;
   uint8_t quality = depth / bandWidth + 1U;
   if (quality > Config::PONG_HIT_QUALITY_BANDS) {
     quality = Config::PONG_HIT_QUALITY_BANDS;
@@ -158,7 +189,9 @@ void Pong1DGame::update(uint32_t now) {
     return;
   }
 
-  handleHits(now);
+  if (handleHits(now)) {
+    return;
+  }
   moveBall(now);
 }
 
@@ -196,8 +229,7 @@ void Pong1DGame::renderPerfectHit(uint32_t now) const {
 void Pong1DGame::render(uint32_t now) const {
   LedManager::clearStrip();
 
-  const uint8_t paddleWidth =
-      Config::PONG_PADDLE_LENGTH * Config::GAME_PIXEL_WIDTH;
+  const uint8_t paddleWidth = hitZoneWidth();
 
   if (phase_ == Phase::GameOver) {
     if ((now / 250U) % 2U == 0U) {

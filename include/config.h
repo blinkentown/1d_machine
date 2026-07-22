@@ -6,6 +6,10 @@
 #define ENABLE_SERIAL_DIAGNOSTICS 0
 #endif
 
+#ifndef GAME_SET_SOURCE_GAMES
+#define GAME_SET_SOURCE_GAMES 0
+#endif
+
 #if ENABLE_SERIAL_DIAGNOSTICS
 #define DEBUG_PRINT(...) Serial.print(__VA_ARGS__)
 #define DEBUG_PRINTLN(...) Serial.println(__VA_ARGS__)
@@ -73,6 +77,8 @@ constexpr uint32_t MODE_REACTION_RACE_COLOR = 0x00FF00UL;
 constexpr uint32_t MODE_COLOUR_SNAKE_COLOR = 0x8000FFUL;
 constexpr uint32_t MODE_SNAKE_COLOR = 0x00FFFFUL;
 constexpr uint32_t MODE_MEMORY_COLOR = 0x8000FFUL;
+constexpr uint32_t MODE_CATCH_COLOR = 0xFF00FFUL;
+constexpr uint32_t MODE_COLOUR_GATE_COLOR = 0x0080FFUL;
 
 constexpr uint16_t POWER_STRESS_DURATION_MS = 10000;
 constexpr uint32_t POWER_STRESS_COLOR = 0xFFFFFFUL;
@@ -82,6 +88,8 @@ constexpr uint32_t BENCH_MODE_READY_COLOR = 0x00FF00UL;
 
 constexpr uint8_t PONG_PADDLE_LENGTH = 2;
 constexpr uint8_t PONG_HIT_ZONE_LENGTH = PONG_PADDLE_LENGTH;
+constexpr uint8_t PONG_MINIMUM_HIT_ZONE_PIXELS = GAME_PIXEL_WIDTH;
+constexpr uint8_t PONG_ZONE_SHRINK_PIXELS_PER_POINT = 1;
 constexpr uint8_t PONG_HIT_QUALITY_BANDS = 3;
 constexpr uint16_t PONG_INITIAL_STEP_MS = 20;
 constexpr uint16_t PONG_MINIMUM_SERVE_STEP_MS = 14;
@@ -96,10 +104,11 @@ constexpr uint8_t PONG_WINNING_SCORE = 5;
 constexpr uint32_t PONG_BALL_COLOR = 0xFFFFFFUL;
 constexpr uint32_t PONG_LEFT_PLAYER_COLOR = BUTTON_1_COLOR;
 constexpr uint32_t PONG_RIGHT_PLAYER_COLOR = BUTTON_3_COLOR;
-static_assert((PONG_HIT_ZONE_LENGTH * GAME_PIXEL_WIDTH) %
-                      PONG_HIT_QUALITY_BANDS ==
-                  0,
-              "Pong hit zone must divide into equal quality bands");
+static_assert(PONG_MINIMUM_HIT_ZONE_PIXELS > 0,
+              "Pong minimum hit zone must be visible");
+static_assert(PONG_MINIMUM_HIT_ZONE_PIXELS <=
+                  PONG_HIT_ZONE_LENGTH * GAME_PIXEL_WIDTH,
+              "Pong minimum hit zone cannot exceed its starting width");
 
 constexpr uint8_t TENNIS_COURT_LENGTH = LED_COUNT / 4U;
 constexpr uint8_t TENNIS_PADDLE_WIDTH = GAME_PIXEL_WIDTH;
@@ -189,6 +198,45 @@ constexpr uint16_t MEMORY_INPUT_TIMEOUT_MS = 3500;
 constexpr uint16_t MEMORY_SUCCESS_MS = 700;
 constexpr uint32_t MEMORY_SUCCESS_COLOR = 0x00FF00UL;
 constexpr uint32_t MEMORY_ERROR_COLOR = 0xFF0000UL;
+
+constexpr uint8_t CATCH_INITIAL_TARGET_WIDTH = GAME_PIXEL_WIDTH * 3U;
+constexpr uint8_t CATCH_MINIMUM_TARGET_WIDTH = GAME_PIXEL_WIDTH;
+constexpr uint8_t CATCH_TARGET_SHRINK_PIXELS_PER_HIT = 2;
+constexpr uint8_t CATCH_MARKER_WIDTH = TAPE_PIXEL_WIDTH;
+constexpr uint8_t CATCH_INITIAL_STEP_MS = 14;
+constexpr uint8_t CATCH_MINIMUM_STEP_MS = 6;
+constexpr uint8_t CATCH_SPEEDUP_MS = 1;
+constexpr uint8_t CATCH_MAX_CATCHUP_STEPS = 12;
+constexpr uint16_t CATCH_HIT_EFFECT_MS = 300;
+constexpr uint32_t CATCH_TARGET_COLOR = 0x004000UL;
+constexpr uint32_t CATCH_MARKER_COLOR = 0xFFFFFFUL;
+constexpr uint32_t CATCH_SUCCESS_COLOR = 0x00FF00UL;
+constexpr uint32_t CATCH_ERROR_COLOR = 0xFF0000UL;
+static_assert(CATCH_MINIMUM_TARGET_WIDTH > 0,
+              "Catch minimum target must be visible");
+static_assert(CATCH_MINIMUM_TARGET_WIDTH <= CATCH_INITIAL_TARGET_WIDTH,
+              "Catch minimum target cannot exceed its starting width");
+static_assert(CATCH_INITIAL_TARGET_WIDTH <= LED_COUNT,
+              "Catch target must fit on the strip");
+
+constexpr uint8_t COLOUR_GATE_STARTING_LIVES = 3;
+constexpr uint16_t COLOUR_GATE_CENTER = LED_COUNT / 4U;
+constexpr uint8_t COLOUR_GATE_WIDTH = GAME_PIXEL_WIDTH * 2U;
+constexpr uint8_t COLOUR_GATE_CUE_WIDTH = TAPE_PIXEL_WIDTH;
+constexpr uint8_t COLOUR_GATE_INITIAL_STEP_MS = 10;
+constexpr uint8_t COLOUR_GATE_MINIMUM_STEP_MS = 5;
+constexpr uint8_t COLOUR_GATE_SPEEDUP_MS = 1;
+constexpr uint8_t COLOUR_GATE_SPEEDUP_EVERY = 3;
+constexpr uint8_t COLOUR_GATE_MAX_CATCHUP_STEPS = 12;
+constexpr uint16_t COLOUR_GATE_FEEDBACK_MS = 320;
+constexpr uint32_t COLOUR_GATE_COLOR = 0x202020UL;
+constexpr uint32_t COLOUR_GATE_SUCCESS_COLOR = 0x00FF00UL;
+constexpr uint32_t COLOUR_GATE_ERROR_COLOR = 0xFF0000UL;
+constexpr uint32_t COLOUR_GATE_LIFE_COLOR = 0x004000UL;
+static_assert(COLOUR_GATE_WIDTH > 0 &&
+                  COLOUR_GATE_CENTER >= COLOUR_GATE_WIDTH / 2U &&
+                  COLOUR_GATE_CENTER + COLOUR_GATE_WIDTH / 2U < LED_COUNT,
+              "Colour Gate target must fit on the strip");
 
 constexpr uint8_t COLOUR_SHOOTER_STARTING_LIVES = 3;
 constexpr uint8_t COLOUR_SHOOTER_TARGET_COUNT = 8;

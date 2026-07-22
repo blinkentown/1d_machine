@@ -13,7 +13,8 @@ The four buttons form two symmetric player interfaces:
 The two installed player encoders are decoded but never navigate the selector.
 The Player 1 encoder controls Twang. Both encoders control Tennis 1D. Colour
 Shooter, Pong, Reaction Race, and Colour Snake Duel retain their button
-controls. The Player 2 encoder click remains reserved.
+controls. Catch 1D uses red and Colour Gate uses all four color buttons in the
+source-games profile. The Player 2 encoder click remains reserved.
 
 ## Gameplay UI rule
 
@@ -35,6 +36,13 @@ The selector order is grouped by player count:
 -> 2P Colour Snake Duel -> repeat
 ```
 
+The `sparkfun_promicro16_source_games` profile has its own compile-time
+catalog so unused games are removed by link-time optimization:
+
+```text
+1P Catch 1D -> 1P Colour Gate -> repeat
+```
+
 To change power mode without restarting, remain at the game selector and hold
 the blue and yellow game buttons together for two seconds.
 
@@ -52,6 +60,8 @@ the blue and yellow game buttons together for two seconds.
 | Tennis 1D selected/running | Cyan |
 | Reaction Race selected/running | Green |
 | Colour Snake Duel selected/running | Violet |
+| Catch 1D selected/running | Magenta |
+| Colour Gate selected/running | Azure |
 
 After a one-second power confirmation, the selector output returns to the
 selected game's color. Red is the PSU confirmation; green can be the brief
@@ -81,12 +91,14 @@ The selection display identifies player count and game:
 | 2 | Tennis 1D | `2P tEn` |
 | 2 | Reaction Race | `2P rAC` |
 | 2 | Colour Snake Duel | `2P CSn` |
+| 1 | Catch 1D | `1P CtC` |
+| 1 | Colour Gate | `1P CGt` |
 
 During play, the left three digits show Player 1 and the right three show
-Player 2. Twang and Colour Shooter use Player 1 score and leave the Player 2
-field blank. Pong, Tennis, and Reaction Race show
-both scores. Each field is right-aligned, has no leading zeroes, and is limited
-to 999. Lives remain visible on the LED strip.
+Player 2. Twang, Colour Shooter, Catch 1D, and Colour Gate use the left
+field and leave the right field blank. Pong, Tennis, Reaction Race, and Colour
+Snake Duel show both scores. Each field is right-aligned, has no leading
+zeroes, and is limited to 999. Lives remain visible on the LED strip.
 
 ## Colour Snake Duel
 
@@ -176,16 +188,19 @@ Selector output: blue.
 - Green / P1-B and yellow / P2-B are reserved for later specials.
 - The 12-LED ball accelerates after successful returns.
 - Ball position advances one physical LED per movement step.
-- Each visible 24-LED paddle is also the complete hit zone.
-- The hit zone has three 8-LED accuracy bands. Deeper hits speed up the ball by
-  2, 4, or 6 ms for the current rally.
+- Each visible paddle is also the complete hit zone. Both start at 24 LEDs and
+  shrink by one physical LED after every point, down to a 12-LED minimum.
+- The current hit zone is divided into three accuracy bands. Deeper hits speed
+  up the ball by 2, 4, or 6 ms for the current rally.
+- Pressing before the ball reaches the correct player's hit zone awards the
+  point to the opponent.
 - After every point, the next serve starts 1 ms faster until its baseline
   reaches 14 ms. Rally boosts can reduce the interval further to 8 ms.
 - A perfect hit in the final 8 LEDs produces a 240 ms expanding white and
   player-colour explosion from that end of the strip.
 - First player to five points wins.
-- Game-over output: the winning 24-LED paddle flashes red on the left or blue
-  on the right.
+- Game-over output: the winning current-width paddle flashes red on the left
+  or blue on the right.
 - Any color button restarts after game over.
 
 ## Tennis 1D
@@ -236,10 +251,39 @@ Selector output: green.
   the full strip.
 - Any color game button restarts after game over.
 
+## Catch 1D (source-games profile)
+
+Selector output: magenta.
+
+- A white three-LED marker bounces between the two ends of the strip.
+- The dim green target starts 36 LEDs wide at strip center.
+- Press red / P1-A while the marker is inside the target.
+- A correct catch produces an expanding green effect, adds one point, makes
+  subsequent movement faster down to a six-millisecond pixel step, and shrinks
+  the target by two physical LEDs down to a 12-LED minimum.
+- Pressing outside the target ends the run and flashes the target red.
+- The display shows the catch count in the left score field.
+- Any color button restarts after game over.
+
+## Colour Gate (source-games profile)
+
+Selector output: azure.
+
+- A three-LED cue travels from the far end toward a dim white 24-LED gate.
+- The cue is randomly red, green, blue, or yellow.
+- Press the matching color button while the cue is inside the gate.
+- Correct timing and color add one point and flash the gate green.
+- A wrong color, early press, late press, or missed cue costs one of three
+  green life indicators and flashes the gate red.
+- Every three successful cues shorten the physical-pixel movement interval by
+  one millisecond, from 10 ms down to 5 ms.
+- After three mistakes the gate flashes red; any color button restarts.
+- The display shows the score in the left field.
+
 ## Snake 1D (inactive source)
 
-Snake 1D is retained in the repository but is not selectable in the focused
-five-game firmware.
+Snake 1D remains in the source tree but is excluded from both compiled game
+profiles.
 
 - A continuous row of 12-LED colored segments moves toward the player.
 - Adjacent normal segments always have different colors.
@@ -259,7 +303,7 @@ five-game firmware.
 ## Meteor Dodge (inactive source)
 
 Meteor Dodge is retained as an encoder-tested prototype but is not selectable
-in the focused five-game firmware.
+in either compiled game profile.
 
 - The white player begins at strip center. Each Player 1 encoder detent moves
   one 12-LED cell left or right.
@@ -277,8 +321,8 @@ in the focused five-game firmware.
 
 ## Memory Sequence (inactive source)
 
-Memory Sequence is retained in the repository but is not selectable in the
-focused five-game firmware.
+Memory Sequence remains in the source tree but is excluded from both compiled
+game profiles.
 
 - Four dim 12-LED stations represent red, green, blue, and yellow at fixed
   positions along the strip.

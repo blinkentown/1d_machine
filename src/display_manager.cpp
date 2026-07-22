@@ -27,13 +27,17 @@ const uint8_t DIGIT_GLYPHS[10] PROGMEM = {
     0x6D, 0x7D, 0x07, 0x7F, 0x6F,
 };
 
-const uint8_t MODE_GLYPHS[18] PROGMEM = {
+const uint8_t MODE_GLYPHS[30] PROGMEM = {
     GLYPH_T, GLYPH_N, GLYPH_G,  // Twang: tNG
     GLYPH_C, GLYPH_S, GLYPH_H,  // Colour Shooter: CSH
     GLYPH_P, GLYPH_N, GLYPH_G,  // Pong: PnG
     GLYPH_T, GLYPH_E, GLYPH_N,  // Tennis: tEn
     GLYPH_R, GLYPH_A, GLYPH_C,  // Reaction Race: rAC
     GLYPH_C, GLYPH_S, GLYPH_N,  // Colour Snake Duel: CSn
+    GLYPH_S, GLYPH_E, GLYPH_G,  // Memory Sequence: SEG
+    GLYPH_S, GLYPH_N, GLYPH_E,  // Snake 1D: SnE
+    GLYPH_C, GLYPH_T, GLYPH_C,  // Catch 1D: CtC
+    GLYPH_C, GLYPH_G, GLYPH_T,  // Colour Gate: CGt
 };
 
 uint8_t previousDigits[DIGIT_COUNT] = {};

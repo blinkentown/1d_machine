@@ -11,6 +11,10 @@ enum class Mode : uint8_t {
   Tennis1D,
   ReactionRace,
   ColourSnakeDuel,
+  MemorySequence,
+  Snake1D,
+  Catch1D,
+  ColourGate,
   Count,
 };
 
