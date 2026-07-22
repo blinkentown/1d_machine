@@ -2,7 +2,6 @@
 
 #include "config.h"
 #include "controls.h"
-#include "input_manager.h"
 #include "led_manager.h"
 
 namespace {
@@ -27,7 +26,7 @@ void MeteorDodgeGame::start(uint32_t now) {
     randomState_ = 1;
   }
   DEBUG_PRINTLN(F("Meteor Dodge started"));
-  DEBUG_PRINTLN(F("Red/Green move, Blue dashes, Yellow shields"));
+  DEBUG_PRINTLN(F("P1 encoder moves, Red dashes, Green shields"));
   startMeteor(now);
 }
 
@@ -85,26 +84,28 @@ void MeteorDodgeGame::resolveImpact(uint32_t now) {
 }
 
 void MeteorDodgeGame::update(uint32_t now) {
+  int8_t movement = Controls::rotation(Controls::Player::One);
   if (phase_ == Phase::GameOver) {
-    if (InputManager::wasPressed(InputManager::Button::Red) ||
-        InputManager::wasPressed(InputManager::Button::Green) ||
-        InputManager::wasPressed(InputManager::Button::Blue) ||
-        InputManager::wasPressed(InputManager::Button::Yellow)) {
+    if (movement != 0 ||
+        Controls::primaryPressed(Controls::Player::One) ||
+        Controls::secondaryPressed(Controls::Player::One)) {
       start(now);
     }
     return;
   }
 
-  if (InputManager::wasPressed(Controls::ONE_PLAYER_LEFT)) {
+  while (movement < 0) {
     move(-1, false, now);
+    ++movement;
   }
-  if (InputManager::wasPressed(Controls::ONE_PLAYER_RIGHT)) {
+  while (movement > 0) {
     move(1, false, now);
+    --movement;
   }
-  if (InputManager::wasPressed(Controls::ONE_PLAYER_ACTION)) {
+  if (Controls::primaryPressed(Controls::Player::One)) {
     move(facing_, true, now);
   }
-  if (InputManager::wasPressed(Controls::ONE_PLAYER_SPECIAL) &&
+  if (Controls::secondaryPressed(Controls::Player::One) &&
       !shieldActive_ && shields_ > 0) {
     --shields_;
     shieldActive_ = true;

@@ -44,14 +44,14 @@ Pins are centralized in `include/pins.h`. Tunable values are centralized in
 
 Reviewed five-game, two-encoder, and display build baseline:
 
-- Static SRAM: 1604 / 2560 bytes
-- Flash: 22258 / 28672 bytes
+- Static SRAM: 1606 / 2560 bytes
+- Flash: 22240 / 28672 bytes
 - Active game states: Colour Shooter 124 bytes, Twang 29 bytes, Pong 24 bytes,
   Meteor Dodge 19 bytes, and Reaction Race 18 bytes
 
-The remaining 956 SRAM bytes also contain the runtime stack. Snake and Memory
+The remaining 954 SRAM bytes also contain the runtime stack. Snake and Memory
 are not instantiated or dispatched, so link-time optimization removes their
-firmware code while their source remains available. The remaining 6414 flash
+firmware code while their source remains available. The remaining 6432 flash
 bytes provide headroom for system UI and focused gameplay improvements.
 
 The AVR build enables link-time optimization, shared function prologues,
@@ -75,18 +75,18 @@ preserve flash for game logic.
 - Both encoder pairs use CHANGE interrupts, the shared quadrature transition
   table, four transitions per detent, and saturating pending deltas. Display
   and LED transfers therefore cannot hide normal player rotation.
-- No large local arrays were found. The 956-byte SRAM reserve still includes
+- No large local arrays were found. The 954-byte SRAM reserve still includes
   the unknown runtime stack, so a stack high-water measurement is recommended
   before adding another persistent buffer.
 
 ## Player and system input boundary
 
 Player 1 owns D0/D1 plus red/green. Player 2 owns D2/D3 plus blue/yellow. Both
-encoder directions are independently configurable. Both directions were
-reversed together after the last hardware check, but encoder deltas are
-currently ignored by all games and the selector. Gameplay remains on the
-proven color-button UI until each encoder use is designed and tested
-separately.
+encoder directions are independently configurable and were reversed together
+after the last hardware check. Meteor Dodge is the first game to consume the
+Player 1 encoder: one detent moves one logical cell, red dashes, and green
+activates a shield. All other games and the selector ignore encoder deltas
+until each use is designed and tested separately.
 
 The illuminated selector owns cycle, start, and return behavior. D5 is the
 setup input. The existing D4 encoder click is reserved and ignored during
@@ -133,8 +133,8 @@ F while preserving the center segment and decimal-point bit.
 
 - Five controller-focused games are selectable. Snake and Memory remain as
   inactive source code.
-- Both encoder decoders and installed hardware behavior are validated. Encoder
-  gameplay integration is deliberately deferred.
+- Both encoder decoders and installed hardware behavior are validated. Meteor
+  Dodge is the first isolated encoder gameplay test; Twang is planned next.
 - The encoder and six-digit TM1637 display are integrated and hardware-tested.
   All six digits and all six decimal points are validated on A0/A1.
 - FastLED current limiting is an estimate. The measured 3000 mA setting draws

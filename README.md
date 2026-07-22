@@ -53,8 +53,9 @@ rails must not be tied together without proper power-source isolation.
 All switches use `INPUT_PULLUP`: released is `HIGH`, pressed is `LOW`.
 
 Player 1 owns red `P1-A` and green `P1-B`; Player 2 owns blue `P2-A` and
-yellow `P2-B`. Both encoders are installed and decoded, but intentionally
-reserved while their gameplay behavior is introduced one game at a time. The
+yellow `P2-B`. Both encoders are installed and decoded. The Player 1 encoder is
+active only in Meteor Dodge while gameplay behavior is introduced one game at
+a time; the Player 2 encoder remains reserved. The
 illuminated selector and setup button are system controls. A2 and A3 are the
 only two currently exposed, completely free direct GPIOs. See
 [GAMES.md](GAMES.md) for per-game assignments.
@@ -132,8 +133,8 @@ All tunable constants live in `include/config.h`.
 
 The reviewed five-game build with two encoders and TM1637 display uses:
 
-- SRAM: 1604 / 2560 bytes (62.7%)
-- Flash: 22258 / 28672 bytes (77.6%)
+- SRAM: 1606 / 2560 bytes (62.7%)
+- Flash: 22240 / 28672 bytes (77.6%)
 
 The SRAM figure does not include peak stack usage. Future games must use small,
 fixed state and no additional LED framebuffer.
@@ -141,9 +142,9 @@ fixed state and no additional LED framebuffer.
 ## Player and system inputs
 
 Both player encoders use interrupt-driven quadrature decoding. Their configured
-directions have been reversed together from the last hardware test, but their
-deltas are intentionally ignored by the selector and all five games. This
-keeps the proven button UI stable while encoder controls are added gradually.
+directions have been reversed together from the last hardware test. The Player
+1 encoder controls movement only in Meteor Dodge; all other games and the
+selector ignore encoder deltas while integration proceeds gradually.
 Short-press the illuminated selector to cycle games, hold it for about 0.8
 seconds to start, and press it during a game to return. D5 remains the dedicated
 setup input. A2/A3 are reserved for future system controls; until then,

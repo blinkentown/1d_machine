@@ -10,10 +10,10 @@ The four buttons form two symmetric player interfaces:
 | Player 1 | Red / P1-A | Green / P1-B |
 | Player 2 | Blue / P2-A | Yellow / P2-B |
 
-The two installed player encoders are decoded but currently ignored by every
-game and by the selector. They will be introduced carefully per game after
-separate play tests. The click in the Player 2 encoder is also reserved and
-ignored.
+The two installed player encoders are decoded but never navigate the selector.
+The Player 1 encoder is active only in Meteor Dodge. Twang is the next planned
+encoder integration; Colour Shooter, Pong, and Reaction Race retain their
+button controls. The Player 2 encoder and its click remain reserved.
 
 ## Selector and power-mode outputs
 
@@ -188,19 +188,19 @@ five-game firmware.
 
 Selector output: red.
 
-- The white player begins at strip center. Red moves one 12-LED cell left;
-  green moves one cell right.
-- Blue dashes three cells in the current direction, clamped inside
+- The white player begins at strip center. Each Player 1 encoder detent moves
+  one 12-LED cell left or right.
+- Red / P1-A dashes three cells in the current direction, clamped inside
   the play area, with a 700 ms recharge.
 - An orange pulsing cell warns where the next meteor will strike.
 - The impact expands across five cells as a rapid red-white blast. Being
   within two cells of its center costs one of three green lives.
-- Yellow spends one of three cyan shield indicators. The active
+- Green / P1-B spends one of three cyan shield indicators. The active
   shield colors the player cyan and absorbs the next otherwise damaging hit.
 - Each clean dodge increases score. Warning time falls from 1.2 seconds toward
   465 ms as score rises; the 360 ms impact animation remains constant.
 - Three hits produce a flashing red game-over blast at strip center.
-- Any color button restarts after game over.
+- Either Player 1 button or Player 1 encoder movement restarts after game over.
 
 ## Memory Sequence (inactive source)
 
