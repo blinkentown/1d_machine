@@ -82,6 +82,10 @@ constexpr uint32_t MODE_COLOUR_GATE_COLOR = 0x0080FFUL;
 constexpr uint32_t MODE_CODEBREAKER_COLOR = 0x8000FFUL;
 constexpr uint32_t MODE_LIGHTS_OUT_COLOR = 0x0040FFUL;
 constexpr uint32_t MODE_LIGHTS_OUT_DUEL_COLOR = 0x0080FFUL;
+constexpr uint32_t MODE_MINEFIELD_COLOR = 0xFF8000UL;
+constexpr uint32_t MODE_NIM_DUEL_COLOR = 0x00FFFFUL;
+constexpr uint32_t MODE_HANOI_COLOR = 0x00FF80UL;
+constexpr uint32_t MODE_WHACK_COLOR = 0xFF00FFUL;
 
 constexpr uint16_t POWER_STRESS_DURATION_MS = 10000;
 constexpr uint32_t POWER_STRESS_COLOR = 0xFFFFFFUL;
@@ -289,6 +293,62 @@ constexpr uint32_t LIGHTS_OUT_PLAYER_1_CURSOR_COLOR = 0xFF0000UL;
 constexpr uint32_t LIGHTS_OUT_PLAYER_2_CURSOR_COLOR = 0xFFFF00UL;
 constexpr uint32_t LIGHTS_OUT_SUCCESS_COLOR = 0x00FF00UL;
 constexpr uint32_t LIGHTS_OUT_TIE_COLOR = 0xFF8000UL;
+
+constexpr uint8_t MINEFIELD_BASE_MINES = 4;
+constexpr uint8_t MINEFIELD_MAX_MINES = 8;
+constexpr uint8_t MINEFIELD_MORE_MINES_EVERY = 2;
+constexpr uint16_t MINEFIELD_SUCCESS_MS = 900;
+constexpr uint32_t MINEFIELD_HIDDEN_COLOR = 0x060606UL;
+constexpr uint32_t MINEFIELD_CLEAR_COLOR = 0x004000UL;
+constexpr uint32_t MINEFIELD_ONE_COLOR = 0x0040FFUL;
+constexpr uint32_t MINEFIELD_TWO_COLOR = 0xFF8000UL;
+constexpr uint32_t MINEFIELD_FLAG_COLOR = 0xFFFF00UL;
+constexpr uint32_t MINEFIELD_MINE_COLOR = 0xFF0000UL;
+constexpr uint32_t MINEFIELD_CURSOR_COLOR = 0xFFFFFFUL;
+constexpr uint32_t MINEFIELD_SUCCESS_COLOR = 0x00FF00UL;
+static_assert(MINEFIELD_BASE_MINES > 0 &&
+                  MINEFIELD_BASE_MINES <= MINEFIELD_MAX_MINES,
+              "Minefield mine counts must be ordered");
+
+constexpr uint8_t NIM_STARTING_STONES = 21;
+constexpr uint8_t NIM_MAX_TAKE = 3;
+constexpr uint16_t NIM_ROUND_FEEDBACK_MS = 900;
+constexpr uint32_t NIM_STONE_COLOR = 0x202020UL;
+constexpr uint32_t NIM_PLAYER_1_COLOR = 0xFF0000UL;
+constexpr uint32_t NIM_PLAYER_2_COLOR = 0x0080FFUL;
+static_assert(NIM_MAX_TAKE > 0 && NIM_MAX_TAKE <= NIM_STARTING_STONES,
+              "Nim take range must fit its starting pile");
+
+constexpr uint8_t HANOI_STARTING_DISKS = 3;
+constexpr uint8_t HANOI_MAX_DISKS = 5;
+constexpr uint16_t HANOI_ERROR_MS = 320;
+constexpr uint16_t HANOI_LEVEL_CLEAR_MS = 900;
+constexpr uint32_t HANOI_PEG_COLOR = 0x101010UL;
+constexpr uint32_t HANOI_GOAL_COLOR = 0x004000UL;
+constexpr uint32_t HANOI_SELECTION_COLOR = 0xFFFFFFUL;
+constexpr uint32_t HANOI_ERROR_COLOR = 0xFF0000UL;
+constexpr uint32_t HANOI_SUCCESS_COLOR = 0x00FF00UL;
+static_assert(HANOI_STARTING_DISKS > 0 &&
+                  HANOI_STARTING_DISKS <= HANOI_MAX_DISKS,
+              "Hanoi disk counts must be ordered");
+
+constexpr uint8_t WHACK_STARTING_LIVES = 3;
+constexpr uint16_t WHACK_INITIAL_DURATION_MS = 1100;
+constexpr uint16_t WHACK_MINIMUM_DURATION_MS = 420;
+constexpr uint8_t WHACK_SPEEDUP_MS = 20;
+constexpr uint8_t WHACK_TWO_TARGET_SCORE = 8;
+constexpr uint8_t WHACK_THREE_TARGET_SCORE = 24;
+constexpr uint8_t WHACK_TARGET_WIDTH = GAME_PIXEL_WIDTH * 3U;
+constexpr uint16_t WHACK_ERROR_MS = 280;
+constexpr uint32_t WHACK_DIM_RED = 0x100000UL;
+constexpr uint32_t WHACK_DIM_GREEN = 0x001000UL;
+constexpr uint32_t WHACK_DIM_BLUE = 0x000010UL;
+constexpr uint32_t WHACK_DIM_YELLOW = 0x101000UL;
+constexpr uint32_t WHACK_TARGET_CORE_COLOR = 0xFFFFFFUL;
+constexpr uint32_t WHACK_ERROR_COLOR = 0xFF0000UL;
+constexpr uint32_t WHACK_LIFE_COLOR = 0x00FF00UL;
+static_assert(WHACK_INITIAL_DURATION_MS > WHACK_MINIMUM_DURATION_MS,
+              "Whack duration must be able to decrease");
 
 constexpr uint8_t COLOUR_SHOOTER_STARTING_LIVES = 3;
 constexpr uint8_t COLOUR_SHOOTER_TARGET_COUNT = 8;
